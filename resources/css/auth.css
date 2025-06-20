@@ -1,0 +1,154 @@
+/* public/css/auth.css */
+
+/* 整體頁面樣式 */
+body {
+    font-family: 'Helvetica Neue', Arial, '蘋方-繁', 'Microsoft JhengHei', sans-serif;
+    background-color: #f4f7f9;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 主要容器 */
+.auth-container {
+    max-width: 420px;
+    width: 100%;
+    margin: 40px auto;
+    background-color: #ffffff;
+    padding: 30px 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+/* 標題 */
+.auth-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* 分頁標籤容器 */
+.auth-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+/* 單一分頁標籤 */
+.auth-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    background-color: #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-bottom: 3px solid transparent;
+    color: #6c757d;
+}
+
+.auth-tab:first-child {
+    border-top-left-radius: 8px;
+}
+
+.auth-tab:last-child {
+    border-top-right-radius: 8px;
+}
+
+/* 被選中的分頁標籤 */
+.auth-tab.active {
+    background-color: #ffffff;
+    border-bottom: 3px solid #007bff;
+    color: #007bff;
+    font-weight: 500;
+}
+
+/* 表單 */
+.auth-form {
+    display: none;
+    /* 預設隱藏 */
+}
+
+.auth-form.active {
+    display: block;
+    /* 顯示被選中的表單 */
+}
+
+/* 表單中的輸入框群組 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* 輸入框 */
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    /* 確保 padding 不會影響寬度 */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* 按鈕 */
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #1e7e34;
+}
+
+/* 訊息提示框 */
+.alert {
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    list-style: none;
+    padding-left: 0;
+}
+
+.alert-danger p {
+    margin: 0;
+}
