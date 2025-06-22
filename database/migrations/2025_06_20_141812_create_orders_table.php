@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number', 32);
-            $table->string('user_account', 64)->index();
-            $table->unsignedBigInteger('idle_id')->index();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
             $table->decimal('order_price', 10, 2);
             $table->tinyInteger('payment_status')->default(0);
             $table->string('payment_way', 32)->default('面交');
@@ -23,9 +23,6 @@ return new class extends Migration
             $table->enum('order_status', ['pending', 'success', 'cancelled', 'failed'])->default('pending');
             $table->string('cancel_reason', 128)->nullable();
             $table->json('meetup_location')->nullable();
-
-            $table->foreign('user_account')->references('account')->on('users')->onDelete('cascade');
-            $table->foreign('idle_id')->references('id')->on('idle_items')->onDelete('cascade');
         });
     }
 

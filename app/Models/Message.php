@@ -3,24 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Message extends Model {
-    public $timestamps = false;
+    const UPDATED_AT = null;
 
-    // 訊息屬於一個聊天室
-    public function conversation() {
-        return $this->belongsTo(Conversation::class, 'conversation_id', 'id');
+    public function conversation(): BelongsTo {
+        return $this->belongsTo(Conversation::class);
     }
-    // 訊息的發送者
-    public function sender() {
-        return $this->belongsTo(User::class, 'sender_account', 'account');
+
+    public function sender(): BelongsTo {
+        return $this->belongsTo(User::class, 'sender_id');
     }
-    // 訊息可能關聯一個商品
-    public function item() {
-        return $this->belongsTo(IdleItem::class, 'idle_id', 'id');
+
+    public function idleItem(): BelongsTo {
+        return $this->belongsTo(IdleItem::class);
     }
-    // 訊息可能有多個附件
-    public function attachments() {
-        return $this->hasMany(MessageAttachment::class, 'message_id', 'id');
+
+    public function attachments(): HasMany {
+        return $this->hasMany(MessageAttachment::class);
     }
 }

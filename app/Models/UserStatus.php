@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserStatus extends Model {
     protected $table = 'user_statuses';
@@ -10,6 +11,6 @@ class UserStatus extends Model {
 
     // 一個狀態屬於一個用戶
     public function user() {
-        return $this->belongsTo(User::class, 'user_account', 'account');
+        return $this->belongsTo(User::class);
     }
 }

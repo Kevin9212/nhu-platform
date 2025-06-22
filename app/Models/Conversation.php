@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Conversation extends Model {
-    // 此表有 created_at, updated_at，不需設定 $timestamps = false;
-
-    // 聊天室的買家
-    public function buyer() {
-        return $this->belongsTo(User::class, 'buyer_account', 'account');
+    // Laravel 會自動尋找 created_at 和 updated_at 這兩個欄位
+    public function buyer(): BelongsTo {
+        return $this->belongsTo(User::class, 'buyer_id');
     }
-    // 聊天室的賣家
-    public function seller() {
-        return $this->belongsTo(User::class, 'seller_account', 'account');
+    // Laravel 會自動尋找 seller_id 這個外鍵
+    public function seller(): BelongsTo {
+        return $this->belongsTo(User::class, 'seller_id');
     }
-    // 聊天室有多則訊息
-    public function messages() {
-        return $this->hasMany(Message::class, 'conversation_id', 'id');
+    // Laravel 會自動尋找 idle_item_id 這個外鍵
+    public function messages(): HasMany {
+        return $this->hasMany(Message::class);
     }
 }

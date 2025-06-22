@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('system_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('user_account', 64)->nullable()->index();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->string('action_type', 64);
             $table->text('action_detail')->nullable();
             $table->string('ip_address', 45)->nullable();
             $table->timestamp('created_at')->useCurrent()->index();
-
-            $table->foreign('user_account')->references('account')->on('users')->onDelete('set null');
         });
     }
 

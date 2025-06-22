@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model {
     public $timestamps = false;
 
-    // 一個分類下有多個商品
-    public function idleItems() {
-        return $this->hasMany(IdleItem::class, 'idle_label', 'id');
+    public function idleItems(): HasMany {
+        // Laravel 會自動尋找 category_id 這個外鍵
+        return $this->hasMany(IdleItem::class);
     }
 }

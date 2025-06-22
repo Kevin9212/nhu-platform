@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id(); // id() 等同於 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+            $table->id();
             $table->string('name', 64);
         });
     }

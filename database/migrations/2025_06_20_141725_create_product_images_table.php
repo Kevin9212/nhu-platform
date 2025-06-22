@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
+            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
             $table->string('image_url', 256);
-
-            $table->foreign('product_id')->references('id')->on('idle_items')->onDelete('cascade');
         });
     }
 

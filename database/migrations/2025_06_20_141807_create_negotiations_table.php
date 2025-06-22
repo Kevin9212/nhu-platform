@@ -12,18 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('negotiations', function (Blueprint $table) {
-            $table->string('buyer_account', 64);
-            $table->string('seller_account', 64);
-            $table->unsignedBigInteger('idle_id');
+            $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
             $table->decimal('offered_price', 10, 2);
             $table->timestamp('negotiation_time')->useCurrent();
 
             // 複合主鍵
-            $table->primary(['buyer_account', 'seller_account', 'idle_id']);
-
-            $table->foreign('buyer_account')->references('account')->on('users')->onDelete('cascade');
-            $table->foreign('seller_account')->references('account')->on('users')->onDelete('cascade');
-            $table->foreign('idle_id')->references('id')->on('idle_items')->onDelete('cascade');
+            $table->primary(['buyer_id', 'seller_id', 'idle_item_id']);
         });
     }
 

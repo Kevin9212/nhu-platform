@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductImage extends Model {
     protected $table = 'product_images';
     public $timestamps = false;
 
-    // 一張圖片屬於一個商品
-    public function item() {
-        return $this->belongsTo(IdleItem::class, 'product_id', 'id');
+    public function idleItem(): BelongsTo {
+        // Laravel 會自動尋找 idle_item_id
+        return $this->belongsTo(IdleItem::class);
     }
 }

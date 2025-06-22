@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('meetup_locations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idle_id');
+            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
             $table->string('location_address', 128);
             $table->decimal('latitude', 9, 6)->nullable();
             $table->decimal('longitude', 9, 6)->nullable();
-
-            $table->foreign('idle_id')->references('id')->on('idle_items')->onDelete('cascade');
         });
     }
 

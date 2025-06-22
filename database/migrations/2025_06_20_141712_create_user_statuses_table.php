@@ -9,17 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+    public function up(): void {
         Schema::create('user_statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('user_account', 64);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('warnings_count')->default(0);
             $table->integer('suspension_count')->default(0);
             $table->decimal('rating', 3, 2)->default(5.00)->index();
             $table->timestamp('updated_time')->useCurrent()->useCurrentOnUpdate();
-
-            $table->foreign('user_account')->references('account')->on('users')->onDelete('cascade');
         });
     }
 

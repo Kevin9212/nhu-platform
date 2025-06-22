@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Favorite extends Model {
-    public $timestamps = false;
+    
+    const CREATED_AT = 'create_time';
+    const UPDATED_AT = null;
 
-    // 一個收藏紀錄屬於一個用戶
-    public function user() {
-        return $this->belongsTo(User::class, 'user_account', 'account');
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class);
     }
-    // 一個收藏紀錄屬於一個商品
-    public function item() {
-        return $this->belongsTo(IdleItem::class, 'idle_id', 'id');
+    
+    public function idleItem(): BelongsTo {
+        return $this->belongsTo(IdleItem::class);
     }
 }

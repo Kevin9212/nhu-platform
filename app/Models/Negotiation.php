@@ -3,23 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Negotiation extends Model {
-    // 注意：Laravel Eloquent 原生不支援複合主鍵
-    // 這裡我們不設定主鍵，但關聯依舊可以正常運作
     public $incrementing = false;
-    public $timestamps = false;
+    const CREATED_AT = 'negotiation_time';
+    const UPDATED_AT = null;
 
-    // 議價的買家
-    public function buyer() {
-        return $this->belongsTo(User::class, 'buyer_account', 'account');
+    public function buyer(): BelongsTo {
+        return $this->belongsTo(User::class, 'buyer_id');
     }
-    // 議價的賣家
-    public function seller() {
-        return $this->belongsTo(User::class, 'seller_account', 'account');
+
+    public function seller(): BelongsTo {
+        return $this->belongsTo(User::class, 'seller_id');
     }
-    // 議價的商品
-    public function item() {
-        return $this->belongsTo(IdleItem::class, 'idle_id', 'id');
+
+    public function idleItem(): BelongsTo {
+        return $this->belongsTo(IdleItem::class);
     }
 }

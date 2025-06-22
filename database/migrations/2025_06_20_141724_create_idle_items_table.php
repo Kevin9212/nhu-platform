@@ -9,18 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+    public function up(): void {
         Schema::create('idle_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('current_buyer_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('idle_name', 128);
             $table->text('idle_details');
             $table->decimal('idle_price', 10, 2)->index();
-            $table->unsignedBigInteger('idle_label');
             $table->timestamp('release_time')->useCurrent();
             $table->tinyInteger('idle_status')->default(1);
-            $table->string('user_account', 64);
-            $table->string('current_buyer_account', 64)->nullable();
 
             // 租屋專屬
             $table->boolean('is_rental')->default(false);
@@ -32,12 +31,7 @@ return new class extends Migration
             $table->json('meetup_location')->nullable();
 
             // 索引
-            $table->index(['idle_label', 'idle_status'], 'idx_label_status');
-
-            // 外鍵
-            $table->foreign('user_account')->references('account')->on('users')->onDelete('cascade');
-            $table->foreign('idle_label')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('current_buyer_account')->references('account')->on('users')->onDelete('set null');
+            $table->index(['category_id', 'idle_status'], 'idx_label_status');
         });
     }
 

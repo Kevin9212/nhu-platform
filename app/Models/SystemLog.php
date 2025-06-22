@@ -10,6 +10,6 @@ class SystemLog extends Model {
 
     // 日誌可能由某個用戶觸發
     public function user() {
-        return $this->belongsTo(User::class, 'user_account', 'account');
+        return $this->belongsTo(User::class);
     }
 }

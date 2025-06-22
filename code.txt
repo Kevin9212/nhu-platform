@@ -46,8 +46,13 @@ php artisan make:model SystemLog
 php artisan migrate
 
 php artisan make:controller UserController
+----------------------------------------------
 
+php artisan make:controller IdleItemController --resource
 
+php artisan make:controller Auth\\PasswordResetController
 
 啓動伺服器
 php artisan serve
+
+
