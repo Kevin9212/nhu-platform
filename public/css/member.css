@@ -1,0 +1,112 @@
+/* public/css/member.css */
+
+/* --- 主要佈局 --- */
+.member-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    /* 讓兩欄頂部對齊 */
+}
+
+.member-nav {
+    flex-basis: 220px;
+    /* 左側導覽列固定寬度 */
+    flex-shrink: 0;
+}
+
+.member-content {
+    flex-grow: 1;
+    /* 右側內容填滿剩餘空間 */
+    min-width: 0;
+    /* 避免內容過多時撐開佈局 */
+}
+
+/* --- 左側導覽選單 --- */
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    padding: 0.75rem;
+}
+
+.nav-list li a {
+    display: block;
+    padding: 0.85rem 1rem;
+    color: #333;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    font-weight: 500;
+}
+
+.nav-list li a.active,
+.nav-list li a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* --- 右側內容區塊 --- */
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 我的刊登列表樣式 --- */
+.listings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.listings-table th,
+.listings-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.listings-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.listings-table img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.listings-table .action-buttons a {
+    margin-right: 10px;
+    font-size: 0.9rem;
+    color: #007bff;
+}
+
+.listings-table .action-buttons a.delete {
+    color: #dc3545;
+}

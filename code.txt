@@ -1,3 +1,20 @@
+首頁、
+商品列表(搜尋、分類結果)、
+商品詳細頁、
+租屋頁、
+使用者中心、
+賣家刊登頁面(商品上架表單、租屋上架表單)、
+交易紀錄(買家賣家交易紀錄、訂單狀態)、
+註冊登入頁面、
+通知中心、
+議價功能、
+評分系統、
+聊天功能、
+選擇面交時間與地點
+
+
+
+
 php.ini
     extension=fileinfo
     extension=pdo_mysql
@@ -52,6 +69,12 @@ php artisan make:controller IdleItemController --resource
 
 php artisan make:controller Auth\\PasswordResetController
 
+php artisan make:controller MemberController
+
+
+-------------------------------------------------
+php artisan make:migration add_parent_id_to_categories_table --table=categories
+修改資料表
 啓動伺服器
 php artisan serve
 

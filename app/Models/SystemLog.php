@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SystemLog extends Model {
     protected $table = 'system_logs';
-    public $timestamps = false;
+    const UPDATED_AT = null;
 
-    // 日誌可能由某個用戶觸發
-    public function user() {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 }

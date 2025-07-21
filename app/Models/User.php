@@ -2,37 +2,39 @@
 
 namespace App\Models;
 
-
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable {
-    /**
-     * 因爲我們的主鍵不是預設的'id'
-     * 所以必須加上這三行，告訴laravel 如何處理。
-     *protected $primaryKey = 'account'; // 指定主鍵名稱
-     *public $incrementing = false; // 主鍵不是自增的
-     *protected $keyType = 'string'; // 主鍵類型是字符串  
-     */
-    // Laravel 預設的時間戳欄位是 created_at 和 updated_at
-    // 如果你的資料表沒有這些欄位，可以關閉自動管理時間戳
+    // 因為您的 users 資料表沒有 created_at 和 updated_at，所以保留這行
     public $timestamps = false;
 
-
-    // 告訴 Laravel 密碼的欄位叫'user_password'
-    public function getAuthPassword() {
+    /**
+     * 告訴 Laravel 我們的密碼欄位叫做 'user_password'。
+     * @return string
+     */
+    public function getAuthPassword(): string {
         return $this->user_password;
     }
 
-    // 定義關聯：一對多User個商品
-    public function idleItem() {
-        // 參數：關聯的模型，外鍵欄位，本地主鍵欄位
+    /**
+     * 定義關聯：一個 User 可以有多個刊登商品 (IdleItem)。
+     * 我們使用複數的 idleItems() 來表示「一對多」的關係。
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function idleItems(): HasMany {
+        // Laravel 會自動根據方法名稱，去尋找 user_id 這個外鍵
         return $this->hasMany(IdleItem::class);
     }
 
-    // 關聯：一個user有一個狀態
+    /**
+     * 定義關聯：一個 User 有一個狀態 (UserStatus)。
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function status(): HasOne {
+        // Laravel 會自動尋找 user_id 這個外鍵
         return $this->hasOne(UserStatus::class);
     }
+    
 }

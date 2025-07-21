@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 64);
+            $table->string('name', 64)->unique();
+            $table->tinyInteger('sort_order')->default(0);
         });
     }
 
