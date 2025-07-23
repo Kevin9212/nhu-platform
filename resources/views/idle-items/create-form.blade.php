@@ -42,8 +42,9 @@
     </div>
 
     <div class="form-group">
-        <label for="image" style="display: block; margin-bottom: 5px; font-weight: bold;">商品圖片</label>
-        <input id="image" type="file" name="image" class="form-control" required>
+        <label for="images" style="display: block; margin-bottom: 5px; font-weight: bold;">商品圖片 (可上傳多張)</label>
+        {{-- 修正：name="images[]" 並加上 multiple 屬性以支援多圖上傳 --}}
+        <input id="images" type="file" name="images[]" class="form-control" required multiple>
     </div>
 
     <div class="form-group" style="text-align: center; margin-top: 2rem;">

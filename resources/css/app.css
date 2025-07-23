@@ -1,10 +1,24 @@
+/*
+ * 這是你的主要 CSS 進入點，通常與 Laravel Vite 或 Mix 配合使用。
+ * 它引入了 Tailwind CSS，並設定了內容來源，
+ * 以便 Tailwind 的 JIT (Just-In-Time) 引擎能夠掃描你的檔案並生成必要的 CSS。
+ */
+
 @import 'tailwindcss';
 
+/*
+ * @source 指令告訴 JIT 引擎要去掃描哪些檔案。
+ * 這確保了你在 Blade 模板和 JS 中使用的任何 Tailwind class 都會被正確編譯。
+ */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/*
+ * @theme 區塊用來自訂 Tailwind 的設計系統，
+ * 例如更換預設字體。
+ */
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';

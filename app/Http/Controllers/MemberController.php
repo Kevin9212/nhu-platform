@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\IdleItem;
 use App\Models\Category;
+use App\Models\IdleItem;
 use App\Models\User;
 
 class MemberController extends Controller
@@ -19,10 +19,10 @@ class MemberController extends Controller
         $user = Auth::user();
 
         // 取得使用者刊登的商品
-        $userItems = $user->idleItems()->with('images')->latest('release_time')->get();
+        $userItems = $user->items()->with('images')->latest()->get();
 
         // 取得使用者收藏的商品 (此功能尚未實現，暫時留空)
-        $favoriteItems = collect();
+        $favoriteItems = $user->favorites()->with('item.images')->latest()->get();
 
         // 取得所有分類，供「新增商品」表單使用
         $categories = Category::all();
@@ -54,9 +54,12 @@ class MemberController extends Controller
 
         if ($request->hasFile('avatar')) {
             $avatarFile = $request->file('avatar');
-            $avatarName = $user->id . '_' . time() . '.' . $avatarFile->getClientOriginalExtension();
-            $avatarFile->move(public_path('images/avatars'), $avatarName);
-            $user->avatar = 'images/avatars/' . $avatarName;
+            // 建立一個更安全、不易重複的檔案名稱
+            $avatarName = $user->id . '_' . uniqid() . '.' . $avatarFile->getClientOriginalExtension();
+            // 將檔案移動到 public/storage/avatars
+            $avatarFile->storeAs('avatars', $avatarName, 'public');
+            // 儲存相對路徑
+            $user->avatar = 'storage/avatars/' . $avatarName;
         }
 
         $user->save();

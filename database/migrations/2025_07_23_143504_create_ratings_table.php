@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rater_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('rated_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('score');
+            $table->foreignId('rater_id')->comment('評分人')->constrained('users')->onDelete('cascade');
+            $table->foreignId('rated_id')->comment('被評分人')->constrained('users')->onDelete('cascade');
+            $table->tinyInteger('score')->unsigned()->comment('評分 1-5');
             $table->text('comment')->nullable();
-            $table->timestamp('rating_time')->useCurrent();
+            $table->timestamps();
         });
     }
 

@@ -2,39 +2,75 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable {
-    // 因為您的 users 資料表沒有 created_at 和 updated_at，所以保留這行
-    public $timestamps = false;
+    
+    use HasFactory , Notifiable;
+    /**
+     * The attributes that are mass assignable.
+     * 可以進行大量賦值的屬性（白名單）。
+     * @var array<int,string>
+     */
+    protected $fillable = [
+        'nickname',
+        'account',
+        'email',
+        'password',
+        'avatar',
+        'user_phone',
+        'last_login_time',
+        'user_status',
+        'role',
+    ];
 
     /**
-     * 告訴 Laravel 我們的密碼欄位叫做 'user_password'。
-     * @return string
+     *  The attributes that shoule be hidden for serialization.
+     *  應在序列化時被隱藏的屬性（黑名單）。
+     * @var array<int,string>
      */
-    public function getAuthPassword(): string {
-        return $this->user_password;
+    protected $hidden = [
+        'password','remember_roken',
+    ];
+
+
+    /**
+     * Get the attributes that should be cast.
+     * 取得應被轉換的屬性
+     * 
+     * @return array<string,string>
+     */
+    protected function casts():array{
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'last_login_time' => 'datetime',
+        ];
     }
 
     /**
-     * 定義關聯：一個 User 可以有多個刊登商品 (IdleItem)。
-     * 我們使用複數的 idleItems() 來表示「一對多」的關係。
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * 一個用戶可以刊登多個商品
      */
-    public function idleItems(): HasMany {
-        // Laravel 會自動根據方法名稱，去尋找 user_id 這個外鍵
+    public function items():HasMany{
         return $this->hasMany(IdleItem::class);
     }
 
-    /**
-     * 定義關聯：一個 User 有一個狀態 (UserStatus)。
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function status(): HasOne {
-        // Laravel 會自動尋找 user_id 這個外鍵
-        return $this->hasOne(UserStatus::class);
+    /** 
+     * 一個用戶可以有多筆訂單
+    */
+    public function orders():HasMany{
+        return $this->hasMay(Order::class);
     }
-    
+
+    /**
+     * 一個用戶可以有多筆訂單
+     */
+    public function favorites():HasMany{
+        return $this->hasMany(Favorite::class);
+    }
+
 }

@@ -3,33 +3,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabLinks = document.querySelectorAll('.tab-link');
     const tabPanes = document.querySelectorAll('.tab-pane');
 
+    /**
+     * 根據傳入的 tabId 切換分頁
+     * @param {string} tabId - 要顯示的分頁ID (例如 'profile', 'listings')
+     */
     function switchTab(tabId) {
-        // 關掉全部
-        tabLinks.forEach(l => l.classList.remove('active'));
-        tabPanes.forEach(p => p.classList.remove('active'));
+        // 隱藏所有分頁內容，並移除所有連結的 active 狀態
+        tabLinks.forEach(link => link.classList.remove('active'));
+        tabPanes.forEach(pane => pane.classList.remove('active'));
 
-        // link OK，pane 改用 id 找
+        // 找到對應的連結和內容區塊
         const activeLink = document.querySelector(`.tab-link[data-tab="${tabId}"]`);
         const activePane = document.getElementById(`tab-${tabId}`);
 
+        // 如果找到了，就將它們設為 active (顯示出來)
         if (activeLink && activePane) {
             activeLink.classList.add('active');
             activePane.classList.add('active');
-            // 統一使用 same key
+            // 將當前分頁ID存入 localStorage，以便下次載入時記住位置
             localStorage.setItem('activeMemberTab', tabId);
         }
     }
 
+    // 為每一個導覽連結加上點擊事件
     tabLinks.forEach(link => {
         link.addEventListener('click', e => {
-            e.preventDefault();
-            switchTab(link.dataset.tab);
+            e.preventDefault(); // 防止頁面跳轉
+            const tabId = link.dataset.tab;
+            switchTab(tabId);
         });
     });
 
-    // 初始：看看有沒有記錄
-    const saved = localStorage.getItem('activeMemberTab');
-    const first = tabLinks[0].dataset.tab;
-    switchTab(saved && document.getElementById(`tab-${saved}`) ? saved : first);
+    // 頁面載入時，檢查 localStorage 中是否有儲存的分頁紀錄
+    const savedTab = localStorage.getItem('activeMemberTab');
+    // 如果有紀錄且該分頁存在，則顯示該分頁，否則顯示第一個分頁
+    const initialTab = (savedTab && document.getElementById(`tab-${savedTab}`))
+        ? savedTab
+        : tabLinks[0].dataset.tab;
+
+    switchTab(initialTab);
 });
-  

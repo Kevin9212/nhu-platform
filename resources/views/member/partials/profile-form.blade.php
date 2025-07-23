@@ -44,7 +44,8 @@
         @if(Auth::user()->avatar)
         <div style="margin-top: 10px;">
             <p>目前頭像：</p>
-            <img src="{{ asset(Auth::user()->avatar) }}" alt="目前頭像" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+            {{-- 修正：圖片路徑應指向 storage --}}
+            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="目前頭像" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
         </div>
         @endif
     </div>

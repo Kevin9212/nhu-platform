@@ -11,18 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
-            $table->string('image_url', 256);
+        Schema::table('categories', function (Blueprint $table) {
+            // 在 'name' 欄位後面新增一個用於排序的整數欄位
+            $table->integer('sort_order')->default(0)->after('name');
         });
     }
+
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn('sort_order');
+        });
     }
 };

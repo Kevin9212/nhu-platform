@@ -9,14 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void {
-        Schema::create('user_statuses', function (Blueprint $table) {
+    public function up(): void
+    {
+        Schema::create('favorites', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('warnings_count')->default(0);
-            $table->integer('suspension_count')->default(0);
-            $table->decimal('rating', 3, 2)->default(5.00)->index();
-            $table->timestamp('updated_time')->useCurrent()->useCurrentOnUpdate();
+            $table->foreignId('idle_item_id')->constrained()->onDelete('cascade');
+            $table->unique(['user_id', 'idle_item_id']);
+            $table->timestamps();
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_statuses');
+        Schema::dropIfExists('favorites');
     }
 };

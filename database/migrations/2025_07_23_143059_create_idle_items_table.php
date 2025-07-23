@@ -9,17 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('idle_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('current_buyer_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('user_id')->comment('賣家ID')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->comment('分類ID')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('current_buyer_id')->nullable()->comment('已成交買家ID')->constrained('users')->onDelete('set null');
             $table->string('idle_name', 128);
             $table->text('idle_details');
             $table->decimal('idle_price', 10, 2)->index();
-            $table->timestamp('release_time')->useCurrent();
-            $table->tinyInteger('idle_status')->default(1);
+            $table->tinyInteger('idle_status')->default(1)->comment('1:上架 2:議價中 3:交易中 4:完成 0:刪除');
 
             // 租屋專屬
             $table->boolean('is_rental')->default(false);
@@ -30,8 +30,8 @@ return new class extends Migration
             $table->text('equipment')->nullable();
             $table->json('meetup_location')->nullable();
 
-            // 索引
-            $table->index(['category_id', 'idle_status'], 'idx_label_status');
+            $table->index(['category_id', 'idle_status']);
+            $table->timestamps();
         });
     }
 

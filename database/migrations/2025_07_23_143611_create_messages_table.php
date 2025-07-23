@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conversation_id')->constrained()->onDelete('cascade');
+            // 外鍵
+            $table->foreignId('conversation_id')->constrained('conversations')->onDelete('cascade');
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('idle_item_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('idle_item_id')->nullable()->constrained('idle_items')->onDelete('set null');
+
+            // 訊息內容
             $table->enum('msg_type', ['text', 'image', 'system'])->default('text');
             $table->text('content');
-            $table->timestamp('created_at')->useCurrent();
-            $table->boolean('is_recalled')->default(false);
+            $table->boolean('is_recalled')->default(false)->comment('訊息是否已收回');
 
-            $table->index(['conversation_id', 'created_at']);
-            $table->index(['sender_id', 'created_at']);
+            // 時間戳
+            $table->timestamps();
         });
     }
 

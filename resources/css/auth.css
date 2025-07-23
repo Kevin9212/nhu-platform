@@ -66,13 +66,11 @@ body {
 
 /* 表單 */
 .auth-form {
-    display: none;
-    /* 預設隱藏 */
+    display: none; /* 預設隱藏 */
 }
 
 .auth-form.active {
-    display: block;
-    /* 顯示被選中的表單 */
+    display: block; /* 顯示被選中的表單 */
 }
 
 /* 表單中的輸入框群組 */
@@ -86,8 +84,7 @@ body {
     padding: 12px;
     border: 1px solid #ced4da;
     border-radius: 6px;
-    box-sizing: border-box;
-    /* 確保 padding 不會影響寬度 */
+    box-sizing: border-box; /* 確保 padding 不會影響寬度 */
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -149,6 +146,6 @@ body {
     padding-left: 0;
 }
 
-.alert-danger p {
+.alert-danger p, .alert-danger li {
     margin: 0;
 }

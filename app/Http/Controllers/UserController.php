@@ -52,13 +52,15 @@ class UserController extends Controller {
             'user_phone' => 'required|string',
         ]);
 
-        // 建立新使用者
-        $user = new User();
-        $user->account = $request->account;
-        $user->user_password = Hash::make($request->password); // Hash密碼加密
-        $user->nickname = $request->nickname;
-        $user->user_phone = $request->user_phone;
-        $user->save(); // 儲存使用者資料
+        // 使用 create 方法建立新使用者
+         $user = User::create([
+            'account' => $request->account,
+            'email' => $request->account, // 將 account 同時存入 email 欄位
+            'password' => Hash::make($request->password), // 使用 'password' 欄位
+            'nickname' => $request->nickname,
+            'user_phone' => $request->user_phone,
+        ]);
+        
 
         // 注冊成功后，把使用者導入登入頁面，并且附帶成功訊息
         return redirect()->route('login')->with('success', '註冊成功，請登入');
@@ -67,51 +69,31 @@ class UserController extends Controller {
     /**
      * 處理登入請求
      */
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
+        // 驗證輸入的資料
         $credentials = $request->validate([
-            'account' => 'required|email',
-            'password' => 'required',
+            'account' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        /**
-         * 1. 使用 Eloquent 模型查找使用者
-         * 使用 User 模型查找帳號對應的使用者
-         * 這裡假設帳號是唯一的，並且已經在資料庫中存在
-         * 如果使用者不存在，則會返回 null
-         */
-        $user = User::where('account', $credentials['account'])->first();
-
-        // 2. 檢查使用者是否存在，並手動用 Hash::check 驗證密碼
-        if ($user && Hash::check($credentials['password'], $user->user_password)) {
-
-            // 3. 如果驗證成功，手動將使用者登入
-            Auth::login($user);
-
-            // 重新生成 session ID
+        // 使用 Auth::attempt 進行登入驗證，這是 Laravel 的標準做法
+        // 注意：我們使用 'email' 欄位來進行驗證，值來自使用者輸入的 'account'
+        if (Auth::attempt(['email' => $credentials['account'], 'password' => $credentials['password']], $request->filled('remember'))) {
+            // 重新生成 session ID，防止 session fixation 攻擊
             $request->session()->regenerate();
 
-            // 導向首頁，並附帶成功訊息
-            return redirect()->intended('/')->with('success', '登入成功！');
+            // 登入成功，導向使用者原本想去的頁面，如果沒有則導向首頁
+            return redirect()->intended(route('home'))->with('success', '登入成功！');
         }
-        // 如果驗證失敗，則返回上一頁，並附帶錯誤訊息
+
+        // 如果驗證失敗，則返回登入頁面，並附帶錯誤訊息
         return back()->withErrors([
             'account' => '帳號或密碼錯誤。',
         ])->onlyInput('account');
-        /**嘗試使用Auth::attempt方法進行登入
-         * 如果登入成功，Auth::attempt會返回true，否則返回false
-         * 如果登入成功，會自動將使用者的ID存儲在session
-         * 這樣就可以在後續的請求中使用Auth::check()
-         * 來檢查使用者是否已經登入
-         * 如果登入失敗，Auth::attempt會返回false
-         *並且不會將使用者的ID存儲在session中
-         */
-
-
-        // 登入失敗，導向登入頁面並顯示錯誤信息
-        return back()->withErrors([
-            'account' => '賬號或密碼錯誤。',
-        ])->onlyInput('account'); // only input('account') 只保留輸入的賬號
     }
+
+
     /**
      * 處理登出請求
      */

@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IdleItemController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,3 +36,4 @@ Route::resource('idle-items', IdleItemController::class)->except(['create'])->mi
 Route::get('/member', [MemberController::class, 'index'])->middleware('auth')->name('member.index');
 Route::patch('/member/profile', [MemberController::class, 'updateProfile'])->middleware('auth')->name('member.profile.update');
 
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
