@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-// 引入 Laravel 基礎 Controller，這是所有 Controller 的父類別
+
 use App\Http\Controllers\Controller;
-// 引入權限檢查功能所需的 Trait
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 // 引入會用到的 Model
@@ -72,6 +71,8 @@ class IdleItemController extends Controller
             'idle_status' => 1,
         ]);
 
+        // debug
+        //dd($item->toArray());
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imageFile) {
                 $path = $imageFile->store('products', 'public');
@@ -85,22 +86,22 @@ class IdleItemController extends Controller
     /**
      * 顯示指定的單一商品資源
      */
-    public function show(IdleItem $item)
+    public function show(IdleItem $idleItem)
     {
-        $item->load(['seller', 'images']);
-        return view('idle-items.show', ['item' => $item]);
+        $idleItem->load(['seller', 'images']);
+        return view('idle-items.show', ['item' => $idleItem]);
     }
 
     /**
      * 顯示編輯商品的表單
      */
-    public function edit(IdleItem $item)
+    public function edit(IdleItem $idleItem)
     {
-        $this->authorize('update', $item);
+        $this->authorize('update', $idleItem);
 
         $categories = Category::all();
         return view('idle-items.edit', [
-            'item' => $item,
+            'item' => $idleItem,
             'categories' => $categories,
         ]);
     }
@@ -108,9 +109,9 @@ class IdleItemController extends Controller
     /**
      * 更新指定的商品資源
      */
-    public function update(Request $request, IdleItem $item)
+    public function update(Request $request, IdleItem $idleItem)
     {
-        $this->authorize('update', $item);
+        $this->authorize('update', $idleItem);
 
         $validated = $request->validate([
             'idle_name' => 'required|string|max:255',
@@ -121,16 +122,16 @@ class IdleItemController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $item->update($validated);
+        $idleItem->update($validated);
 
         if ($request->hasFile('images')) {
-            foreach ($item->images as $image) {
+            foreach ($idleItem->images as $image) {
                 Storage::disk('public')->delete($image->image_url);
             }
-            $item->images()->delete();
+            $idleItem->images()->delete();
             foreach ($request->file('images') as $imageFile) {
                 $path = $imageFile->store('products', 'public');
-                $item->images()->create(['image_url' => $path]);
+                $idleItem->images()->create(['image_url' => $path]);
             }
         }
 
@@ -140,15 +141,15 @@ class IdleItemController extends Controller
     /**
      * 刪除指定的商品資源
      */
-    public function destroy(IdleItem $item)
+    public function destroy(IdleItem $idleItem)
     {
-        $this->authorize('delete', $item);
+        $this->authorize('delete', $idleItem);
 
-        foreach ($item->images as $image) {
+        foreach ($idleItem->images as $image) {
             Storage::disk('public')->delete($image->image_url);
         }
 
-        $item->delete();
+        $idleItem->delete();
 
         return redirect()->route('member.index')->with('success', '商品已成功刪除！');
     }

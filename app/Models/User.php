@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable {
-    
-    use HasFactory , Notifiable;
+    use HasFactory, Notifiable;
+
     /**
-     * The attributes that are mass assignable.
      * 可以進行大量賦值的屬性（白名單）。
-     * @var array<int,string>
      */
     protected $fillable = [
         'nickname',
@@ -29,22 +26,17 @@ class User extends Authenticatable {
     ];
 
     /**
-     *  The attributes that shoule be hidden for serialization.
-     *  應在序列化時被隱藏的屬性（黑名單）。
-     * @var array<int,string>
+     * 應在序列化時被隱藏的屬性。
      */
     protected $hidden = [
-        'password','remember_roken',
+        'password',
+        'remember_token',
     ];
 
-
     /**
-     * Get the attributes that should be cast.
-     * 取得應被轉換的屬性
-     * 
-     * @return array<string,string>
+     * 應被轉換的屬性。
      */
-    protected function casts():array{
+    protected function casts(): array {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
@@ -55,22 +47,23 @@ class User extends Authenticatable {
     /**
      * 一個用戶可以刊登多個商品
      */
-    public function items():HasMany{
-        return $this->hasMany(IdleItem::class);
-    }
-
-    /** 
-     * 一個用戶可以有多筆訂單
-    */
-    public function orders():HasMany{
-        return $this->hasMay(Order::class);
+    public function items(): HasMany {
+        // 核心修正：明確指定關聯的外鍵和本地鍵
+        // 這告訴 Laravel: "idle_items 表的 user_id 欄位，對應到 users 表的 id 欄位"
+        return $this->hasMany(IdleItem::class, 'user_id', 'id');
     }
 
     /**
      * 一個用戶可以有多筆訂單
      */
-    public function favorites():HasMany{
-        return $this->hasMany(Favorite::class);
+    public function orders(): HasMany {
+        return $this->hasMany(Order::class, 'user_id', 'id');
     }
 
+    /**
+     * 一個用戶可以收藏多個商品
+     */
+    public function favorites(): HasMany {
+        return $this->hasMany(Favorite::class, 'user_id', 'id');
+    }
 }

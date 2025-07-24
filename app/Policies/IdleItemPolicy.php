@@ -13,8 +13,16 @@ class IdleItemPolicy
      */
     public function update(User $user, IdleItem $idleItem): bool
     {
+        // dd(
+        //     '目前登入的使用者 (User) 物件:',
+        //     $user->toArray(),
+        //     '要編輯的商品 (IdleItem) 物件:',
+        //     $idleItem->toArray()
+        // );
+        // dd($user->id, $idleItem->user_id);
+
         // 只有當商品的 user_id 等於當前登入者的 id 時，才允許更新
-        return $user->id === $idleItem->user_id;
+        return $user->id == $idleItem->user_id;
     }
 
     /**
@@ -23,6 +31,6 @@ class IdleItemPolicy
     public function delete(User $user, IdleItem $idleItem): bool
     {
         // 只有當商品的 user_id 等於當前登入者的 id 時，才允許刪除
-        return $user->id === $idleItem->user_id;
+        return $user->id == $idleItem->user_id;
     }
 }
