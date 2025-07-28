@@ -37,3 +37,9 @@ Route::get('/member', [MemberController::class, 'index'])->middleware('auth')->n
 Route::patch('/member/profile', [MemberController::class, 'updateProfile'])->middleware('auth')->name('member.profile.update');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+
+// --- 聊天功能路由 ---
+// 這個路由用來開始或顯示與某個賣家的對話
+Route::get('/conversation/with/{user}', [ConversationController::class, 'startOrShow'])->name('conversation.start');
+// 這個路由用來處理傳送新訊息的請求
+Route::post('/conversation/{conversation}/messages', [ConversationController::class, 'storeMessage'])->name('conversation.message.store');
