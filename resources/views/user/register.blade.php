@@ -1,16 +1,20 @@
 {{-- resources/views/user/register.blade.php --}}
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>註冊新帳號 - NHU 二手交易平台</title>
 
     {{-- 與登入頁面共用同一個 CSS 檔案 --}}
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}"> {{-- 引入共用的樣式檔 --}}
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
-<body>
+
+<body class="auth-body">
 
     {{-- 引入共用的頁首 --}}
     @include('partials.header')
@@ -35,25 +39,46 @@
             <div class="form-group">
                 <label for="account">學校信箱</label>
                 {{-- 新增 old() 和 autocomplete --}}
-                <input id="account" type="email" name="account" class="form-control" placeholder="範例: 11124149@nhu.edu.tw" value="{{ old('account') }}" required autocomplete="email" autofocus>
+                {{-- 新增 @error 判斷式加上 is-invalid class --}}
+                <input id="account" type="email" name="account" class="form-control @error('account') is-invalid @enderror" placeholder="範例: xxxxxxxx@nhu.edu.tw" value="{{ old('account') }}" required autocomplete="email" autofocus>
+                {{-- 新增 顯示單一欄位的錯誤訊息  --}}
+                @error('account')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="nickname">暱稱</label>
-                <input id="nickname" type="text" name="nickname" class="form-control" value="{{ old('nickname') }}" required autocomplete="nickname">
+                <input id="nickname" type="text" name="nickname" class="form-control @error('nickname') is-invalid @enderror" value="{{ old('nickname') }}" required autocomplete="nickname">
+                @error('nickname')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="user_phone">聯絡電話</label>
-                <input id="user_phone" type="text" name="user_phone" class="form-control" value="{{ old('user_phone') }}" required autocomplete="tel">
+                <input id="user_phone" type="text" name="user_phone" class="form-control @error('user_phone') is-invalid @enderror" placeholder="請輸入手機號碼(09xxxxxxxx)" value="{{ old('user_phone') }}" required autocomplete="tel">
+                @error('user_phone')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="password">密碼</label>
-                <input id="password" type="password" name="password" class="form-control" placeholder="至少需要 8 位數" required autocomplete="new-password">
+                <input id="password" type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="至少需要 8 位數" required autocomplete="new-password">
+                @error('password')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="password_confirmation">確認密碼</label>
                 <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" placeholder="請再輸入一次密碼" required autocomplete="new-password">
             </div>
-            
+            <div class = "form-group">
+                <div class = "g-recaptcha" data-sitekey = "{{  env('RECAPTCHA_SITE_KEY') }}"></div>
+                @error('g-recaptcha-response')
+                    <span class = "invalid-feedback" style = "display: block;">{{ $message }}</span>
+                @enderror
+            </div>
+
+
             <button type="submit" class="btn btn-success">註冊</button>
         </form>
 
@@ -61,5 +86,10 @@
             已經有帳號了？ <a href="{{ route('login') }}">前往登入</a>
         </div>
     </div>
+
+    <script>
+
+    </script>
 </body>
+
 </html>

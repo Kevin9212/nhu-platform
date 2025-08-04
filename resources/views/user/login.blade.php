@@ -9,7 +9,7 @@
     {{-- 與註冊頁面共用同一個 CSS 檔案 --}}
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
-<body>
+<body class="auth-body">
     <div class="auth-container">
         <h2>登入您的帳戶</h2>
 

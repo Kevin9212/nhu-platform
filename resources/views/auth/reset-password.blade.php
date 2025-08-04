@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-<body>
+<body class="auth-body">
     @include('partials.header')
 
     <div class="auth-container">

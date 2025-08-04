@@ -78,4 +78,18 @@ php artisan make:migration add_parent_id_to_categories_table --table=categories
 啓動伺服器
 php artisan serve
 
+8/3
+app/Controllers/Http/UserController.php 在register（）方法中添加了自定錯誤訊息
+resources/views/user/register.blade.php 每一個輸入框都加入 @error 判斷
+
+public/css/style.css 這是通用的樣式，負責頁首，商品卡片等
+
+resources/css/auth.css 這是用來美化登入、注冊的樣式
+把auth.css 放到 public/css/裏面
+
+新增加的錯誤樣式(.is-invalid,.invalid-feedback)是給表單用的 -> 放在auth.css 裏面
+
+** ！！！添加了Google reCAPTCHA金錀
+。env
+
 

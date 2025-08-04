@@ -7,7 +7,7 @@
     <title>會員系統 - NHU 二手交易平台</title>
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
-<body>
+<body class="auth-body">
     <div class="auth-container">
         <h2>會員系統</h2>
 

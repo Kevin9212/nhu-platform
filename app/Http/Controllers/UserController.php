@@ -6,7 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller {
     /**
@@ -45,22 +46,51 @@ class UserController extends Controller {
                 'required',
                 'email',
                 'unique:users,account',
+                'unique:users,email',
                 'regex:/@(nhu\.edu\.tw|ccu\.edu\.com\.tw)$/'
             ],
-            'password' => 'required|min:6|confirmed', // 密碼欄位是必須的，最小長度為6個字符，並且需要確認密碼
-            'nickname' => 'required|string|max:32',
-            'user_phone' => 'required|string',
+            'password' => ['required', 'confirmed', Password::defaults()], // 密碼欄位是必須的，最小長度為8個字符，並且需要確認密碼
+            'nickname' => ['required', 'string', 'max:32'],  // 昵称是必需的，字符串类型，最大长度为32个字符
+            'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含數字，長度不超過10個字符
+            'g-recaptcha-response' => ['required',function($attribute,$value,$fail){
+                // 驗證 Google reCAPTCHA
+                $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => env('RECAPTCHA_SECRET_KEY'),
+                    'response' => $value, // 前端傳回的 reCAPTCHA Token
+                    'remoteip' => request()->ip(), // 可選，使用者的 IP 地址
+                ]);
+                if(!$response->json()['success']) {
+                    $fail('驗證碼錯誤，請重新輸入。');
+                }
+            }],
+        ], [
+            // 自定錯誤訊息
+            'account.required' => '學校信箱為必填項目。',
+            'account.email' => '請輸入有效的信箱格式。',
+            'account.unique' => '此信箱已被註冊，請嘗試登入或使用其他信箱。',
+            'account.regex' => '信箱必須為南華大學 (@nhu.edu.tw) 或中正大學 (@ccu.edu.com.tw) 的信箱。',
+
+            'password.required' => '密碼為必填項目。',
+            'password.confirmed' => '兩次輸入的密碼不一致。',
+            // Password::defaults() 的錯誤訊息的laravel自動產生的（例如：密碼必須8個字元、包含數字等）
+
+            'nickname.required' => '暱稱為必填項目。',
+            'nickname.max' => '暱稱長度不得超過32個字符。',
+
+            'user_phone.required' => '電話號碼為必填項目。',
+            'user_phone.numeric' => '電話號碼只能包含數字。',
+            'user_phone.digits' => '電話號碼長度不得超過16個字符。',
         ]);
 
         // 使用 create 方法建立新使用者
-         $user = User::create([
+        User::create([
             'account' => $request->account,
             'email' => $request->account, // 將 account 同時存入 email 欄位
             'password' => Hash::make($request->password), // 使用 'password' 欄位
             'nickname' => $request->nickname,
             'user_phone' => $request->user_phone,
         ]);
-        
+
 
         // 注冊成功后，把使用者導入登入頁面，并且附帶成功訊息
         return redirect()->route('login')->with('success', '註冊成功，請登入');
@@ -69,8 +99,7 @@ class UserController extends Controller {
     /**
      * 處理登入請求
      */
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         // 驗證輸入的資料
         $credentials = $request->validate([
             'account' => ['required', 'email'],

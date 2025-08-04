@@ -1,7 +1,7 @@
 /* public/css/auth.css */
 
 /* 整體頁面樣式 */
-body {
+.auth-body {
     font-family: 'Helvetica Neue', Arial, '蘋方-繁', 'Microsoft JhengHei', sans-serif;
     background-color: #f4f7f9;
     margin: 0;

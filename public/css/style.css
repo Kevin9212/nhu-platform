@@ -192,3 +192,29 @@ header nav a.btn-primary:hover {
     font-weight: bold;
     color: #e44d26;
 }
+/* 加入錯誤的輸入框樣式 */
+.form-control.is-invalid{
+    border-color: #dc3545;
+    background-color: #fef2f2;
+    /* 淡紅背景，增加對比 */
+    padding-right: calc(1.5em + .75rem);
+    /* 預留圖示空間 */
+    background-image: url('https: //placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片');
+    background-repeat: no-repeat; /* 背景不重複 */
+    background-position: right calc(.375em + .1875rem) center; /* 圖示位置放在輸入框右邊並垂直置中 */
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);   /* 圖示大小 */
+    
+}
+/* 錯誤的輸入框在 focus 時 */
+.form-control.is-invalid:focus{
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+/* 錯誤訊息文字 */
+.invalid-feedback{
+    display: block;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em;
+    color: #dc3545; /* 紅色文字 */
+}
