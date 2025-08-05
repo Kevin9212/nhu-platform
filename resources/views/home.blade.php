@@ -1,87 +1,75 @@
 {{-- resources/views/home.blade.php --}}
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>南華大學二手交易平台</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+@extends('layouts.app')
 
-    @include('partials.header')
+@section('title', '南華大學二手交易平台')
 
-    <div class="search-bar">
-        {{-- 修正：將搜尋表單指向一個實際的路由 (search.index 需在 web.php 中定義) --}}
-        <form action="{{ route('search.index') }}" method="GET">
-            <input type="text" name="q" placeholder="搜尋商品名稱或分類...">
-            <button type="submit">搜尋</button>
-        </form>
-    </div>
+@section('content')
+<div class="container">
+    {{-- 搜尋表單 --}}
+    @include('partials.search-form', ['showAdvanced' => true])
 
+    {{-- 最新上架商品區塊 --}}
     <section class="section">
-        <h2>📦 最新上架商品</h2>
-        <div class="products">
-            @forelse ($items as $item)
-            <div class="product-card">
-                <a href="{{ route('idle-items.show', $item->id) }}" class="product-image-link">
-                    {{-- 修正：圖片路徑應指向 storage，並處理無圖片的情況 --}}
-                    @if($item->images->isNotEmpty())
-                        <img src="{{ asset('storage/' . $item->images->first()->image_url) }}" alt="{{ $item->idle_name }}">
-                    @else
-                        <img src="https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片" alt="{{ $item->idle_name }}">
-                    @endif
-                </a>
-                <div class="product-content">
-                    <h3>
-                        <a href="{{ route('idle-items.show', $item->id) }}">{{ $item->idle_name }}</a>
-                    </h3>
-                    <div class="seller">
-                        {{-- 建議：未來可以將賣家連結指向賣家個人頁面 --}}
-                        賣家：<a href="#">{{ $item->seller->nickname }}</a>
-                    </div>
-                    <p class="price">NT$ {{ number_format($item->idle_price) }}</p>
-                </div>
-            </div>
-            @empty
-            <p>目前沒有任何上架中的商品。</p>
-            @endforelse
+        <div class="section-header">
+            <h2>📦 最新上架商品</h2>
+            <a href="{{ route('idle-items.index') }}" class="view-all-link">查看全部 →</a>
         </div>
-        
-        {{-- 新增：顯示分頁連結 --}}
-        <div class="pagination-links" style="margin-top: 2rem;">
+
+        @include('partials.product-grid', [
+        'items' => $items,
+        'emptyMessage' => '目前沒有任何上架中的商品。',
+        'showCategory' => true
+        ])
+
+        {{-- 只在有分頁時顯示 --}}
+        @if($items->hasPages())
+        <div class="pagination-links">
             {{ $items->links() }}
         </div>
+        @endif
     </section>
 
+    {{-- 隨機推薦商品區塊 --}}
     <section class="section">
-        <h2>🎁 隨機推薦商品</h2>
-        <div class="products">
-            {{-- 修正：使用從 Controller 傳來的 $randomItems 變數 --}}
-            @forelse ($randomItems as $item)
-            <div class="product-card">
-                <a href="{{ route('idle-items.show', $item->id) }}" class="product-image-link">
-                    @if($item->images->isNotEmpty())
-                        <img src="{{ asset('storage/' . $item->images->first()->image_url) }}" alt="{{ $item->idle_name }}">
-                    @else
-                        <img src="https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片" alt="{{ $item->idle_name }}">
-                    @endif
-                </a>
-                <div class="product-content">
-                    <h3>
-                        <a href="{{ route('idle-items.show', $item->id) }}">{{ $item->idle_name }}</a>
-                    </h3>
-                    <div class="seller">
-                        賣家：<a href="#">{{ $item->seller->nickname }}</a>
-                    </div>
-                    <p class="price">NT$ {{ number_format($item->idle_price) }}</p>
-                </div>
-            </div>
-            @empty
-            <p>目前沒有任何商品可供推薦。</p>
-            @endforelse
+        <div class="section-header">
+            <h2>🎁 隨機推薦商品</h2>
+            <button onclick="refreshRecommendations()" class="refresh-btn">🔄 換一批</button>
+        </div>
+
+        <div id="random-items-container">
+            @include('partials.product-grid', [
+            'items' => $randomItems,
+            'emptyMessage' => '目前沒有任何商品可供推薦。',
+            'showCategory' => true
+            ])
         </div>
     </section>
+</div>
 
-</body>
-</html>
+{{-- 加入換一批推薦的 JavaScript --}}
+@push('scripts')
+<script>
+    function refreshRecommendations() {
+        const container = document.getElementById('random-items-container');
+        const refreshBtn = document.querySelector('.refresh-btn');
+
+        // 顯示載入狀態
+        refreshBtn.textContent = '🔄 載入中...';
+        refreshBtn.disabled = true;
+
+        fetch('{{ route("home.random-items") }}')
+            .then(response => response.text())
+            .then(html => {
+                container.innerHTML = html;
+                refreshBtn.textContent = '🔄 換一批';
+                refreshBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                refreshBtn.textContent = '🔄 換一批';
+                refreshBtn.disabled = false;
+            });
+    }
+</script>
+@endpush
+@endsection

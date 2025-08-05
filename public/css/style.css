@@ -5,6 +5,12 @@ body {
     padding: 0;
     background-color: #f8f9fa;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+main{
+    flex-grow:1;
 }
 
 a {
@@ -23,6 +29,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    flex-shrink:0;
 }
 
 header h1 {
@@ -76,6 +83,7 @@ header nav a.btn-primary:hover {
     justify-content: center;
     padding: 0 1rem;
 }
+
 
 .search-bar form {
     display: flex;
@@ -217,4 +225,180 @@ header nav a.btn-primary:hover {
     margin-top: .25rem;
     font-size: .875em;
     color: #dc3545; /* 紅色文字 */
+}
+
+.search-form {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-input-group input,
+.search-input-group select {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 1rem;
+}
+
+.search-input-group input[type="text"] {
+    flex-grow: 1;
+}
+
+.search-input-group button {
+    border: none;
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* --- 新增：通用樣式 --- */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+}
+
+.alert-error {
+    color: #842029;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+}
+
+.site-footer {
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 4rem;
+    flex-shrink: 0;
+}
+
+/* --- 新增：區塊標頭 --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.view-all-link,
+.refresh-btn {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* --- 新增：搜尋建議 --- */
+.search-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+/* --- 新增：商品卡片狀態標籤 --- */
+.product-image-link {
+    position: relative;
+}
+
+.status-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-badge.new {
+    background: #198754;
+    color: white;
+}
+
+.status-badge.sold {
+    background: #dc3545;
+    color: white;
+}
+
+/* --- 新增：商品卡片價格與元資訊 --- */
+.price-info {
+    margin-bottom: 0.5rem;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.discount {
+    background: #ff4444;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+}
+
+.category-tag {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-top: auto;
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.75rem;
 }

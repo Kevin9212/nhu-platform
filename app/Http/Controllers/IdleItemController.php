@@ -46,6 +46,14 @@ class IdleItemController extends Controller
     }
 
     /**
+     * 新增：顯示新增商品的表單頁面
+     */
+    public function create() {
+        $categories = Category::all();
+        return view('idle-items.create', ['categories' => $categories]);
+    }
+    
+    /**
      * 將新增加的商品存入資料庫
      */
     public function store(Request $request)
