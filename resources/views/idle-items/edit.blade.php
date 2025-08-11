@@ -1,13 +1,14 @@
 {{-- resources/views/idle-items/edit.blade.php --}}
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>編輯商品 - {{ $item->idle_name }}</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/member.css') }}">
-</head>
+    @vite(['resources/css/style.css', 'resources/css/member.css'])
+    </head>
+
 <body>
     @include('partials.header')
 
@@ -59,14 +60,14 @@
                     <label for="images">新增圖片 (選填，會覆蓋舊圖片)</label>
                     <input id="images" type="file" name="images[]" class="form-control" multiple>
                 </div>
-                
+
                 <div class="form-group">
                     <p>目前圖片：</p>
                     <div class="current-images">
                         @forelse($item->images as $image)
-                            <img src="{{ asset('storage/' . $image->image_url) }}" alt="商品圖片" style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px;">
+                        <img src="{{ asset('storage/' . $image->image_url) }}" alt="商品圖片" style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px;">
                         @empty
-                            <p>無</p>
+                        <p>無</p>
                         @endforelse
                     </div>
                 </div>
@@ -76,4 +77,5 @@
         </section>
     </div>
 </body>
+
 </html>

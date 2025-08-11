@@ -1,13 +1,15 @@
 {{-- resources/views/auth/reset-password.blade.php --}}
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>重設密碼 - NHU 二手交易平台</title>
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    @vite(['resources/css/style.css', 'resources/css/auth.css'])
 </head>
+
 <body class="auth-body">
     @include('partials.header')
 
@@ -28,7 +30,7 @@
             @csrf
             {{-- 隱藏欄位，用來傳遞 token 和 email --}}
             <input type="hidden" name="token" value="{{ $token }}">
-            
+
             <div class="form-group">
                 <label for="email">學校信箱</label>
                 {{-- 讓使用者可以看到信箱，但不能修改 --}}
@@ -51,4 +53,5 @@
         </form>
     </div>
 </body>
+
 </html>

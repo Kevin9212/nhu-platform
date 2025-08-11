@@ -1,12 +1,15 @@
 {{-- resources/views/user/auth.blade.php --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>會員系統 - NHU 二手交易平台</title>
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+    @vite(['resources/css/auth.css'])
+    
 </head>
+
 <body class="auth-body">
     <div class="auth-container">
         <h2>會員系統</h2>
@@ -31,8 +34,8 @@
 
         {{-- 判斷哪個分頁應該是活躍的 --}}
         @php
-            // 如果有註冊相關的錯誤，則預設顯示註冊分頁，否則顯示登入分頁
-            $is_register_active = $errors->has('nickname') || $errors->has('user_phone') || $errors->has('password_confirmation');
+        // 如果有註冊相關的錯誤，則預設顯示註冊分頁，否則顯示登入分頁
+        $is_register_active = $errors->has('nickname') || $errors->has('user_phone') || $errors->has('password_confirmation');
         @endphp
 
         <div class="auth-tabs">
@@ -82,4 +85,5 @@
     {{-- 從外部檔案引入 JavaScript --}}
     <script src="{{ asset('js/auth.js') }}"></script>
 </body>
+
 </html>

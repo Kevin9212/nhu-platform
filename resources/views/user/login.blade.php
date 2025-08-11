@@ -1,14 +1,16 @@
 {{-- resources/views/user/login.blade.php --}}
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登入 - NHU 二手交易平台</title>
 
     {{-- 與註冊頁面共用同一個 CSS 檔案 --}}
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+    @vite(['resources/css/auth.css'])
 </head>
+
 <body class="auth-body">
     <div class="auth-container">
         <h2>登入您的帳戶</h2>
@@ -63,4 +65,5 @@
         </div>
     </div>
 </body>
+
 </html>

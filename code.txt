@@ -93,3 +93,44 @@ resources/css/auth.css 這是用來美化登入、注冊的樣式
 。env
 
 
+8/5
+feat: 全面重構核心架構與功能實作
+今天對專案進行了全面的基礎設施重構與核心功能開發，主要包含以下幾個方面：
+
+1. 資料庫與模型層 (Database & Models)
+標準化遷移 (Migrations)：根據 nhu.sql 檔案，重新建立了所有資料表的遷移檔案，使其完全符合 Laravel 框架慣例（例如，統一使用 user_id 作為外鍵，並加入 timestamps()）。
+
+修正 sessions 表：解決了因主鍵類型問題導致在不同資料庫驅動 (MySQL/SQLite) 下的遷移錯誤。
+
+效能優化：為 idle_items 資料表加入了複合索引，以提升未來多條件查詢的效能。
+
+模型完善：建立了所有核心功能的 Eloquent 模型 (User, IdleItem, Category, Favorite, Order, Conversation 等)，並明確定義了它們之間的關聯。
+
+2. 核心設定與環境 (Core & Environment)
+修正 Session/Cache 驅動：將 .env 中的 SESSION_DRIVER 和 CACHE_DRIVER 從 database 改為 file，徹底解決了多個因資料庫設定引起的底層錯誤。
+
+還原核心檔案：重新建立了遺失的核心服務提供者 (AuthServiceProvider 等) 和路由檔案 (api.php, channels.php)，恢復了專案的完整性。
+
+在地化設定：在 config/app.php 中，將時區設定為 Asia/Taipei，並將預設語系設為 zh_TW，以符合在地化需求。
+
+3. 後端邏輯 (Controllers & Policies)
+使用者認證強化：重構了 UserController，加入了更嚴格的後端驗證（包含電話號碼格式、密碼強度），並整合了 Google reCAPTCHA v2 功能以防止機器人註冊。
+
+商品管理 (CRUD)：完善了 IdleItemController，實現了完整的商品新增、編輯、更新和刪除功能。
+
+權限系統建立：建立了 IdleItemPolicy 和 ConversationPolicy，並透過 AuthServiceProvider 進行註冊，確保使用者只能管理自己的商品和對話，極大地提升了安全性。
+
+關鍵錯誤修復：透過偵錯，找出了因路由模型綁定變數不匹配，以及模型關聯定義不明確，而導致的 403 Forbidden 權限錯誤，並予以修正。
+
+首頁邏輯分離：建立了新的 HomeController 來專門處理首頁的業務邏輯，包含了非同步載入「隨機推薦商品」的 API 端點。
+
+4. 前端介面與體驗 (Views & CSS)
+前端架構重構：將所有頁面重構為使用一個主要的佈局檔案 (layouts/app.blade.php) 和多個可重複使用的局部視圖 (partials/*.blade.php)，使程式碼更清晰、更易於維護。
+
+黏性頁尾 (Sticky Footer)：使用 CSS Flexbox 修正了在內容不足時，頁尾無法固定在底部的排版問題。
+
+註冊頁面防呆機制：優化了 register.blade.php，現在當驗證失敗時，會用紅框標示出錯誤的欄位，並在下方顯示清晰的錯誤訊息，同時保留使用者已輸入的內容。
+
+進階搜尋功能：實作了包含關鍵字、分類和價格區間的多條件複合搜尋功能，並建立了對應的前端搜尋表單。
+
+今天是非常充實且高效的一天，您的專案現在已經擁有一個非常穩固、安全且功能豐富的基礎了！
