@@ -52,7 +52,7 @@ class UserController extends Controller {
             'password' => ['required', 'confirmed', Password::defaults()], // 密碼欄位是必須的，最小長度為8個字符，並且需要確認密碼
             'nickname' => ['required', 'string', 'max:32'],  // 昵称是必需的，字符串类型，最大长度为32个字符
             'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含數字，長度不超過10個字符
-            'g-recaptcha-response' => ['required',function($attribute,$value,$fail){
+           /* 'g-recaptcha-response' => ['required',function($attribute,$value,$fail){
                 // 驗證 Google reCAPTCHA
                 $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
                     'secret' => env('RECAPTCHA_SECRET_KEY'),
@@ -62,7 +62,7 @@ class UserController extends Controller {
                 if(!$response->json()['success']) {
                     $fail('驗證碼錯誤，請重新輸入。');
                 }
-            }],
+            }],*/
         ], [
             // 自定錯誤訊息
             'account.required' => '學校信箱為必填項目。',

@@ -9,8 +9,9 @@
 
     {{-- 與登入頁面共用同一個 CSS 檔案 --}}
     @vite(['resources/css/style.css', 'resources/css/auth.css'])
-    
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    {{-- 暫時不需要載入 reCAPTCHA 腳本 --}}
+    {{-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> --}}
 </head>
 
 <body class="auth-body">
@@ -70,12 +71,13 @@
                 <label for="password_confirmation">確認密碼</label>
                 <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" placeholder="請再輸入一次密碼" required autocomplete="new-password">
             </div>
-            <div class="form-group">
+            {{-- --- 暫時停用 reCAPTCHA 元件 --- --}}
+            {{-- <div class="form-group">
                 <div class="g-recaptcha" data-sitekey="{{  env('RECAPTCHA_SITE_KEY') }}"></div>
                 @error('g-recaptcha-response')
                 <span class="invalid-feedback" style="display: block;">{{ $message }}</span>
                 @enderror
-            </div>
+            </div>--}}
 
 
             <button type="submit" class="btn btn-success">註冊</button>
