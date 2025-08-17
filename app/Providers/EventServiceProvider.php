@@ -17,6 +17,10 @@ class EventServiceProvider extends ServiceProvider {
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        // 加入Event 和 Listeners的對應關係
+        \App\Events\NewMessageReceived::class => [
+            \App\Listeners\CreateNewMessageNotification::class,
+        ],
     ];
 
     /**

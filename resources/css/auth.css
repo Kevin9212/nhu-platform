@@ -10,7 +10,14 @@
     align-items: center;
     min-height: 100vh;
 }
-
+.auth-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    /* 讓這個容器填滿 <main> 的所有可用空間 */
+    padding: 2rem 0;
+}
 /* 主要容器 */
 .auth-container {
     max-width: 420px;

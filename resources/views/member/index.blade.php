@@ -9,13 +9,14 @@
         {{-- 左側導覽選單 --}}
         <aside class="member-nav">
             <div class="user-profile-summary">
-                <img src="{{ asset($user->avatar ?? 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像') }}" alt="使用者頭像" class="avatar">
+                <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}" alt="使用者頭像" class="avatar">
                 <p class="nickname">{{ $user->nickname }}</p>
             </div>
             <ul class="nav-list">
                 <li><a href="#" data-tab="profile" class="tab-link active">個人資料</a></li>
                 <li><a href="#" data-tab="listings" class="tab-link">我的刊登</a></li>
                 <li><a href="#" data-tab="favorites" class="tab-link">我的收藏</a></li>
+                <li><a href="#" data-tab="messages" class="tab-link">我的訊息</a></li> {{-- 新增：訊息分頁連結 --}}
             </ul>
         </aside>
 
@@ -50,6 +51,44 @@
                     ])
                 </section>
             </div>
+
+            {{-- 新增：我的訊息 Tab --}}
+            <div id="tab-messages" class="tab-pane">
+                <section class="section">
+                    <h2>我的訊息</h2>
+                    <div class="conversation-list">
+                        @forelse($conversations as $conversation)
+                        @php
+                        // 判斷在這場對話中，誰是「對方」
+                        $otherUser = $conversation->buyer_id === Auth::id() ? $conversation->seller : $conversation->buyer;
+                        $lastMessage = $conversation->messages->first();
+                        @endphp
+                        <a href="{{ route('conversation.start', $otherUser->id) }}" class="conversation-item">
+                            <img src="{{ $otherUser->avatar ? asset('storage/' . $otherUser->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}" alt="avatar" class="avatar">
+                            <div class="conversation-details">
+                                <div class="conversation-header">
+                                    <span class="nickname">{{ $otherUser->nickname }}</span>
+                                    <span class="time">{{ $lastMessage ? $lastMessage->created_at->diffForHumans() : $conversation->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="last-message">
+                                    @if($lastMessage)
+                                    {{-- 如果最新訊息是自己傳的，就加上 "你：" 的前綴 --}}
+                                    @if($lastMessage->sender_id === Auth::id())
+                                    <span class="message-prefix">你：</span>
+                                    @endif
+                                    {{ Str::limit($lastMessage->content, 30) }}
+                                    @else
+                                    開啟對話...
+                                    @endif
+                                </p>
+                            </div>
+                        </a>
+                        @empty
+                        <p>您目前沒有任何對話。</p>
+                        @endforelse
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 </div>
@@ -57,7 +96,7 @@
 
 @push('styles')
 <style>
-    /* --- 主要佈局 --- */
+    
     .member-container {
         display: flex;
         gap: 2rem;
@@ -76,7 +115,6 @@
         min-width: 0;
     }
 
-    /* --- 左側導覽選單 --- */
     .user-profile-summary {
         text-align: center;
         margin-bottom: 1.5rem;
@@ -116,7 +154,6 @@
         color: #fff;
     }
 
-    /* --- 右側內容區塊 --- */
     .tab-pane {
         display: none;
     }
@@ -138,61 +175,67 @@
         }
     }
 
-    /* --- 我的刊登列表樣式 --- */
-    .table-responsive {
-        overflow-x: auto;
+    /* --- 新增：對話列表樣式 --- */
+    .conversation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
-    .listings-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-        min-width: 600px;
-    }
-
-    .listings-table th,
-    .listings-table td {
+    .conversation-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
         padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-        vertical-align: middle;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
     }
 
-    .listings-table th {
+    .conversation-item:hover {
         background-color: #f8f9fa;
-        font-weight: 600;
     }
 
-    .listing-thumbnail {
-        width: 60px;
-        height: 60px;
+    .conversation-item .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
         object-fit: cover;
-        border-radius: 6px;
     }
 
-    .listings-table .btn {
-        padding: 0.3rem 0.7rem;
+    .conversation-details {
+        flex-grow: 1;
+    }
+
+    .conversation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .conversation-header .nickname {
+        font-weight: bold;
+    }
+
+    .conversation-header .time {
         font-size: 0.8rem;
-        border-radius: 4px;
+        color: #6c757d;
     }
 
-    .listings-table .btn-edit {
-        background-color: #ffc107;
-        color: #212529;
-        border: none;
+    .last-message {
+        margin: 0.25rem 0 0;
+        color: #6c757d;
+        font-size: 0.9rem;
     }
 
-    .listings-table .btn-delete {
-        background-color: #dc3545;
-        color: white;
-        border: none;
+    .last-message .message-prefix {
+        color: #333;
+        font-weight: 500;
     }
 </style>
 @endpush
 
 @push('scripts')
 <script src="{{ asset('js/member.js') }}"></script>
+@vite('resources/js/member.js'))
 @endpush

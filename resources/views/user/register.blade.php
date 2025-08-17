@@ -71,21 +71,48 @@
                 <label for="password_confirmation">確認密碼</label>
                 <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" placeholder="請再輸入一次密碼" required autocomplete="new-password">
             </div>
+            <!-- 驗證碼 -->
+            <div class="form-group">
+                <div class="captcha-label">
+                    請輸入驗證碼 <span class="required">*</span>
+                    <span class="refresh-link" onclick="refreshCaptcha()" id="refresh-btn">
+                        🔄 刷新
+                    </span>
+                </div>
+                <div class="captcha-wrapper">
+                    <div class="captcha-image" id="captchaText">{{ $captcha ?? '' }}</div>
+                    <input
+                        type="text"
+                        name="captcha"
+                        class="captcha-input form-control @error('captcha') is-invalid @enderror"
+                        id="captchaInput"
+                        required
+                        maxlength="5"
+                        autocomplete="off">
+                </div>
+                @error('captcha')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn btn-success" id="submit-btn">
+                <span class="btn-text">註冊</span>
+                <span class="btn-spinner" style="display: none;">⏳</span>
+            </button>
             {{-- --- 暫時停用 reCAPTCHA 元件 --- --}}
             {{-- <div class="form-group">
-                <div class="g-recaptcha" data-sitekey="{{  env('RECAPTCHA_SITE_KEY') }}"></div>
-                @error('g-recaptcha-response')
-                <span class="invalid-feedback" style="display: block;">{{ $message }}</span>
-                @enderror
-            </div>--}}
+                <div class="g-recaptcha" data-sitekey="{{  env('RECAPTCHA_SITE_KEY') }}">
+    </div>
+    @error('g-recaptcha-response')
+    <span class="invalid-feedback" style="display: block;">{{ $message }}</span>
+    @enderror
+    </div>--}}
 
+    </form>
 
-            <button type="submit" class="btn btn-success">註冊</button>
-        </form>
-
-        <div class="auth-link">
-            已經有帳號了？ <a href="{{ route('login') }}">前往登入</a>
-        </div>
+    <div class="auth-link">
+        已經有帳號了？ <a href="{{ route('login') }}">前往登入</a>
+    </div>
     </div>
 
     <script>

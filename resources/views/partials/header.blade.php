@@ -8,6 +8,16 @@
         <a href="{{ route('register') }}" class="nav-button btn-secondary">註冊</a>
         <a href="{{ route('login') }}" class="nav-button btn-primary">登入</a>
         @else
+
+        <a href="#" class="nav-button notification-bell" title="通知">
+            🔔
+            @if(isset($unreadNotifications) && $unreadNotifications > 0)
+            <span class="notification-count">{{ $unreadNotifications }}</span>
+            @endif
+        </a>
+
+
+
         {{-- 已登入：顯示會員中心和登出按鈕 --}}
         <a href="{{ route('member.index') }}" class="nav-button btn-secondary">會員中心</a>
 

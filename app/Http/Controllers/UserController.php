@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller {
     /**
@@ -31,7 +32,11 @@ class UserController extends Controller {
         if (Auth::check()) {
             return redirect()->route('home');
         }
-        return view('user.register');
+        // 產生驗證碼並存入Session
+        $captcha = $this ->generateCaptcha();
+        Session::put('captcha', $captcha);
+
+        return view('user.register',['captcha' => $captcha]);
     }
 
     /**
@@ -52,6 +57,15 @@ class UserController extends Controller {
             'password' => ['required', 'confirmed', Password::defaults()], // 密碼欄位是必須的，最小長度為8個字符，並且需要確認密碼
             'nickname' => ['required', 'string', 'max:32'],  // 昵称是必需的，字符串类型，最大长度为32个字符
             'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含數字，長度不超過10個字符
+            // 新增加一個 Captcha 邏輯規則
+            'captcha' => ['required','string',function ($attribute, $value, $fail) {
+                if(strtoupper($value)!== Seeion::get('captcha')){
+                    $newCaptcha = $this->generateCaptcha();
+                    Session::put('captcha',$newCaptcha);
+                    $fail('驗證碼錯誤，請重新輸入。');
+                }
+            }],
+
            /* 'g-recaptcha-response' => ['required',function($attribute,$value,$fail){
                 // 驗證 Google reCAPTCHA
                 $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
@@ -80,8 +94,11 @@ class UserController extends Controller {
             'user_phone.required' => '電話號碼為必填項目。',
             'user_phone.numeric' => '電話號碼只能包含數字。',
             'user_phone.digits' => '電話號碼長度不得超過16個字符。',
+            'captcha.required' => '請輸入驗證碼。',
         ]);
 
+        // 驗證後清除Session中的Captcha
+        Session::forget('captcha');
         // 使用 create 方法建立新使用者
         User::create([
             'account' => $request->account,
@@ -96,6 +113,8 @@ class UserController extends Controller {
         return redirect()->route('login')->with('success', '註冊成功，請登入');
     }
 
+
+    
     /**
      * 處理登入請求
      */
@@ -131,5 +150,23 @@ class UserController extends Controller {
         $request->session()->invalidate(); // 使會話無效
         $request->session()->regenerateToken(); // 重新生成CSRF token
         return redirect()->route('home')->with('success', '登出成功'); // 導向首頁並顯示成功信息
+    }
+
+    /**
+     * AJAX：刷新驗證碼
+     */
+    public function refeshCaptcha(){
+        $captcha = $this->generateCaptcha();
+        Session::put('captcha', $captcha);
+        return response()->json(['captcha' => $captcha]);
+    }
+
+    /**
+     * 私有方法：產生一個 5 位數的驗證碼字串
+     */
+    private function generateCaptcha()
+    {
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        return substr(str_shuffle(str_repeat($chars, 5)), 0, 5);
     }
 }

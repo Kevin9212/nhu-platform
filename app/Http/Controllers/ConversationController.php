@@ -6,16 +6,14 @@ use App\Models\Conversation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // 新增：引入 AuthorizesRequests Trait
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Events\NewMessageReceived;
 
 class ConversationController extends Controller {
-    use AuthorizesRequests; // 新增：在 Controller 中使用這個 Trait
+    use AuthorizesRequests;
 
     /**
      * 開始或顯示與指定使用者的對話。
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\View\View
      */
     public function startOrShow(User $user) {
         /** @var \App\Models\User $currentUser */
@@ -27,7 +25,6 @@ class ConversationController extends Controller {
         }
 
         // 尋找或建立買賣雙方之間的對話
-        // firstOrCreate 會先嘗試尋找，如果找不到，就會用給定的資料建立一個新的
         $conversation = Conversation::firstOrCreate(
             [
                 'buyer_id' => $currentUser->id,
@@ -46,13 +43,9 @@ class ConversationController extends Controller {
 
     /**
      * 在指定的對話中儲存新訊息。
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Conversation  $conversation
-     * @return \Illuminate\Http\JsonResponse
      */
     public function storeMessage(Request $request, Conversation $conversation) {
-        // 權限檢查：確保目前使用者是這個對話的一方
+        // 權限檢查：確保目前使用者是這個對話的一方 
         $this->authorize('view', $conversation);
 
         $request->validate(['content' => 'required|string|max:2000']);
@@ -65,6 +58,9 @@ class ConversationController extends Controller {
             'sender_id' => $user->id,
             'content' => $request->content,
         ]);
+
+        // 步驟 2：在訊息建立後、回傳前，觸發「收到新訊息」事件
+        event(new NewMessageReceived($message));
 
         // 載入新訊息的發送者資訊，以便回傳給前端
         $message->load('sender');

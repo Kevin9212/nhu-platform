@@ -63,3 +63,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/conversation/with/{user}', [ConversationController::class, 'startOrShow'])->name('conversation.start');
     Route::post('/conversation/{conversation}/messages', [ConversationController::class, 'storeMessage'])->name('conversation.message.store');
 });
+
+// --- 評價相關路由 ---
+Route::middleware('auth')->group(function () {
+    // 儲存對某個使用者的新評價
+    Route::post('/users/{user}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+    // 顯示某個使用者收到的所有評價 (一個獨立的頁面)
+    Route::get('/users/{user}/ratings', [RatingController::class, 'index'])->name('ratings.index');
+    // AJAX：取得使用者評價的摘要資訊
+    Route::get('/users/{user}/ratings/summary', [RatingController::class, 'getRatingSummary'])->name('ratings.summary');
+});
+
+//--- 刷新驗證碼路由
+Route::get('/captcha',[UserController::class,'refreshCaptcha'])->name('captcha.refresh');

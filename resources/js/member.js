@@ -1,4 +1,4 @@
-// public/js/member.js
+// resources/js/member.js
 document.addEventListener('DOMContentLoaded', () => {
     const tabLinks = document.querySelectorAll('.tab-link');
     const tabPanes = document.querySelectorAll('.tab-pane');
@@ -36,10 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 頁面載入時，檢查 localStorage 中是否有儲存的分頁紀錄
     const savedTab = localStorage.getItem('activeMemberTab');
-    // 如果有紀錄且該分頁存在，則顯示該分頁，否則顯示第一個分頁
+
+    // 找到第一個可見的導覽連結作為預設值
+    const firstTabLink = document.querySelector('.tab-link');
+    const defaultTab = firstTabLink ? firstTabLink.dataset.tab : 'profile';
+
+    // 如果有紀錄且該分頁存在，則顯示該分頁，否則顯示預設分頁
     const initialTab = (savedTab && document.getElementById(`tab-${savedTab}`))
         ? savedTab
-        : tabLinks[0].dataset.tab;
+        : defaultTab;
 
     switchTab(initialTab);
 });
