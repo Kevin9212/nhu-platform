@@ -9,6 +9,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\Auth\PasswordResetController; // 新增：引入密碼重設控制器
+use App\Http\Controllers\NotificationController; // 新增：引入通知控制器
+use App\Http\Controllers\RatingController; // 新增：引入評價控制器
+use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,3 +79,17 @@ Route::middleware('auth')->group(function () {
 
 //--- 刷新驗證碼路由
 Route::get('/captcha',[UserController::class,'refreshCaptcha'])->name('captcha.refresh');
+
+//--- 新增:: 通知相關路由 --
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+});
+
+// --- 新增：後台管理路由 ---
+// 使用 prefix('admin') 讓所有後台網址都以 /admin/ 開頭
+// 使用 middleware(['auth', 'admin']) 確保只有登入的管理員才能訪問
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // 未來所有後台管理的路由，例如使用者管理、商品管理，都會放在這裡
+});

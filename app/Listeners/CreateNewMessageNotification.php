@@ -3,19 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\NewMessageReceived;
+use App\Notifications\NewMessageNotification; // 引入新的通知類別
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class CreateNewMessageNotification
-{
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
-    }
-
+class CreateNewMessageNotification {
     /**
      * Handle the event.
      */
@@ -23,19 +15,12 @@ class CreateNewMessageNotification
         $message = $event->message;
         $conversation = $message->conversation;
 
-        // 核心修正：先找出接收者，再建立通知
+        // 找出訊息的接收者
         $receiver = $message->sender_id === $conversation->buyer_id
             ? $conversation->seller
             : $conversation->buyer;
 
-        // 建立通知
-        $receiver->notifications()->create([
-            'type' => 'new_message',
-            'data' => json_encode([
-                'message' => Str::limit($message->content, 50),
-                'sender_name' => $message->sender->nickname,
-                'url' => route('conversation.start', $message->sender_id),
-            ]),
-        ]);
+        // 核心修正：使用 notify() 方法來發送通知
+        $receiver->notify(new NewMessageNotification($message));
     }
 }

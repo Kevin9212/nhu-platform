@@ -46,6 +46,8 @@ header nav {
     display: flex;
     align-items: center;
     gap: 10px;
+    position:relative;
+    z-index:1001;
 }
 
 /* --- 修改重點：將 a 標籤也套用按鈕樣式 --- */
@@ -424,4 +426,87 @@ header nav a.btn-primary:hover {
     font-size: 0.7rem;
     font-weight: bold;
     border: 2px solid white;
+}
+.notification-container {
+    position: relative;
+}
+
+.notification-bell {
+    position: relative;
+    font-size: 1.5rem;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.notifications-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 350px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    margin-top: 10px;
+    z-index: 1002;
+    overflow: hidden;
+}
+
+.dropdown-header {
+    padding: 1rem;
+    font-weight: bold;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: block;
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item strong {
+    font-size: 0.9rem;
+}
+
+.notification-item p {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.notification-item .time {
+    font-size: 0.75rem;
+    color: #adb5bd;
+    float: right;
+}
+
+.loading-text,
+.no-notifications {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
 }

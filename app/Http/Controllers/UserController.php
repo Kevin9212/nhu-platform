@@ -59,7 +59,7 @@ class UserController extends Controller {
             'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含數字，長度不超過10個字符
             // 新增加一個 Captcha 邏輯規則
             'captcha' => ['required','string',function ($attribute, $value, $fail) {
-                if(strtoupper($value)!== Seeion::get('captcha')){
+                if(strtoupper($value)!== Session::get('captcha')){
                     $newCaptcha = $this->generateCaptcha();
                     Session::put('captcha',$newCaptcha);
                     $fail('驗證碼錯誤，請重新輸入。');
@@ -155,7 +155,7 @@ class UserController extends Controller {
     /**
      * AJAX：刷新驗證碼
      */
-    public function refeshCaptcha(){
+    public function refreshCaptcha(){
         $captcha = $this->generateCaptcha();
         Session::put('captcha', $captcha);
         return response()->json(['captcha' => $captcha]);
