@@ -125,21 +125,27 @@ class UserController extends Controller {
             'password' => ['required'],
         ]);
 
-        // 使用 Auth::attempt 進行登入驗證，這是 Laravel 的標準做法
-        // 注意：我們使用 'email' 欄位來進行驗證，值來自使用者輸入的 'account'
         if (Auth::attempt(['email' => $credentials['account'], 'password' => $credentials['password']], $request->filled('remember'))) {
-            // 重新生成 session ID，防止 session fixation 攻擊
             $request->session()->regenerate();
 
-            // 登入成功，導向使用者原本想去的頁面，如果沒有則導向首頁
+            $user = Auth::user();
+
+            // 檢查是否被封禁
+            if ($user->user_status === 'banned') {
+                Auth::logout(); // 立刻登出
+                return back()->withErrors([
+                    'account' => '此帳號已被封禁，請聯絡管理員。',
+                ])->onlyInput('account');
+            }
+
             return redirect()->intended(route('home'))->with('success', '登入成功！');
         }
 
-        // 如果驗證失敗，則返回登入頁面，並附帶錯誤訊息
         return back()->withErrors([
             'account' => '帳號或密碼錯誤。',
         ])->onlyInput('account');
     }
+
 
 
     /**

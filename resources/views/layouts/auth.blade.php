@@ -9,7 +9,7 @@
     <title>@yield('title', '南華大學二手交易平台')</title>
 
     {{-- 共用css/js --}}
-    @vite(['resources/css/style.css','resources/js/app.js'])
+    @vite(['resources/css/auth.css','resources/js/app.js'])
     {{--<link rel="stylesheet" href="{{ asset('css/style.css') }}">--}}
     {{-- 頁面專屬css --}}
 

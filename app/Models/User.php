@@ -41,6 +41,7 @@ class User extends Authenticatable {
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_login_time' => 'datetime',
+            'banned_until' => 'datetime',
         ];
     }
 

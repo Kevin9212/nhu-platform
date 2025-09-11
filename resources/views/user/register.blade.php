@@ -1,5 +1,5 @@
 {{-- resources/views/user/register.blade.php --}}
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', '註冊新帳號 - NHU 二手交易平台')
 
