@@ -8,18 +8,20 @@
     <div class="item-detail-container">
         <div class="item-images">
             @if($item->images->isNotEmpty())
-            <img src="{{ asset('storage/' . $item->images->first()->image_url) }}" alt="{{ $item->idle_name }}" class="main-image">
+            <img src="{{ asset('storage/' . $item->images->first()->image_url) }}"
+                alt="{{ $item->idle_name }}" class="main-image">
             @else
-            <img src="https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片" alt="{{ $item->idle_name }}" class="main-image">
+            <img src="https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片"
+                alt="{{ $item->idle_name }}" class="main-image">
             @endif
             {{-- 未來可以新增多張圖片的縮圖輪播 --}}
         </div>
 
         <div class="item-info">
             <h1>{{ $item->idle_name }}</h1>
-
             <div class="seller-info">
-                <img src="{{ asset($item->seller->avatar ?? 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像') }}" alt="{{ $item->seller->nickname }}">
+                <img src="{{ asset($item->seller->avatar ?? 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像') }}"
+                    alt="{{ $item->seller->nickname }}">
                 <div>
                     <strong>{{ $item->seller->nickname }}</strong>
                     <p style="margin: 0; color: #6c757d;">賣家</p>
@@ -28,7 +30,19 @@
 
             <p class="item-price">NT$ {{ number_format($item->idle_price) }}</p>
 
-            <a href="{{ route('conversation.start', ['user' => $item->seller->id]) }}" class="btn btn-primary" style="width: 100%;">聯絡賣家</a>
+            {{-- ✅ 新增議價表單 --}}
+            @if(Auth::check() && Auth::id() !== $item->seller->id)
+            <form method="POST" action="{{ route('negotiations.store', $item) }}" style="margin-bottom: 1rem;">
+                @csrf
+                <label for="proposed_price">出價：</label>
+                <input type="number" name="proposed_price" id="proposed_price"
+                    required min="1" style="width: 100%; padding: 8px; margin: 8px 0;">
+                <button type="submit" class="btn btn-warning" style="width: 100%;">提出議價</button>
+            </form>
+            @endif
+
+            <a href="{{ route('conversation.start', ['user' => $item->seller->id]) }}"
+                class="btn btn-primary" style="width: 100%;">聯絡賣家</a>
         </div>
     </div>
 
@@ -41,7 +55,6 @@
 
 @push('styles')
 <style>
-    /* 針對此頁面的額外樣式 */
     .item-detail-container {
         display: flex;
         gap: 2rem;

@@ -1,5 +1,11 @@
-/* resources/css/style.css */
-html{
+/* public/css/style.css */
+:root {
+    background: rgb(136, 151, 170);
+    button: hsl(207, 22%, 46%);
+
+}
+
+html {
     height: 100%;
 }
 
@@ -7,14 +13,15 @@ body {
     font-family: 'Helvetica Neue', Arial, '蘋方-繁', 'Microsoft JhengHei', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: #edefea;
+    color: #ffffff;
     display: flex;
     min-height: 100%;
     flex-direction: column;
 }
-main{
-    flex-grow:1;
+
+main {
+    flex-grow: 1;
 }
 
 a {
@@ -22,32 +29,37 @@ a {
     color: inherit;
 }
 
+.home-link {
+    color: inherit;
+    text-decoration: none;
+}
+
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
-    color: #333;
+    background-color: #d1d6ce;
+    color: #273636;
     padding: 1rem 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
-    flex-shrink:0;
+    flex-shrink: 0;
 }
 
 header h1 {
     margin: 0;
+    padding: 5px 5px 5px 5px;
     font-size: 1.75rem;
     font-weight: bold;
+    font-size: 3rem;
 }
 
 header nav {
     display: flex;
     align-items: center;
     gap: 10px;
-    position:relative;
-    z-index:1001;
 }
 
 /* --- 修改重點：將 a 標籤也套用按鈕樣式 --- */
@@ -68,20 +80,31 @@ header nav a.btn-secondary {
     border-color: #ddd;
 }
 
+header nav a.btn-logout {
+    background-color: #637873;
+    color: white;
+}
+
+
 header nav a.btn-secondary:hover {
     background-color: #e2e6ea;
     border-color: #ccc;
 }
 
 header nav a.btn-primary {
-    background-color: #007bff;
+    background-color: #637873;
     color: white;
 }
 
 header nav a.btn-primary:hover {
-    background-color: #0056b3;
+    background-color: #425f7f;
 }
 
+.search h1 {
+    font-size: 3rem;
+    margin: 6rem 3rem 0rem 4rem;
+    color: #273636;
+}
 
 .search-bar {
     margin: 2rem 0;
@@ -135,8 +158,9 @@ header nav a.btn-primary:hover {
 .section h2 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #eee;
+    margin-left: 2.7rem;
     padding-bottom: 0.5rem;
+    color: #273636;
 }
 
 .products {
@@ -206,39 +230,42 @@ header nav a.btn-primary:hover {
     font-weight: bold;
     color: #e44d26;
 }
+
 /* 加入錯誤的輸入框樣式 */
-.form-control.is-invalid{
+.form-control.is-invalid {
     border-color: #dc3545;
     background-color: #fef2f2;
     /* 淡紅背景，增加對比 */
     padding-right: calc(1.5em + .75rem);
     /* 預留圖示空間 */
     background-image: url('https: //placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片');
-    background-repeat: no-repeat; /* 背景不重複 */
-    background-position: right calc(.375em + .1875rem) center; /* 圖示位置放在輸入框右邊並垂直置中 */
-    background-size: calc(.75em + .375rem) calc(.75em + .375rem);   /* 圖示大小 */
-    
+    background-repeat: no-repeat;
+    /* 背景不重複 */
+    background-position: right calc(.375em + .1875rem) center;
+    /* 圖示位置放在輸入框右邊並垂直置中 */
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+    /* 圖示大小 */
+
 }
+
 /* 錯誤的輸入框在 focus 時 */
-.form-control.is-invalid:focus{
+.form-control.is-invalid:focus {
     border-color: #dc3545;
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
 }
+
 /* 錯誤訊息文字 */
-.invalid-feedback{
+.invalid-feedback {
     display: block;
     width: 100%;
     margin-top: .25rem;
     font-size: .875em;
-    color: #dc3545; /* 紅色文字 */
+    color: #dc3545;
+    /* 紅色文字 */
 }
 
 .search-form {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    margin: 2rem auto;
+    margin: 1rem auto 2rem 4rem;
     max-width: 1000px;
 }
 
@@ -258,6 +285,38 @@ header nav a.btn-primary:hover {
 
 .search-input-group input[type="text"] {
     flex-grow: 1;
+}
+
+.search-input {
+    background-color: #f8f9f5;
+    border: none;
+    color: #273636;
+    padding: 0.3rem 0.3rem;
+    margin: 0rem 0rem 1rem 0rem;
+    border-radius: 6px 0px 0px 6px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    width: 800px;
+    height: 35px;
+}
+
+.search-button {
+
+    height: 45px;
+    width: 45px;
+    border: none;
+    border-radius: 0px 7px 7px 0px;
+    background-color: #f8f9f5;
+}
+
+.search-icon img {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}
+
+.search-button:active {
+    background-color: #d7d8d5;
 }
 
 .search-input-group button {
@@ -305,11 +364,12 @@ header nav a.btn-primary:hover {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    margin-left:0rem;
 }
 
 .view-all-link,
 .refresh-btn {
-    color: #007bff;
+    color: #273636;
     text-decoration: none;
     font-size: 0.9rem;
     background: none;
@@ -319,8 +379,10 @@ header nav a.btn-primary:hover {
 
 /* --- 新增：搜尋建議 --- */
 .search-input-container {
+    display: flex;
     position: relative;
     width: 100%;
+
 }
 
 .search-suggestions {
@@ -348,6 +410,40 @@ header nav a.btn-primary:hover {
 /* --- 新增：商品卡片狀態標籤 --- */
 .product-image-link {
     position: relative;
+}
+
+.filter-select {
+    appearance: none;
+    /* 移除瀏覽器預設樣式 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    margin: 0rem 3rem 1rem 0rem;
+    background-color: #f9f9f5;
+    border: 1px solid #f9f9f5;
+    border-radius: 6px;
+    padding: 0.1rem 2rem 0.1rem 0.1rem;
+    /* 右邊預留給箭頭 */
+    font-size: 1.25rem;
+    color: hsl(214, 3%, 58%);
+    cursor: pointer;
+    min-width: 500px;
+    /* 可以調寬度 */
+    height: 40px;
+}
+
+.price-input {
+    /* 移除瀏覽器預設樣式 */
+    margin: 0rem 3rem 1rem 0rem;
+    background-color: #f9f9f5;
+    border: 1px solid #f9f9f5;
+    border-radius: 6px;
+    padding: 0.1rem 2rem 0.1rem 0.1rem;
+    /* 右邊預留給箭頭 */
+    font-size: 1.25rem;
+    color: hsl(210, 3%, 70%);
+    cursor: pointer;
+    min-width: 150px;
+    height: 35px;
 }
 
 .status-badge {
@@ -407,106 +503,4 @@ header nav a.btn-primary:hover {
     font-size: 0.8rem;
     color: #6c757d;
     margin-top: 0.75rem;
-}
-.notification-bell {
-    position: relative;
-    font-size: 1.5rem;
-    /* 讓鈴鐺圖示變大一點 */
-}
-
-.notification-count {
-    position: absolute;
-    top: -5px;
-    right: -8px;
-    background-color: #dc3545;
-    /* 紅色背景 */
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    border: 2px solid white;
-}
-.notification-container {
-    position: relative;
-}
-
-.notification-bell {
-    position: relative;
-    font-size: 1.5rem;
-}
-
-.notification-count {
-    position: absolute;
-    top: -5px;
-    right: -8px;
-    background-color: #dc3545;
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    border: 2px solid white;
-}
-
-.notifications-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 350px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-    margin-top: 10px;
-    z-index: 1002;
-    overflow: hidden;
-}
-
-.dropdown-header {
-    padding: 1rem;
-    font-weight: bold;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.dropdown-body {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    display: block;
-    padding: 1rem;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s ease;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-.notification-item:hover {
-    background-color: #f8f9fa;
-}
-
-.notification-item strong {
-    font-size: 0.9rem;
-}
-
-.notification-item p {
-    margin: 0.25rem 0 0;
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-.notification-item .time {
-    font-size: 0.75rem;
-    color: #adb5bd;
-    float: right;
-}
-
-.loading-text,
-.no-notifications {
-    padding: 2rem;
-    text-align: center;
-    color: #6c757d;
 }

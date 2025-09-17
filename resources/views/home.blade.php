@@ -11,7 +11,7 @@
     {{-- 最新上架商品區塊 --}}
     <section class="section">
         <div class="section-header">
-            <h2>📦 最新上架商品</h2>
+
             <a href="{{ route('idle-items.index') }}" class="view-all-link">查看全部 →</a>
         </div>
 
@@ -32,7 +32,6 @@
     {{-- 隨機推薦商品區塊 --}}
     <section class="section">
         <div class="section-header">
-            <h2>🎁 隨機推薦商品</h2>
             <button onclick="refreshRecommendations()" class="refresh-btn">🔄 換一批</button>
         </div>
 

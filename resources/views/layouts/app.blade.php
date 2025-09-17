@@ -6,13 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', '南華大學二手交易平台')</title>
+    <title>@yield('title', 'NHU 2ND')</title>
+
 
     {{-- 共用css/js --}}
     @vite(['resources/css/style.css','resources/js/app.js'])
     {{--<link rel="stylesheet" href="{{ asset('css/style.css') }}">--}}
     {{-- 頁面專屬css --}}
-
     @stack('styles')
 </head>
 
@@ -52,7 +52,6 @@
     </footer>
     {{-- 頁面專屬js --}}
     @stack('scripts')
-    <script src="{{ asset('js/main.js') }}"></script>
 </body>
 
 </html>

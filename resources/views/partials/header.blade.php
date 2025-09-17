@@ -1,6 +1,6 @@
 {{-- resources/views/partials/header.blade.php --}}
 <header>
-    <h1><a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">南華二手交易平台</a></h1>
+    <h1><a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">NHU 2nd</a></h1>
     <nav>
         @guest
         {{-- Not logged in: Show Register and Login buttons --}}
@@ -19,7 +19,7 @@
         <form method="POST" action="{{ route('logout') }}" style="display: inline;">
             @csrf
             <a href="{{ route('logout') }}"
-                class="nav-button btn-secondary"
+                class="nav-button btn-logout"
                 onclick="event.preventDefault(); this.closest('form').submit();">
                 登出
             </a>

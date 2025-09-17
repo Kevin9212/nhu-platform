@@ -11,8 +11,9 @@
                     autocomplete="off"
                     id="searchInput">
                 <button type="submit" class="search-button">
-                    <span class="search-icon">🔍</span>
-                    <span class="search-text">搜尋</span>
+                    <span class="search-icon">
+                        <img src="images/search_icon.png" alt="Search" class="icon">
+                    </span>
                 </button>
             </div>
         </div>
@@ -21,7 +22,7 @@
         @if($showAdvanced ?? true)
         <div class="filters-row" id="filtersRow">
             <div class="filter-group">
-                <label for="category_id" class="filter-label">分類</label>
+
                 <select name="category_id" id="category_id" class="filter-select">
                     <option value="">所有分類</option>
                     @if(isset($categories) && $categories->count() > 0)
@@ -36,7 +37,7 @@
             </div>
 
             <div class="filter-group price-filters">
-                <label class="filter-label">價格範圍</label>
+
                 <div class="price-inputs">
                     <input type="number"
                         name="min_price"
