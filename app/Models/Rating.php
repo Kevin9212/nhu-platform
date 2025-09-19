@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Datebase\Eloquent\Factories\HasFactory;a
+use Illuminate\Datebase\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

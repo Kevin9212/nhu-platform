@@ -170,7 +170,7 @@ header nav a.btn-primary:hover {
 }
 
 .product-card {
-    background: white;
+    background: #f9f9f6;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
@@ -265,7 +265,7 @@ header nav a.btn-primary:hover {
 }
 
 .search-form {
-    margin: 1rem auto 2rem 4rem;
+    margin: 1rem auto 2rem 22rem;
     max-width: 1000px;
 }
 

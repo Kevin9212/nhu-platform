@@ -32,7 +32,7 @@
     {{-- 隨機推薦商品區塊 --}}
     <section class="section">
         <div class="section-header">
-            <button onclick="refreshRecommendations()" class="refresh-btn">🔄 換一批</button>
+            <button onclick="refreshRecommendations()" class="refresh-btn"> 換一批</button>
         </div>
 
         <div id="random-items-container">
@@ -53,19 +53,19 @@
         const refreshBtn = document.querySelector('.refresh-btn');
 
         // 顯示載入狀態
-        refreshBtn.textContent = '🔄 載入中...';
+        refreshBtn.textContent = ' 載入中...';
         refreshBtn.disabled = true;
 
         fetch('{{ route("home.random-items") }}')
             .then(response => response.text())
             .then(html => {
                 container.innerHTML = html;
-                refreshBtn.textContent = '🔄 換一批';
+                refreshBtn.textContent = ' 換一批';
                 refreshBtn.disabled = false;
             })
             .catch(error => {
                 console.error('Error:', error);
-                refreshBtn.textContent = '🔄 換一批';
+                refreshBtn.textContent = ' 換一批';
                 refreshBtn.disabled = false;
             });
     }

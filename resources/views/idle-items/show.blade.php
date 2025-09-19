@@ -79,6 +79,7 @@
     }
 
     .item-info h1 {
+        color: #273636;
         margin-top: 0;
         font-size: 2rem;
     }
@@ -86,7 +87,7 @@
     .item-price {
         font-size: 1.8rem;
         font-weight: bold;
-        color: #e44d26;
+        color: #273636;
         margin: 1rem 0;
     }
 
@@ -108,6 +109,7 @@
     }
 
     .item-description {
+        color:#273636;
         margin-top: 2rem;
         line-height: 1.8;
     }

@@ -9,7 +9,10 @@
         @else
         {{-- Logged in: Show notification bell, Member Center, and Logout form --}}
         <a href="#" class="nav-button notification-bell" title="通知">
-            🔔
+
+            <span class="search-icon">
+                <img src="images/notify.png" alt="notify" class="icon">
+            </span>
             @if(isset($unreadNotifications) && $unreadNotifications > 0)
             <span class="notification-count">{{ $unreadNotifications }}</span>
             @endif
