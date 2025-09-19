@@ -14,11 +14,11 @@
             <img src="https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片"
                 alt="{{ $item->idle_name }}" class="main-image">
             @endif
-            {{-- 未來可以新增多張圖片的縮圖輪播 --}}
         </div>
 
         <div class="item-info">
             <h1>{{ $item->idle_name }}</h1>
+
             <div class="seller-info">
                 <img src="{{ asset($item->seller->avatar ?? 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像') }}"
                     alt="{{ $item->seller->nickname }}">
@@ -30,7 +30,7 @@
 
             <p class="item-price">NT$ {{ number_format($item->idle_price) }}</p>
 
-            {{-- ✅ 新增議價表單 --}}
+            {{-- ✅ 議價表單 --}}
             @if(Auth::check() && Auth::id() !== $item->seller->id)
             <form method="POST" action="{{ route('negotiations.store', $item) }}" style="margin-bottom: 1rem;">
                 @csrf
@@ -41,6 +41,7 @@
             </form>
             @endif
 
+            {{-- 聯絡賣家（進聊天室） --}}
             <a href="{{ route('conversation.start', ['user' => $item->seller->id]) }}"
                 class="btn btn-primary" style="width: 100%;">聯絡賣家</a>
         </div>
@@ -52,66 +53,3 @@
     </div>
 </div>
 @endsection
-
-@push('styles')
-<style>
-    .item-detail-container {
-        display: flex;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-
-    .item-images {
-        flex: 1;
-    }
-
-    .main-image {
-        width: 100%;
-        height: auto;
-        max-height: 500px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-
-    .item-info {
-        flex: 1;
-    }
-
-    .item-info h1 {
-        color: #273636;
-        margin-top: 0;
-        font-size: 2rem;
-    }
-
-    .item-price {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: #273636;
-        margin: 1rem 0;
-    }
-
-    .seller-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1.5rem 0;
-    }
-
-    .seller-info img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .item-description {
-        color:#273636;
-        margin-top: 2rem;
-        line-height: 1.8;
-    }
-</style>
-@endpush

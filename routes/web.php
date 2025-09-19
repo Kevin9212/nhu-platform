@@ -15,7 +15,7 @@ use App\Http\Controllers\NegotiationController;        // 前台議價
 use App\Http\Controllers\Admin\DashboardController;    // 後台儀表板
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\NegotiationController as AdminNegotiationController;
-
+use App\Http\Controllers\Admin\ItemController; // 後台商品管理
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -62,10 +62,21 @@ Route::middleware(['auth', 'checkBanned'])->group(function () {
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
 
-// --- 聊天功能 ---
+// --- 聊天室功能 ---
 Route::middleware(['auth', 'checkBanned'])->group(function () {
-    Route::get('/conversation/with/{user}', [ConversationController::class, 'startOrShow'])->name('conversation.start');
-    Route::post('/conversation/{conversation}/messages', [ConversationController::class, 'storeMessage'])->name('conversation.message.store');
+    // 收件匣（顯示所有對話，預設選第一個）
+    Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+
+    // 單一聊天室
+    Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
+
+    // 發送訊息
+    Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage'])
+        ->name('conversations.message.store');
+   
+// 開始對話    
+    Route::get('/conversations/start/{user}', [ConversationController::class, 'start'])
+        ->name('conversation.start');
 });
 
 // --- 評價功能 ---
@@ -86,6 +97,7 @@ Route::middleware(['auth', 'checkBanned'])->group(function () {
 
 // --- 後台管理 ---
 Route::redirect('/admin', '/admin/dashboard');
+
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->name('admin.')
@@ -98,11 +110,18 @@ Route::prefix('admin')
         Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
         Route::patch('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
 
+        // 商品管理
+        Route::get('/items', [App\Http\Controllers\Admin\ItemController::class, 'index'])->name('items.index');
+        Route::get('/items/{item}', [App\Http\Controllers\Admin\ItemController::class, 'show'])->name('items.show');
+        Route::patch('/items/{item}/approve', [App\Http\Controllers\Admin\ItemController::class, 'approve'])->name('items.approve');
+        Route::patch('/items/{item}/reject', [App\Http\Controllers\Admin\ItemController::class, 'reject'])->name('items.reject');
+        Route::patch('/items/{item}/toggle-status', [App\Http\Controllers\Admin\ItemController::class, 'toggleStatus'])->name('items.toggle');
+
         // 議價管理
         Route::get('/negotiations', [AdminNegotiationController::class, 'index'])->name('negotiations.index');
+        Route::patch('/negotiations/{negotiation}/agree', [AdminNegotiationController::class, 'agree'])->name('negotiations.agree');
+        Route::patch('/negotiations/{negotiation}/reject', [AdminNegotiationController::class, 'reject'])->name('negotiations.reject');
     });
-
-// --- 議價功能（前台買賣雙方） ---
 Route::middleware(['auth'])->group(function () {
     Route::post('/items/{item}/negotiations', [NegotiationController::class, 'store'])->name('negotiations.store');
     Route::patch('/negotiations/{negotiation}/agree', [NegotiationController::class, 'agree'])->name('negotiations.agree');

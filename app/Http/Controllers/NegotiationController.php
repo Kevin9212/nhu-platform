@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\IdleItem;
 use App\Models\Negotiation;
-use App\Models\Conversation;
+use App\Models\IdleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NegotiationController extends Controller {
     /**
-     * 儲存新的議價紀錄
+     * 建立新的議價
      */
     public function store(Request $request, IdleItem $item) {
         $request->validate([
@@ -18,30 +17,35 @@ class NegotiationController extends Controller {
         ]);
 
         $buyer = Auth::user();
-        $seller = $item->user; // IdleItem 應該有 user() 關聯
 
-        // 找到或建立買賣雙方的對話
-        $conversation = Conversation::firstOrCreate([
-            'buyer_id'  => $buyer->id,
-            'seller_id' => $seller->id,
-        ]);
-
-        // 1) 儲存議價紀錄
+        // 建立議價紀錄
         $negotiation = Negotiation::create([
-            'idle_item_id'   => $item->id,
-            'buyer_id'       => $buyer->id,
-            'seller_id'      => $seller->id,
+            'idle_item_id'  => $item->id,
+            'buyer_id'      => $buyer->id,
+            'seller_id'     => $item->seller->id,
             'proposed_price' => $request->proposed_price,
         ]);
 
-        // 2) 建立一則系統訊息
-        $conversation->messages()->create([
-            'sender_id' => $buyer->id,
-            'content'   => "💰 買家提出 NT$ " . number_format($request->proposed_price) . " 的議價。",
-            'msg_type'  => 'system',
-        ]);
+        // 🚀 未來可以整合進聊天室訊息
+        // $conversation->messages()->create([...]);
 
-        // 3) 回應
-        return back()->with('success', '已送出議價！');
+        return redirect()->route('conversation.start', ['user' => $item->seller->id])
+            ->with('success', '議價已送出，請等待賣家回覆！');
+    }
+
+    /**
+     * 賣家同意議價
+     */
+    public function agree(Negotiation $negotiation) {
+        $negotiation->update(['status' => 'agreed']);
+        return back()->with('success', '已同意此議價！');
+    }
+
+    /**
+     * 賣家拒絕議價
+     */
+    public function reject(Negotiation $negotiation) {
+        $negotiation->update(['status' => 'rejected']);
+        return back()->with('info', '已拒絕此議價。');
     }
 }

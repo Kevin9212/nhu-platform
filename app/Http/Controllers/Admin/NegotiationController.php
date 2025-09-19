@@ -7,31 +7,24 @@ use App\Models\Negotiation;
 use Illuminate\Http\Request;
 
 class NegotiationController extends Controller {
-    /**
-     * 顯示所有議價紀錄
-     */
+    // 列出所有議價
     public function index() {
-        // 載入關聯 (買家、賣家、商品)
-        $negotiations = Negotiation::with(['buyer', 'seller', 'item'])
-            ->orderByDesc('created_at')
-            ->paginate(10);
+        $negotiations = Negotiation::with(['item', 'buyer', 'seller'])
+            ->latest()
+            ->paginate(20);
 
         return view('admin.negotiations.index', compact('negotiations'));
     }
 
-    /**
-     * 管理員介入：將議價標記為同意
-     */
+    // 管理員同意
     public function agree(Negotiation $negotiation) {
         $negotiation->update(['status' => 'agreed']);
-        return back()->with('success', '已同意此議價！');
+        return back()->with('success', '管理員已同意此議價');
     }
 
-    /**
-     * 管理員介入：將議價標記為拒絕
-     */
+    // 管理員拒絕
     public function reject(Negotiation $negotiation) {
         $negotiation->update(['status' => 'rejected']);
-        return back()->with('success', '已拒絕此議價！');
+        return back()->with('info', '管理員已拒絕此議價');
     }
 }

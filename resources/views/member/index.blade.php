@@ -16,7 +16,6 @@
                 <li><a href="#" data-tab="profile" class="tab-link active">個人資料</a></li>
                 <li><a href="#" data-tab="listings" class="tab-link">我的刊登</a></li>
                 <li><a href="#" data-tab="favorites" class="tab-link">我的收藏</a></li>
-                <li><a href="#" data-tab="messages" class="tab-link">我的訊息</a></li> {{-- 新增：訊息分頁連結 --}}
             </ul>
         </aside>
 
@@ -49,44 +48,6 @@
                     'items' => $favoriteItems->pluck('item')->filter(),
                     'emptyMessage' => '您目前沒有任何收藏的商品。'
                     ])
-                </section>
-            </div>
-
-            {{-- 新增：我的訊息 Tab --}}
-            <div id="tab-messages" class="tab-pane">
-                <section class="section">
-                    <h2>我的訊息</h2>
-                    <div class="conversation-list">
-                        @forelse($conversations as $conversation)
-                        @php
-                        // 判斷在這場對話中，誰是「對方」
-                        $otherUser = $conversation->buyer_id === Auth::id() ? $conversation->seller : $conversation->buyer;
-                        $lastMessage = $conversation->messages->first();
-                        @endphp
-                        <a href="{{ route('conversation.start', $otherUser->id) }}" class="conversation-item">
-                            <img src="{{ $otherUser->avatar ? asset('storage/' . $otherUser->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}" alt="avatar" class="avatar">
-                            <div class="conversation-details">
-                                <div class="conversation-header">
-                                    <span class="nickname">{{ $otherUser->nickname }}</span>
-                                    <span class="time">{{ $lastMessage ? $lastMessage->created_at->diffForHumans() : $conversation->created_at->diffForHumans() }}</span>
-                                </div>
-                                <p class="last-message">
-                                    @if($lastMessage)
-                                    {{-- 如果最新訊息是自己傳的，就加上 "你：" 的前綴 --}}
-                                    @if($lastMessage->sender_id === Auth::id())
-                                    <span class="message-prefix">你：</span>
-                                    @endif
-                                    {{ Str::limit($lastMessage->content, 30) }}
-                                    @else
-                                    開啟對話...
-                                    @endif
-                                </p>
-                            </div>
-                        </a>
-                        @empty
-                        <p>您目前沒有任何對話。</p>
-                        @endforelse
-                    </div>
                 </section>
             </div>
         </main>
@@ -237,5 +198,5 @@
 
 @push('scripts')
 <script src="{{ asset('js/member.js') }}"></script>
-@vite('resources/js/member.js'))
+@vite('resources/js/member.js')
 @endpush

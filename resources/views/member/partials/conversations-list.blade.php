@@ -6,7 +6,7 @@
     $otherUser = $conversation->buyer_id === Auth::id() ? $conversation->seller : $conversation->buyer;
     $lastMessage = $conversation->messages->first();
     @endphp
-    <a href="{{ route('conversation.start', $otherUser->id) }}" class="conversation-item">
+    <a href="{{ route('conversations.show', $otherUser->id) }}" class="conversation-item">
         <img src="{{ $otherUser->avatar ? asset('storage/' . $otherUser->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}" alt="avatar" class="avatar">
         <div class="conversation-details">
             <div class="conversation-header">

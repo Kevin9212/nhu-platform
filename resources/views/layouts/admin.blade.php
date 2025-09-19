@@ -110,6 +110,8 @@
             <nav class="nav">
                 <a href="{{ route('admin.dashboard') }}">📊 儀表板</a>
                 <a href="{{ route('admin.users.index') }}">👥 使用者管理</a>
+                <a href ="{{ route('admin.items.index') }}">🛒 商品審核</a>
+                <a href="{{ route('admin.negotiations.index') }}">💰 議價管理</a>
                 {{-- 後續會加入：商品審核 / 訂單 / 地點 / 公告 等 --}}
             </nav>
         </aside>
