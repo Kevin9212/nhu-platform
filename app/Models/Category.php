@@ -10,7 +10,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name','sort_order'];
 
     /**
      * 一個分類底下可以有多個商品

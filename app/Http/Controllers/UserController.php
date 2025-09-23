@@ -66,17 +66,7 @@ class UserController extends Controller {
                 }
             }],
 
-           /* 'g-recaptcha-response' => ['required',function($attribute,$value,$fail){
-                // 驗證 Google reCAPTCHA
-                $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                    'secret' => env('RECAPTCHA_SECRET_KEY'),
-                    'response' => $value, // 前端傳回的 reCAPTCHA Token
-                    'remoteip' => request()->ip(), // 可選，使用者的 IP 地址
-                ]);
-                if(!$response->json()['success']) {
-                    $fail('驗證碼錯誤，請重新輸入。');
-                }
-            }],*/
+           
         ], [
             // 自定錯誤訊息
             'account.required' => '學校信箱為必填項目。',

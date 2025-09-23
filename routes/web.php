@@ -16,6 +16,13 @@ use App\Http\Controllers\Admin\DashboardController;    // 後台儀表板
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\NegotiationController as AdminNegotiationController;
 use App\Http\Controllers\Admin\ItemController; // 後台商品管理
+
+
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Request;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,6 +46,24 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 });
+
+/*email驗證路由*/
+// 顯示提示頁
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// 驗證連結
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/'); // 驗證後導回首頁或會員中心
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// 重新發送驗證信
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', '驗證信已寄出！');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // 登出
 Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
