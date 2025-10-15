@@ -13,8 +13,8 @@ body {
     font-family: 'Helvetica Neue', Arial, '蘋方-繁', 'Microsoft JhengHei', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #edefea;
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #1497e4;
     display: flex;
     min-height: 100%;
     flex-direction: column;
@@ -168,7 +168,7 @@ header nav a.btn-primary:hover {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
 }
-
+/*
 .product-card {
     background: #f9f9f6;
     border-radius: 8px;
@@ -230,7 +230,7 @@ header nav a.btn-primary:hover {
     font-weight: bold;
     color: #e44d26;
 }
-
+*/
 /* 加入錯誤的輸入框樣式 */
 .form-control.is-invalid {
     border-color: #dc3545;
@@ -238,7 +238,7 @@ header nav a.btn-primary:hover {
     /* 淡紅背景，增加對比 */
     padding-right: calc(1.5em + .75rem);
     /* 預留圖示空間 */
-    background-image: url('https: //placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片');
+    background-image: url('https://placehold.co/600x400/EFEFEF/AAAAAA&text=無圖片');
     background-repeat: no-repeat;
     /* 背景不重複 */
     background-position: right calc(.375em + .1875rem) center;

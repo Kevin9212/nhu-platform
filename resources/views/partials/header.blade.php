@@ -11,44 +11,56 @@
 
         {{-- 🔹 導覽選單 --}}
         <nav class="nav-menu" id="navMenu">
-            
-            <a href="{{ route('search.index') }}" class="nav-link">搜尋商品</a>
-
-            @auth
-            <a href="{{ route('conversations.index') }}" class="nav-link">聊天室</a>
-            <a href="{{ route('member.index') }}" class="nav-link">會員中心</a>
-
-            {{-- 🔔 通知 --}}
-            <a href="{{ route('notifications.index') }}" class="notification-bell">
-                <img src="{{ asset('images/notify.png') }}" alt="notify" class="icon">
-                @if(isset($unreadNotifications) && $unreadNotifications > 0)
-                <span class="notification-count">{{ $unreadNotifications }}</span>
-                @endif
+            <a href="{{ route('search.index') }}" class="nav-link">
+                <img class="search-icon" src="{{ asset('images/search_icon.png') }}" alt="search">
             </a>
 
-            {{-- 登出 --}}
-            <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-                @csrf
-                <button type="submit" class="btn-logout">登出</button>
-            </form>
+            @auth
+                <a href="{{ route('conversations.index') }}" class="nav-link">
+                    <img class="search-icon" src="{{ asset('images/speach-icon.png') }}" alt="chat">
+                </a>
+
+                <a href="{{ route('member.index') }}" class="nav-link">
+                    <img class="search-icon" src="{{ asset('images/member-iocn.png') }}" alt="member">
+                </a>
+
+                {{-- 🔔 通知 --}}
+                <a href="{{ route('notifications.index') }}" class="notification-bell">
+                    <img src="{{ asset('images/notify.png') }}" alt="notify" class="icon">
+                    @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                        <span class="notification-count">{{ $unreadNotifications }}</span>
+                    @endif
+                </a>
+
+                {{-- 登出 --}}
+                <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-logout">登出</button>
+                </form>
             @else
-            <a href="{{ route('login') }}" class="nav-link">登入</a>
-            <a href="{{ route('register') }}" class="nav-link">註冊</a>
+                <a href="{{ route('login') }}" class="nav-link">登入</a>
+                <a href="{{ route('register') }}" class="nav-link">註冊</a>
             @endauth
         </nav>
     </div>
 </header>
 
+@push('styles')
+<style>
+/* 你的 header 相關 CSS 可放這 */
+</style>
+@endpush
+
 @push('scripts')
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const menuToggle = document.getElementById("menuToggle");
-        const navMenu = document.getElementById("navMenu");
-        if (menuToggle) {
-            menuToggle.addEventListener("click", () => {
-                navMenu.classList.toggle("active");
-            });
-        }
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    const menuToggle = document.getElementById("menuToggle");
+    const navMenu = document.getElementById("navMenu");
+    if (menuToggle) {
+        menuToggle.addEventListener("click", () => {
+            navMenu.classList.toggle("active");
+        });
+    }
+});
 </script>
 @endpush

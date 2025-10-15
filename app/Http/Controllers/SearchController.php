@@ -1,5 +1,6 @@
 <?php
 
+// app/Http/Controllers/SearchController.php
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -8,53 +9,56 @@ use App\Models\Category;
 
 class SearchController extends Controller {
     public function index(Request $request) {
-        // 接收搜尋條件
-        $query      = $request->input('query');        // 關鍵字
-        $categoryId = $request->input('category_id');  // 分類
-        $minPrice   = $request->input('min_price');    // 最低價
-        $maxPrice   = $request->input('max_price');    // 最高價
+        // ★ 支援 q 與 query 兩種名稱
+        $q          = trim((string) $request->input('q', $request->input('query', '')));
+        $categoryId = $request->input('category_id');
+        $minPrice   = $request->input('min_price');
+        $maxPrice   = $request->input('max_price');
 
-        // 先抓分類給下拉選單用
         $categories = Category::all();
 
-        // 查詢 IdleItem
-        $itemsQuery = IdleItem::with(['seller', 'category', 'images'])
+        $itemsQuery = IdleItem::query()
+            ->with([
+                // ★ 圖片關聯一起載，並固定第一張排序
+                'images' => fn($qq) => $qq->oldest('id'),
+                'seller',
+                'category',
+            ])
             ->where('idle_status', 1);
 
-        // 模糊搜尋
-        if ($query) {
-            $itemsQuery->where(function ($q) use ($query) {
-                $q->where('idle_name', 'LIKE', "%{$query}%")
-                    ->orWhere('idle_details', 'LIKE', "%{$query}%");
+        if ($q !== '') {
+            $itemsQuery->where(function ($w) use ($q) {
+                $w->where('idle_name', 'like', "%{$q}%")
+                  ->orWhere('idle_details', 'like', "%{$q}%");
             });
         }
 
-        // 分類篩選
         if ($categoryId) {
             $itemsQuery->where('category_id', $categoryId);
         }
-
-        // 價格範圍
-        if ($minPrice !== null) {
-            $itemsQuery->where('idle_price', '>=', $minPrice);
+        if ($minPrice !== null && $minPrice !== '') {
+            $itemsQuery->where('idle_price', '>=', (int)$minPrice);
         }
-        if ($maxPrice !== null) {
-            $itemsQuery->where('idle_price', '<=', $maxPrice);
+        if ($maxPrice !== null && $maxPrice !== '') {
+            $itemsQuery->where('idle_price', '<=', (int)$maxPrice);
         }
 
-        // 分頁
-        $items = $itemsQuery->orderBy('created_at', 'desc')->paginate(12);
+        // ★ 保留查詢字串，分頁不會丟掉篩選條件
+        $items = $itemsQuery->orderByDesc('created_at')->paginate(12)->withQueryString();
 
         return view('search.index', compact('items', 'categories'));
     }
 
     public function suggestions(Request $request) {
-        $term = $request->input('term');
+        // ★ 支援 q 與 term 兩種名稱
+        $term = trim((string) $request->input('q', $request->input('term', '')));
 
         $suggestions = IdleItem::where('idle_status', 1)
             ->where('idle_name', 'LIKE', "%{$term}%")
             ->limit(5)
-            ->pluck('idle_name');
+            ->pluck('idle_name')
+            ->unique()
+            ->values();
 
         return response()->json($suggestions);
     }

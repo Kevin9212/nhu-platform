@@ -1,25 +1,160 @@
 /*
- * 這是你的主要 CSS 進入點，通常與 Laravel Vite 或 Mix 配合使用。
- * 它引入了 Tailwind CSS，並設定了內容來源，
- * 以便 Tailwind 的 JIT (Just-In-Time) 引擎能夠掃描你的檔案並生成必要的 CSS。
- */
-
+ * Tailwind v4 入口與掃描來源
+ * -------------------------------------------------- */
 @import 'tailwindcss';
 
-/*
- * @source 指令告訴 JIT 引擎要去掃描哪些檔案。
- * 這確保了你在 Blade 模板和 JS 中使用的任何 Tailwind class 都會被正確編譯。
- */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/*
- * @theme 區塊用來自訂 Tailwind 的設計系統，
- * 例如更換預設字體。
- */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+               'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
 }
+
+/* ==================================================
+   自訂覆蓋（只放需要覆蓋的部分，避免與 style.css 打架）
+   ================================================== */
+
+/* 產品卡：避免被全域白字影響，並確保內容層級在圖片之上 */
+
+.product-image-link { position: relative; z-index: 0; }
+.product-content   { position: relative; z-index: 1; }
+
+/* 產品標題連結：常態深灰、hover 藍、visited 維持深灰 */
+.product-title a {
+  color: #1f2937 !important;        /* slate-800 */
+  text-decoration: none;
+}
+.product-title a:hover,
+.product-title a:focus { color: #2563eb !important; } /* blue-600 */
+.product-title a:visited { color: #1f2937 !important; }
+
+/* 狀態徽章（與你現有配色一致） */
+.status-badge {
+  position: absolute;
+  top: .75rem; right: .75rem;
+  padding: .25rem .6rem;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 700;
+}
+.status-badge.new  { background: #198754; color:#fff; } /* bootstrap 成功綠 */
+.status-badge.sold { background: #dc3545; color:#fff; } /* bootstrap 危險紅 */
+
+/* 價格資訊與折扣 */
+.price-info { margin-bottom: .5rem; }
+.original-price {
+  text-decoration: line-through;
+  color: #6b7280;            /* gray-500 */
+  font-size: .8rem;
+  margin-left: .5rem;
+}
+.discount {
+  background: #ff4444;
+  color: #fff;
+  padding: .1rem .4rem;
+  border-radius: 4px;
+  font-size: .7rem;
+  margin-left: .5rem;
+}
+
+/* 分類標籤 */
+.category-tag {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: .2rem .5rem;
+  border-radius: 4px;
+  font-size: .75rem;
+  display: inline-block;
+  margin-top: auto;
+}
+
+/* 產品卡底部資訊 */
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: .8rem;
+  color: #6b7280;            /* gray-500 */
+  margin-top: .75rem;
+}
+
+/* ==================================================
+   分頁（Laravel Tailwind 分頁樣式修正）
+   ================================================== */
+
+/* 分頁群組：對齊與間距（不搶 Tailwind class 主導權） */
+nav[role="navigation"] .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+/* 分頁按鈕：統一字級與內距（防 em 影響 svg 大小） */
+nav[role="navigation"] .pagination a,
+nav[role="navigation"] .pagination span {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 6px 10px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  border: 1px solid #e5e7eb;      /* gray-200 */
+  border-radius: 6px;
+  background: #fff;
+  color: #273636;
+}
+
+/* 只把左右箭頭 svg 鎖在 20px（最關鍵） */
+nav[role="navigation"] .pagination svg,
+nav[role="navigation"] a svg,
+nav[role="navigation"] span svg {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  transform: none !important;
+}
+
+/* 可見頁碼的 active 與 disabled 狀態（視覺一致） */
+nav[role="navigation"] .pagination .active > .page-link,
+nav[role="navigation"] .pagination .active > span {
+  background: #2563eb;  /* blue-600 */
+  color: #fff;
+  border-color: #2563eb;
+}
+nav[role="navigation"] .pagination .disabled > .page-link,
+nav[role="navigation"] .pagination .disabled > span {
+  opacity: .5;
+  cursor: default;
+  background: #f5f5f5;
+}
+
+/* ==================================================
+   輪播（如 Swiper / Slick）箭頭常見放大保險
+   ================================================== */
+
+/* Swiper 預設 44px，改為 20px；容器給 32px 點擊面積 */
+:root { --swiper-navigation-size: 20px !important; }
+.swiper-button-prev, .swiper-button-next {
+  width: 32px !important;
+  height: 32px !important;
+}
+.swiper-button-prev::after, .swiper-button-next::after {
+  font-size: 20px !important;
+}
+
+/* Slick（如有用到） */
+.slick-prev:before, .slick-next:before { font-size: 20px !important; }
+
+/* ==================================================
+  （選擇性）專用圖示容器：若你在 Blade 外包 <span class="pg-icon">…</span>
+   ================================================== */
+.pg-icon { width: 20px !important; height: 20px !important; display: inline-block !important; }
+.pg-icon svg { width: 100% !important; height: 100% !important; display: block !important; }

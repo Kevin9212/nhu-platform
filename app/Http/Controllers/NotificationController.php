@@ -8,30 +8,44 @@ use Illuminate\Support\Facades\Auth;
 class NotificationController extends Controller
 {
     /**
-     * 取得使用者所有未讀的通知。
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * 顯示通知頁面
      */
-    public function index(){
-        /** @var \App\Models\User $user */
+    public function index()
+    {
         $user = Auth::user();
-        // 取得所有未讀通知，並限制最多 10 筆
-        $notifications = $user->unreadNotifications()->latest()->limit(10)->get();
 
-        return response()->json($notifications);
+        // 取得所有通知（已讀 + 未讀）
+        $notifications = $user->notifications()->latest()->get();
+
+        return view('notifications.index', compact('notifications'));
     }
 
     /**
-     * 將使用者所有未讀的通知標示為已讀。
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * 單一通知 → 點擊後標記已讀
      */
-    public function markAsRead() {
-        /** @var \App\Models\User $user */
+    public function markAsRead($id)
+    {
+        $user = Auth::user();
+        $notification = $user->unreadNotifications()->find($id);
+
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        // 如果通知有 url，就跳過去
+        return redirect($notification->data['url'] ?? route('notifications.index'));
+    }
+
+    /**
+     * 提供「小鈴鐺」用的未讀數量
+     */
+    public function fetchUnread()
+    {
         $user = Auth::user();
 
-        $user->unreadNotifications()->update(['read_at' => now()]);
-
-        return response()->json(['success' => true]);
+        return response()->json([
+            'count' => $user->unreadNotifications()->count(),
+            'notifications' => $user->unreadNotifications()->latest()->limit(5)->get(),
+        ]);
     }
 }

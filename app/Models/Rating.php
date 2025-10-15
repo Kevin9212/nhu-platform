@@ -15,7 +15,7 @@ class Rating extends Model {
         'rated_id',
         'score',
         'comment',
-    ]
+    ];
     
     /**
      * 做出評價的人 (買家)

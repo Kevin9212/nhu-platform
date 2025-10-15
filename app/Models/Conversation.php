@@ -13,6 +13,7 @@ class Conversation extends Model {
     protected $fillable = [
       'buyer_id',
       'seller_id',  
+      'idle_item_id',
     ];
 
     /**
@@ -31,6 +32,10 @@ class Conversation extends Model {
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    public function item(): BelongsTo {
+        return $this->belongsTo(IdleItem::class, 'idle_item_id');
+    }
+    
     /**
      * 一個對話中可以有多則訊息
      */

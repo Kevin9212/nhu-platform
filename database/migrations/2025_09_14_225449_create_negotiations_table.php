@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('negotiations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('idle_item_id')->constrained('idle_items')->onDelete('cascade'); // 商品
+
+            // 🔹 關聯欄位
+            $table->foreignId('idle_item_id')->constrained('idle_items')->onDelete('cascade');
             $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
-            $table->integer('proposed_price');  // 出價金額
-            $table->enum('status', ['open', 'agreed', 'rejected'])->default('open');
+
+            // 🔹 出價金額
+            $table->decimal('price', 10, 2);
+
+            // 🔹 議價狀態 (enum)
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+
             $table->timestamps();
-        });
-        Schema::table('messages', function (Blueprint $table) {
-            $table->boolean('is_system')->default(false)->after('content');
         });
     }
 

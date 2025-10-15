@@ -23,7 +23,7 @@ class RatingController extends Controller
         /**
          * @var \App\Models\User $rater
          */
-        rater = Auth::user();
+        $rater = Auth::user();
 
         // 防護機制：使用者不能評價自己
         if ($rater->id === $user->id) {

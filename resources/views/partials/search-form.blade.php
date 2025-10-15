@@ -12,7 +12,8 @@
                     id="searchInput">
                 <button type="submit" class="search-button">
                     <span class="search-icon">
-                        <img src="images/search_icon.png" alt="Search" class="icon">
+                       <img src="{{ asset('images/search_icon.png') }}" alt="Search" class="icon">
+
                     </span>
                 </button>
             </div>

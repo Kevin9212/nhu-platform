@@ -12,7 +12,7 @@ class Negotiation extends Model {
         'idle_item_id',
         'buyer_id',
         'seller_id',
-        'proposed_price',
+        'price',
         'status',
     ];
 

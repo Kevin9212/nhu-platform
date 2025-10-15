@@ -1,112 +1,147 @@
-/* public/css/member.css */
+/* resources/css/member.css */
 
 /* --- 主要佈局 --- */
 .member-container {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-    /* 讓兩欄頂部對齊 */
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start; /* 兩欄頂部對齊 */
 }
 
 .member-nav {
-    flex-basis: 220px;
-    /* 左側導覽列固定寬度 */
-    flex-shrink: 0;
+  flex-basis: 220px;  /* 左側導覽固定寬度 */
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px;
 }
 
 .member-content {
-    flex-grow: 1;
-    /* 右側內容填滿剩餘空間 */
-    min-width: 0;
-    /* 避免內容過多時撐開佈局 */
+  flex-grow: 1;      /* 右側內容填滿 */
+  min-width: 0;      /* 避免內容撐開佈局 */
 }
 
 /* --- 左側導覽選單 --- */
+.user-profile-summary {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.user-profile-summary .avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+}
+
 .nav-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    padding: 0.75rem;
+  list-style: none;
+  padding: 0.75rem;
+  margin: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,.08);
 }
 
 .nav-list li a {
-    display: block;
-    padding: 0.85rem 1rem;
-    color: #333;
-    border-radius: 6px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    font-weight: 500;
+  display: block;
+  padding: 0.85rem 1rem;
+  color: #333;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .2s, color .2s;
+  font-weight: 500;
 }
 
+/* 選一種配色就好（下面用你後來一致的藍） */
 .nav-list li a.active,
 .nav-list li a:hover {
-    background-color: #b0b5ac;
-    color: #fff;
+  background-color: #007bff;
+  color: #fff;
 }
 
-/* --- 右側內容區塊 --- */
-.tab-pane {
-    display: none;
-}
-
+/* --- 右側內容區塊（分頁） --- */
+.tab-pane { display: none; }
 .tab-pane.active {
-    display: block;
-    animation: fadeIn 0.5s ease-in-out;
+  display: block;
+  animation: fadeIn .5s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --- 我的刊登列表樣式 --- */
+/* --- 我的刊登列表 --- */
 .listings-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,.08);
 }
-
 .listings-table th,
 .listings-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
 }
-
 .listings-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
+  background-color: #f8f9fa;
+  font-weight: 600;
 }
-
 .listings-table img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 6px;
+  width: 60px; height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
 }
-
 .listings-table .action-buttons a {
-    margin-right: 10px;
-    font-size: 0.9rem;
-    color: #007bff;
+  margin-right: 10px;
+  font-size: .9rem;
+  color: #007bff;
 }
+.listings-table .action-buttons a.delete { color: #dc3545; }
 
-.listings-table .action-buttons a.delete {
-    color: #dc3545;
+/* --- 對話列表 --- */
+.conversation-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: background-color .2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+.conversation-item:hover { background-color: #f8f9fa; }
+.conversation-item .avatar {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.conversation-details { flex-grow: 1; }
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.conversation-header .nickname { font-weight: bold; }
+.conversation-header .time {
+  font-size: .8rem;
+  color: #6c757d;
+}
+.last-message {
+  margin: .25rem 0 0;
+  color: #6c757d;
+  font-size: .9rem;
+}
+.last-message .message-prefix {
+  color: #333;
+  font-weight: 500;
 }

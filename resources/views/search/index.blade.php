@@ -1,59 +1,56 @@
+{{-- resources/views/search/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', '搜尋商品 - NHU 二手交易平台')
 
 @section('content')
 <div class="container">
-    <h1>搜尋商品</h1>
+    <h1 class="mb-3">搜尋商品</h1>
 
     {{-- 🔍 搜尋表單 --}}
-    <form method="GET" action="{{ route('search.index') }}" style="margin-bottom: 1rem;">
-        <input type="text" name="query" placeholder="搜尋商品名稱或描述..." value="{{ request('query') }}">
+    <form method="GET" action="{{ route('search.index') }}" class="mb-4 d-flex flex-wrap gap-2">
+        <input
+            type="text"
+            name="query"
+            placeholder="搜尋商品名稱或描述..."
+            value="{{ old('query', request('query', request('q'))) }}"
+            class="form-control"
+            style="max-width: 280px;"
+        >
 
-        <select name="category_id">
+        <select name="category_id" class="form-select" style="max-width: 200px;">
             <option value="">所有分類</option>
             @foreach($categories as $category)
-            <option value="{{ $category->id }}"
-                {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                {{ $category->name }}
-            </option>
+                <option value="{{ $category->id }}" {{ (string)request('category_id') === (string)$category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                </option>
             @endforeach
         </select>
 
-        <input type="number" name="min_price" placeholder="最低價格" value="{{ request('min_price') }}">
-        <input type="number" name="max_price" placeholder="最高價格" value="{{ request('max_price') }}">
+        <input
+            type="number" name="min_price" placeholder="最低價格"
+            value="{{ request('min_price') }}" class="form-control" style="max-width: 160px;" min="0" step="1">
+        <input
+            type="number" name="max_price" placeholder="最高價格"
+            value="{{ request('max_price') }}" class="form-control" style="max-width: 160px;" min="0" step="1">
 
-        <button type="submit">搜尋</button>
+        <button type="submit" class="btn btn-primary">搜尋</button>
+        @if(request()->hasAny(['query','q','category_id','min_price','max_price']))
+            <a href="{{ route('search.index') }}" class="btn btn-outline-secondary">清除篩選</a>
+        @endif
     </form>
 
     {{-- 🔹 搜尋結果 --}}
-    <div class="product-list">
+    <div class="product-list d-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
         @forelse($items as $item)
-        <div class="product-card">
-            {{-- 圖片 --}}
-            @if($item->images->isNotEmpty())
-            <img src="{{ asset('storage/' . $item->images->first()->image_path) }}" alt="{{ $item->idle_name }}" width="120">
-            @endif
-
-            {{-- 商品名稱 --}}
-            <h3>{{ $item->idle_name }}</h3>
-
-            {{-- 價格 --}}
-            <p>NT$ {{ number_format($item->idle_price) }}</p>
-
-            {{-- 分類 --}}
-            <p>分類：{{ $item->category->name ?? '未分類' }}</p>
-
-            {{-- 賣家 --}}
-            <p>賣家：{{ $item->seller->nickname ?? '未知' }}</p>
-        </div>
+            {{-- 共用卡片（含圖片 fallback） --}}
+            @include('partials.product-card', ['item' => $item, 'lazy' => true, 'showCategory' => true])
         @empty
-        <p>沒有找到符合的商品</p>
+            <div class="text-muted">沒有找到符合條件的商品。</div>
         @endforelse
     </div>
 
-    {{-- 分頁 --}}
-    <div class="pagination">
+    <div class="mt-4">
         {{ $items->links() }}
     </div>
 </div>
