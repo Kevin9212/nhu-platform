@@ -19,12 +19,16 @@ use App\Http\Controllers\Admin\DashboardController;    // 後台儀表板
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\NegotiationController as AdminNegotiationController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
-
+use App\Http\Controllers\OrderController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+
+Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
 // --- 首頁與核心功能 ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -107,10 +111,12 @@ Route::get('/captcha', [UserController::class, 'refreshCaptcha'])->name('captcha
 
 // --- 通知 ---
 Route::middleware(['auth', 'checkBanned'])->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::get('/notifications/fetch-unread', [NotificationController::class, 'fetchUnread'])->name('notifications.fetch');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index'); // 頁面
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read'); // 單筆已讀
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll'); // ✅ 全部已讀（新增）
+    Route::get('/notifications/fetch-unread', [NotificationController::class, 'fetchUnread'])->name('notifications.fetch'); // 鈴鐺 AJAX
 });
+
 
 // --- 後台管理 ---
 Route::redirect('/admin', '/admin/dashboard');

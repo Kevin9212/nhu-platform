@@ -45,6 +45,13 @@
             {{-- 聯絡賣家（進聊天室） --}}
             <a href="{{ route('conversation.start', ['user' => $item->seller->id]) }}"
                class="btn btn-primary" style="width: 100%;">聯絡賣家</a>
+            {{-- 成立訂單 --}}
+            <a href="{{ route('orders.create') }}" 
+                class="btn btn-success" 
+                style="width: 100%; margin-top: 0.5rem;">
+                成立訂單
+            </a>
+
         </div>
     </div>
 

@@ -17,12 +17,12 @@ class NegotiationController extends Controller
      */
     public function store(Request $request, IdleItem $item)
     {
-        $buyer = Auth::user();
+        $buyer  = Auth::user();
         $seller = $item->seller;
 
         // 驗證價格
-        $request->validate([
-            'price' => 'required|numeric|min:1',
+        $validated = $request->validate([
+            'price' => ['required', 'numeric', 'min:1'],
         ]);
 
         // 建立議價紀錄
@@ -30,39 +30,43 @@ class NegotiationController extends Controller
             'idle_item_id' => $item->id,
             'buyer_id'     => $buyer->id,
             'seller_id'    => $seller->id,
-            'price'        => $request->input('price'),
+            'price'        => $validated['price'],
             'status'       => 'pending',
         ]);
 
-        // 確保聊天室存在
+        // 確保聊天室存在（買家/賣家/商品 唯一組合）
         $conversation = Conversation::firstOrCreate([
             'buyer_id'     => $buyer->id,
             'seller_id'    => $seller->id,
             'idle_item_id' => $item->id,
         ]);
 
-        // 💬 普通訊息提示
+        // 💬 一般文字訊息（買家提出議價）
         Message::create([
             'conversation_id' => $conversation->id,
-            'user_id'         => $buyer->id,
+            'sender_id'       => $buyer->id,
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'text',
             'content'         => "💰 {$buyer->nickname} 對商品「{$item->idle_name}」提出了議價：NT$ {$negotiation->price}",
-            'is_system'       => true,
+            'is_recalled'     => false,
         ]);
 
-        // 🧾 建立訂單摘要卡片訊息
+        // 🧾 訂單摘要卡片訊息
         Message::create([
-        'conversation_id' => $conversation->id,
-        'user_id'         => $buyer->id,
-        'content'         => json_encode([
-        'type'       => 'order_summary',
-        'item_name'  => $item->idle_name,
-        'item_price' => $item->idle_price,
-        'offer_price'=> $negotiation->price,
-        'image'      => $item->images->first()->image_url ?? null,
-        'status'     => $negotiation->status, // 新增這行
-    ]),
-    'is_system'       => true,
-]);
+            'conversation_id' => $conversation->id,
+            'sender_id'       => $buyer->id,
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'order_summary',
+            'content'         => json_encode([
+                'type'        => 'order_summary',
+                'item_name'   => $item->idle_name,
+                'item_price'  => $item->idle_price,
+                'offer_price' => $negotiation->price,
+                'image'       => $item->images->first()->image_url ?? null,
+                'status'      => $negotiation->status,
+            ], JSON_UNESCAPED_UNICODE),
+            'is_recalled'     => false,
+        ]);
 
         // 通知賣家
         $seller->notify(new NewOfferNotification($buyer, $item));
@@ -80,8 +84,46 @@ class NegotiationController extends Controller
             return back()->with('error', '您沒有權限同意此議價');
         }
 
+        // 更新議價狀態
         $negotiation->status = 'accepted';
         $negotiation->save();
+
+        // 商品資料
+        $item = IdleItem::with('images')->findOrFail($negotiation->idle_item_id);
+
+        // 確保對話存在
+        $conversation = Conversation::firstOrCreate([
+            'buyer_id'     => $negotiation->buyer_id,
+            'seller_id'    => $negotiation->seller_id,
+            'idle_item_id' => $item->id,
+        ]);
+
+        // ✅ 新增「賣家已接受」訊息
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id'       => Auth::id(),
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'text',
+            'content'         => "✅ 賣家已接受議價：NT$ {$negotiation->price}",
+            'is_recalled'     => false,
+        ]);
+
+        // 🧾 更新狀態卡片
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id'       => Auth::id(),
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'order_summary',
+            'content'         => json_encode([
+                'type'        => 'order_summary',
+                'item_name'   => $item->idle_name,
+                'item_price'  => $item->idle_price,
+                'offer_price' => $negotiation->price,
+                'image'       => optional($item->images->first())->image_url,
+                'status'      => $negotiation->status,
+            ], JSON_UNESCAPED_UNICODE),
+            'is_recalled'     => false,
+        ]);
 
         return back()->with('success', '您已同意此議價');
     }
@@ -95,8 +137,46 @@ class NegotiationController extends Controller
             return back()->with('error', '您沒有權限拒絕此議價');
         }
 
+        // 更新議價狀態
         $negotiation->status = 'rejected';
         $negotiation->save();
+
+        // 商品資料
+        $item = IdleItem::with('images')->findOrFail($negotiation->idle_item_id);
+
+        // 確保對話存在
+        $conversation = Conversation::firstOrCreate([
+            'buyer_id'     => $negotiation->buyer_id,
+            'seller_id'    => $negotiation->seller_id,
+            'idle_item_id' => $item->id,
+        ]);
+
+        // ❌ 新增「賣家已拒絕」訊息
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id'       => Auth::id(),
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'text',
+            'content'         => "❌ 賣家已拒絕議價：NT$ {$negotiation->price}",
+            'is_recalled'     => false,
+        ]);
+
+        // 🧾 更新狀態卡片
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id'       => Auth::id(),
+            'idle_item_id'    => $item->id,
+            'msg_type'        => 'order_summary',
+            'content'         => json_encode([
+                'type'        => 'order_summary',
+                'item_name'   => $item->idle_name,
+                'item_price'  => $item->idle_price,
+                'offer_price' => $negotiation->price,
+                'image'       => optional($item->images->first())->image_url,
+                'status'      => $negotiation->status,
+            ], JSON_UNESCAPED_UNICODE),
+            'is_recalled'     => false,
+        ]);
 
         return back()->with('success', '您已拒絕此議價');
     }
