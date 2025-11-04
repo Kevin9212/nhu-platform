@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Events\MessageSent;
 
 class ConversationController extends Controller
 {
@@ -46,9 +47,9 @@ class ConversationController extends Controller
         $conversations = Conversation::query()
             ->where(function ($q) use ($uid) {
                 $q->where('buyer_id', $uid)
-                ->orWhere('seller_id', $uid);
+                  ->orWhere('seller_id', $uid);
             })
-            ->with(['buyer:id,nickname,account', 'seller:id,nickname,account'])
+            ->with(['buyer:id,nickname,account,avatar', 'seller:id,nickname,account,avatar'])
             ->latest('updated_at')
             ->get();
 
@@ -60,12 +61,17 @@ class ConversationController extends Controller
             'messages' => function ($q) {
                 $q->orderBy('created_at', 'asc');
             },
-            'messages.sender:id,nickname,account',
+            'messages.sender:id,nickname,account,avatar',
         ]);
 
         // 這兩個是你的 Blade 需要的
         $messages = $conversation->messages;
         $role     = ($uid === $conversation->buyer_id) ? 'buyer' : 'seller';
+
+        Message::where('conversation_id',$conversation->id)
+                ->where('sender_id','!=',auth()->id())
+                ->whereNull('read_at')
+                ->update(['read_at'=>now()]);
 
         return view('conversations.show', compact('conversation', 'conversations', 'otherUser', 'messages', 'role'));
     }
@@ -78,28 +84,41 @@ class ConversationController extends Controller
     {
         $uid = Auth::id();
 
-        // 權限：僅限此對話參與者
+        // 權限檢查
         if (!in_array($uid, [$conversation->buyer_id, $conversation->seller_id], true)) {
             abort(403, '您不能在這個對話中發送訊息');
         }
 
-        // 驗證：content 必填；msg_type 可選（預設 text）
+        // 驗證
         $data = $request->validate([
             'content'  => ['required', 'string', 'max:5000'],
-            'msg_type' => ['nullable', 'string', 'max:50'], // 例如 'text'、'order_summary'
+            'msg_type' => ['nullable', 'string', 'max:50'],
         ]);
 
-        // 建立訊息（對齊你的 Message 欄位：sender_id / idle_item_id / msg_type / content / is_recalled）
-        $conversation->messages()->create([
+        // 建立訊息
+        $message = $conversation->messages()->create([
             'sender_id'    => $uid,
-            'idle_item_id' => $conversation->idle_item_id,  // 若此對話綁定商品，順手掛上
+            'idle_item_id' => $conversation->idle_item_id,
             'msg_type'     => $data['msg_type'] ?? 'text',
             'content'      => $data['content'],
             'is_recalled'  => false,
         ]);
 
-        // 更新對話時間，讓列表排序正確
+        // 更新對話時間
         $conversation->touch();
+        
+        // 載入sender ,前端才有nickname / avatar_url
+        $message->load('sender:id,nickname,account,avatar');
+
+        // ✅ 廣播事件（通知其他用戶）
+        broadcast(new MessageSent($message))->toOthers();
+
+        $message->load('sender:id,nickname,account,avatar');
+        // 若是 AJAX 請求可直接回傳 JSON
+        if ($request->ajax() || $request->header('X-Requested-With') === 'XMLHttpRequest'
+        || $request->expectsJson() || $request->wantsJson()) {
+        return response()->json(['message' => $message]);
+    }
 
         return back()->with('success', '訊息已送出！');
     }

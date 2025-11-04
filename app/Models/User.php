@@ -45,6 +45,22 @@ class User extends Authenticatable implements MustVerifyEmail {
             'banned_until' => 'datetime',
         ];
     }
+    // 如果序列化時自動帶出這個欄位
+    protected $appends = ['avatar_url'];
+
+    public function getAvatarUrlAttribute(): string {
+        $v = $this->avatar;
+
+        if(empty($v)){
+            return asset('images/avatar-default.png');
+        }
+        // 已是完整網址（雲端或外部）
+        if (preg_match('/^https?:\/\//i', $v)) {
+            return $v;
+        }
+        // 走 storage（假設你把檔案存到 storage/app/public）
+        return asset('storage/' . ltrim($v, '/'));
+    }
 
     /**
      * 一個用戶可以刊登多個商品

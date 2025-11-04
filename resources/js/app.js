@@ -1,5 +1,6 @@
-import '../css/app.css';
 import './bootstrap';
+import './chat';
+import '../css/app.css';
 // resources/js/app.js
 window.NHU = window.NHU || {};
 NHU.notify = (function () {

@@ -1,4 +1,5 @@
 // resources/js/member.js
+import '../css/member.css';
 document.addEventListener('DOMContentLoaded', () => {
     const tabLinks = document.querySelectorAll('.tab-link');
     const tabPanes = document.querySelectorAll('.tab-pane');

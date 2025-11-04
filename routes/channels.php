@@ -1,5 +1,5 @@
 <?php
-
+use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('conversations.{conversationId}', function ($user, $conversationId) {
+    $conv = Conversation::find($conversationId);
+    if (!$conv) return false;
+    return in_array($user->id, [$conv->buyer_id, $conv->seller_id], true);
 });
+
+
+
+
