@@ -4,7 +4,7 @@
 @section('title', '對話 #'.$conversation->id)
 
 @section('content')
-<div class="container py-4">
+<div class="container py-4" data-enable-echo>
 
   {{-- 標題列 --}}
   <div class="d-flex justify-content-between align-items-center mb-3">

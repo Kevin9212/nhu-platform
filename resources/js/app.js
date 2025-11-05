@@ -1,6 +1,9 @@
 import './bootstrap';
 import './chat';
 import '../css/app.css';
+import './member';
+// console.log('app.js loaded'); // 臨時偵錯
+
 // resources/js/app.js
 window.NHU = window.NHU || {};
 NHU.notify = (function () {

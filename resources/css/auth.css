@@ -83,3 +83,20 @@
 
 .nhu-popover-footer { display:block; text-align:center; padding:10px 12px; color:#197e75; text-decoration:none; border-top:1px solid #eee; }
 .nhu-popover-footer:hover { background:#f8fafc; }
+/* 分頁顯示只靠 hidden；避免與 Bootstrap .tab-pane 衝突 */
+.m-pane { display: block; }
+.m-pane[hidden] { display: none !important; }
+
+/* 會員中心排版（若你已加過可略過） */
+.member-container { display:flex; gap:2rem; align-items:flex-start; margin-top:2rem; }
+.member-nav { width:220px; background:#fff; border-radius:1rem; box-shadow:0 2px 6px rgba(0,0,0,.05); padding:1.5rem; }
+.member-nav .avatar { width:100px; height:100px; border-radius:50%; object-fit:cover; display:block; margin:0 auto 1rem; }
+.member-nav .nickname { text-align:center; font-weight:600; margin-bottom:1rem; }
+.member-nav .nav-list { list-style:none; padding:0; margin:0; }
+.member-nav .nav-list li { margin-bottom:.5rem; }
+.member-nav .tab-link { display:block; text-align:center; padding:.6rem 1rem; border-radius:.5rem; color:#333; text-decoration:none; transition:background .2s,color .2s; }
+.member-nav .tab-link:hover { background:#f1f1f1; }
+.member-nav .tab-link.active { background:#1e40af; color:#fff; font-weight:600; }
+.member-content { flex:1; background:#fff; border-radius:1rem; box-shadow:0 2px 6px rgba(0,0,0,.05); padding:2rem; }
+.member-content h2 { font-size:1.25rem; margin-bottom:1.25rem; font-weight:600; }
+

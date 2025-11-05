@@ -3,7 +3,7 @@
 @section('title', '通知中心')
 
 @section('content')
-<div class="container">
+<div class="container" data-enable-echo>
     <h1>通知中心</h1>
 
     @if($notifications->isEmpty())

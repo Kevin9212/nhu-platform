@@ -35,23 +35,27 @@
         </div>
 
         @php
-          $isFavorited = auth()->check()
-              ? auth()->user()->favorites()->where('idle_item_id', $item->id)->exists()
-              : false;
-        @endphp
+  $isFavorited = auth()->check()
+      ? auth()->user()->favorites()->where('idle_item_id', $item->id)->exists()
+      : false;
+@endphp
 
-        @if(Auth::check() && Auth::id() !== ($item->seller->id ?? null))
-          <form method="POST"
-                action="{{ $isFavorited ? route('favorites.destroy', $item) : route('favorites.store', $item) }}">
-            @csrf
-            @if($isFavorited) @method('DELETE') @endif
-            <button type="submit" class="btn outline">
-              {{ $isFavorited ? '取消收藏' : '加入收藏' }}
-            </button>
-          </form>
-        @elseif(!Auth::check())
-          <a href="{{ route('login') }}" class="btn outline">登入後即可收藏</a>
-        @endif
+@if(Auth::check() && Auth::id() !== ($item->seller->id ?? null))
+  <form method="POST"
+        action="{{ $isFavorited ? route('favorites.destroy', $item) : route('favorites.store', $item) }}">
+    @csrf
+    @if($isFavorited) @method('DELETE') @endif
+
+    {{-- ★ 關鍵：告訴控制器提交完回「目前這個商品頁」 --}}
+    <input type="hidden" name="redirect_to" value="{{ url()->current() }}">
+
+    <button type="submit" class="btn outline">
+      {{ $isFavorited ? '取消收藏' : '加入收藏' }}
+    </button>
+  </form>
+@elseif(!Auth::check())
+  <a href="{{ route('login') }}" class="btn outline">登入後即可收藏</a>
+@endif
 
         @if(Auth::check() && Auth::id() !== ($item->seller->id ?? null))
           <form method="POST" action="{{ route('negotiations.store', $item) }}" class="offer-form">
