@@ -14,7 +14,7 @@
 
   <div class="container-xl">
     <div class="hero-center-card">
-      <h1 class="hero-title">Limited time offere</h1>
+      <h1 class="hero-title">Limited time offer e</h1>
       <p class="hero-subtitle">限時優惠｜快來挖寶你需要的好物</p>
       <div class="hero-cta">
         <a href="{{ route('search.index') }}" class="btn btn-cta">開始逛逛</a>

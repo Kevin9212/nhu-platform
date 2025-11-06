@@ -120,9 +120,6 @@
             </div>
         </form>
 
-        <div class="chat-thread__footer">
-            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">返回上一頁</a>
-        </div>
     </div>
 </div>
 

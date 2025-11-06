@@ -13,11 +13,48 @@ const autoGrowTextArea = (ta) => {
   ta.style.height = Math.min(ta.scrollHeight, 220) + 'px';
 };
 
-const makeScroller = (el) => {
-  const scrollToBottom = () => requestAnimationFrame(() => {
-    if (el) el.scrollTop = el.scrollHeight;
+const makeScroller = (el, list) => {
+  const settle = () => requestAnimationFrame(() => {
+    if (!el) return;
+    const last = list?.lastElementChild;
+    if (last) {
+      last.scrollIntoView({ block: 'end', inline: 'nearest' });
+    }
+    el.scrollTop = el.scrollHeight;
   });
-  return { scrollToBottom };
+
+  const nudge = () => {
+    settle();
+    setTimeout(settle, 180);
+  };
+
+  return { settle, nudge };
+};
+
+const attachWheelSync = (container, scroller) => {
+  if (!container || !scroller) return;
+
+  container.addEventListener('wheel', (event) => {
+    if (event.defaultPrevented || event.ctrlKey) return;
+
+    const deltaY = event.deltaY;
+    if (!deltaY) return;
+
+    const maxScrollTop = scroller.scrollHeight - scroller.clientHeight;
+    if (maxScrollTop <= 0) return;
+
+    const atTop = scroller.scrollTop <= 0;
+    const atBottom = scroller.scrollTop >= maxScrollTop - 1;
+
+    const scrollingUp = deltaY < 0;
+    const scrollingDown = deltaY > 0;
+    const shouldConsume = (scrollingDown && !atBottom) || (scrollingUp && !atTop);
+
+    if (!shouldConsume) return;
+
+    event.preventDefault();
+    scroller.scrollTop += deltaY;
+  }, { passive: false });
 };
 
 const nowISO = () => new Date().toISOString();
@@ -82,6 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const list = $('#messageList');
   const ta = $('#messageInput');
   const scrollerEl = $('#messageScroller');
+  const threadEl = document.querySelector('.chat-thread');
+  const sidebarEl = document.querySelector('.chat-sidebar');
+  const sidebarList = document.querySelector('.chat-sidebar__list');
 
   // 側邊搜尋（即便不在聊天頁也可以運作）
   const searchInput = document.querySelector('[data-chat-search]');
@@ -105,21 +145,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const cid = Number(form.dataset.conversationId || 0);
   const CSRF = $('meta[name="csrf-token"]')?.content || '';
   const DEF_AVATAR = window.CHAT_DEFAULT_AVATAR || '/images/avatar-default.png';
-  const { scrollToBottom } = makeScroller(scrollerEl);
+  const { settle, nudge } = makeScroller(scrollerEl, list);
+
+  attachWheelSync(threadEl, scrollerEl);
+  attachWheelSync(sidebarEl, sidebarList);
 
   const keepAtBottom = () => {
-    scrollToBottom();
-    setTimeout(scrollToBottom, 150);
+    nudge();
   };
 
   keepAtBottom();
   window.addEventListener('load', keepAtBottom, { once: true });
+  window.addEventListener('resize', settle);
+  scrollerEl.addEventListener('load', keepAtBottom, true);
 
   if ('ResizeObserver' in window) {
     const observer = new ResizeObserver(() => {
       const distanceFromBottom = scrollerEl.scrollHeight - scrollerEl.clientHeight - scrollerEl.scrollTop;
       if (distanceFromBottom < 40) {
-        scrollToBottom();
+        settle();
       }
     });
     observer.observe(list);
@@ -187,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     li.innerHTML = markup;
 
     list.appendChild(li);
-    scrollToBottom();
+    nudge();
   };
 
   form.addEventListener('submit', async (e) => {

@@ -73,9 +73,8 @@
         @endforelse
     </ul>
 </div>
-
-
 <style>
+    
 .conversations-list a:hover {
     background: #f0f4f3;
     border-color: #c7d2cc;
