@@ -24,7 +24,21 @@ class ConversationController extends Controller
                 $q->where('buyer_id', $uid)
                   ->orWhere('seller_id', $uid);
             })
-            ->with(['buyer:id,nickname,account', 'seller:id,nickname,account'])
+            ->with([
+                'buyer:id,nickname,account,avatar',
+                'seller:id,nickname,account,avatar',
+                'item:id,idle_name',
+                'messages' => function ($q) {
+                    $q->latest('created_at')->limit(1);
+                },
+                'messages.sender:id,nickname,account,avatar',
+            ])
+            ->withCount([
+                'messages as unread_count' => function ($q) use ($uid) {
+                    $q->whereNull('read_at')
+                      ->where('sender_id', '!=', $uid);
+                },
+            ])
             ->latest('updated_at')
             ->get();
 
@@ -49,7 +63,21 @@ class ConversationController extends Controller
                 $q->where('buyer_id', $uid)
                   ->orWhere('seller_id', $uid);
             })
-            ->with(['buyer:id,nickname,account,avatar', 'seller:id,nickname,account,avatar'])
+            ->with([
+                'buyer:id,nickname,account,avatar',
+                'seller:id,nickname,account,avatar',
+                'item:id,idle_name',
+                'messages' => function ($q) {
+                    $q->latest('created_at')->limit(1);
+                },
+                'messages.sender:id,nickname,account,avatar',
+            ])
+            ->withCount([
+                'messages as unread_count' => function ($q) use ($uid) {
+                    $q->whereNull('read_at')
+                      ->where('sender_id', '!=', $uid);
+                },
+            ])
             ->latest('updated_at')
             ->get();
 
@@ -62,6 +90,7 @@ class ConversationController extends Controller
                 $q->orderBy('created_at', 'asc');
             },
             'messages.sender:id,nickname,account,avatar',
+            'item:id,idle_name',
         ]);
 
         // 這兩個是你的 Blade 需要的

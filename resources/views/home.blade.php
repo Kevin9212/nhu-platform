@@ -4,244 +4,229 @@
 
 @section('content')
 
-{{-- ===== Hero / Banner ===== --}}
-<section class="banner-section">
-  <div class="container-xl py-3">
-    <div id="homeHero" class="carousel slide" data-bs-ride="carousel" aria-label="首頁輪播">
-      {{-- 指示器 --}}
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#homeHero" data-bs-slide-to="0" class="active" aria-current="true" aria-label="第一張"></button>
-        <button type="button" data-bs-target="#homeHero" data-bs-slide-to="1" aria-label="第二張"></button>
-        <button type="button" data-bs-target="#homeHero" data-bs-slide-to="2" aria-label="第三張"></button>
-      </div>
+{{-- ===== Hero / Banner：用你原本輪播其中一張 ===== --}}
+<section class="hero-wrap">
+  <div class="hero-bg">
+    {{-- 這裡直接沿用你現有的 re.png，你也可改成 recycle.png / notify.png --}}
+    <img src="{{ asset('images/re.png') }}" alt="NHU 二手平台" class="hero-img">
+    <div class="hero-overlay"></div>
+  </div>
 
-      {{-- 圖片 --}}
-      <div class="carousel-inner hero-inner rounded-4 shadow-sm overflow-hidden">
-        <div class="carousel-item active">
-          <img src="{{ asset('images/re.png') }}" class="d-block w-100 hero-img" alt="Recycle Banner 1">
-        </div>
-        <div class="carousel-item">
-          <img src="{{ asset('images/recycle.png') }}" class="d-block w-100 hero-img" alt="Recycle Banner 2">
-        </div>
-        <div class="carousel-item">
-          <img src="{{ asset('images/notify.png') }}" class="d-block w-100 hero-img" alt="Notification Banner">
-        </div>
+  <div class="container-xl">
+    <div class="hero-center-card">
+      <h1 class="hero-title">Limited time offere</h1>
+      <p class="hero-subtitle">限時優惠｜快來挖寶你需要的好物</p>
+      <div class="hero-cta">
+        <a href="{{ route('search.index') }}" class="btn btn-cta">開始逛逛</a>
       </div>
-
-      {{-- 左右切換 --}}
-      <button class="carousel-control-prev" type="button" data-bs-target="#homeHero" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">上一張</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#homeHero" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">下一張</span>
-      </button>
     </div>
   </div>
 </section>
 
-{{-- ===== 最新上架 ===== --}}
-<section class="section">
-  <div class="container-xl py-4">
-    <div class="section-header d-flex justify-content-between align-items-end mb-3">
-      <div>
-        <h3 class="section-title">最新上架商品</h3>
-        <p class="section-subtitle">即時更新，別錯過剛上架的好物</p>
-      </div>
-      <a class="btn btn-pill" href="{{ route('idle-items.index') }}">查看全部</a>
-    </div>
-
-    @php
-      $latestChunks = ($items instanceof \Illuminate\Pagination\AbstractPaginator)
-        ? $items->getCollection()->chunk(4)
-        : collect($items)->chunk(4);
-    @endphp
-
-    @if($latestChunks->isEmpty())
-      <div class="empty-state">
-        <div class="empty-icon">📦</div>
-        <h4>目前沒有任何上架中的商品</h4>
-        <p><a href="{{ route('idle-items.create') }}" class="link-create">成為第一個上架商品的人！</a></p>
-      </div>
-    @else
-      <div id="latestItemsCarousel" class="carousel slide multi-carousel" data-bs-interval="false">
-        <div class="carousel-inner">
-          @foreach($latestChunks as $chunkIndex => $chunk)
-            <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
-              <div class="product-row">
-                @foreach($chunk as $item)
-                  @include('partials.product-card', ['item' => $item, 'showCategory' => true])
-                @endforeach
-              </div>
-            </div>
-          @endforeach
+{{-- ===== 分類圖片卡片（4 欄），不要表情貼 ===== --}}
+<section class="quick-cats">
+  <div class="container-xl">
+    <div class="cats-grid">
+      {{-- 電子產品 --}}
+      <a href="{{ route('search.index', ['category_id' => 1]) }}" class="cat-card"
+         style="--bg:url('{{ asset('images/cats/electronics.jpg') }}')">
+        <div class="cat-label">
+          <div class="cat-title">電子產品</div>
+          <div class="cat-sub">筆電・手機・周邊設備</div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#latestItemsCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">上一組</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#latestItemsCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">下一組</span>
-        </button>
-      </div>
+      </a>
 
-      @if($items instanceof \Illuminate\Pagination\AbstractPaginator && $items->hasPages())
-        <div class="pagination-links mt-3">
-          {{ $items->links() }}
+      {{-- 書籍 --}}
+      <a href="{{ route('search.index', ['category_id' => 7]) }}" class="cat-card"
+         style="--bg:url('{{ asset('images/cats/books.jpg') }}')">
+        <div class="cat-label">
+          <div class="cat-title">書籍與講義</div>
+          <div class="cat-sub">課本・參考書・講義</div>
         </div>
-      @endif
-    @endif
-  </div>
-</section>
+      </a>
 
-{{-- ===== 隨機推薦 ===== --}}
-<section class="section">
-  <div class="container-xl py-4">
-    <div class="section-header d-flex justify-content-between align-items-end mb-3">
-      <div>
-        <h3 class="section-title">隨機推薦商品</h3>
-        <p class="section-subtitle">為你推薦一批也許會喜歡的清單</p>
-      </div>
-      <button onclick="refreshRecommendations()" class="btn btn-pill" id="refreshBtn">換一批</button>
-    </div>
-
-    {{-- 用容器包起來，AJAX 更新時整塊替換 --}}
-    <div id="random-items-container">
-      <div id="randomItemsCarousel" class="carousel slide multi-carousel" data-bs-interval="false">
-        <div class="carousel-inner">
-          @foreach($randomItems->chunk(4) as $chunkIndex => $chunk)
-            <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
-              <div class="product-row">
-                @foreach($chunk as $item)
-                  @include('partials.product-card', ['item' => $item])
-                @endforeach
-              </div>
-            </div>
-          @endforeach
+      {{-- 寢具 --}}
+      <a href="{{ route('search.index', ['category_id' => 14]) }}" class="cat-card"
+         style="--bg:url('{{ asset('images/cats/bedding.jpg') }}')">
+        <div class="cat-label">
+          <div class="cat-title">寢具</div>
+          <div class="cat-sub">床墊・枕頭・棉被</div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#randomItemsCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">上一組</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#randomItemsCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">下一組</span>
-        </button>
-      </div>
+      </a>
+
+      {{-- 漫畫 --}}
+      <a href="{{ route('search.index', ['category_id' => 32]) }}" class="cat-card"
+         style="--bg:url('{{ asset('images/cats/manga.jpg') }}')">
+        <div class="cat-label">
+          <div class="cat-title">漫畫 / 動漫週邊</div>
+          <div class="cat-sub">收藏・經典・週邊</div>
+        </div>
+      </a>
     </div>
   </div>
 </section>
+
+
 
 @endsection
 
 @push('styles')
 <style>
+  /* === 延用你原本的 Morandi 配色（與你上一版一致） === */
   :root {
-    --brand: #96a49f;       /* Morandi 綠灰 */
+    --brand: #96a49f;       /* 主色 */
     --brand-700: #82938d;
-    --bg-soft: #edefea;     /* 背景淡米綠 */
+    --bg-soft: #edefea;     /* 淡底色 */
     --card-bg: #ffffff;
-    --text-weak: #6b7280;   /* gray-500 */
+    --ink: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
   }
 
-  /* ===== 共用區塊 ===== */
-  .banner-section { background: var(--bg-soft); }
-  .section { background: var(--bg-soft); }
-  .section-title { margin: 0; font-weight: 700; }
-  .section-subtitle { margin: .25rem 0 0; color: var(--text-weak); font-size: .95rem; }
+  /* ===== Hero ===== */
+  /* ===== Hero 區域重新配色 ===== */
+.hero-wrap {
+  position: relative;
+  background: var(--bg-soft);
+  isolation: isolate;
+  overflow: hidden;
+}
 
-  .btn.btn-pill {
-    background: var(--brand);
-    color: #fff;
-    border-radius: 9999px;
-    padding: .6rem 1.25rem;
-    font-weight: 600;
-    transition: transform .15s ease, filter .15s ease;
-    border: none;
+.hero-bg { position: relative; }
+
+.hero-img {
+  width: 100%;
+  height: clamp(260px, 36vw, 520px);
+  object-fit: cover;
+  display: block;
+  filter: saturate(.9) brightness(.95);
+}
+
+/* 改為柔和灰綠疊層（取代原本的黑灰） */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(150,164,159,0.35),   /* 灰綠上層 */
+    rgba(237,239,234,0.45)    /* 米白綠下層 */
+  );
+}
+
+/* 中央霧面卡片 */
+.hero-center-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: max-content;
+  max-width: min(680px, 86vw);
+  background: rgba(237,239,234,0.9); /* 白帶綠霧感 */
+  color: #243028; /* 深灰綠字 */
+  border-radius: 1.2rem;
+  padding: clamp(1rem, 3.5vw, 2.5rem);
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(150,164,159,.25);
+  backdrop-filter: blur(10px);
+  transform: translateY(clamp(0px, -6vw, -40px));
+  border: 1px solid rgba(150,164,159,0.25);
+}
+
+.hero-title {
+  margin: 0 0 .6rem;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 3vw, 2.25rem);
+  letter-spacing: .2px;
+  color: #2f3a35;
+}
+
+.hero-subtitle {
+  margin: 0 0 1.2rem;
+  color: #4f5c57;
+  font-size: clamp(.95rem, 1.6vw, 1.05rem);
+}
+
+/* 按鈕換成品牌主色（灰綠） */
+.btn-cta {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  padding: .7rem 1.4rem;
+  box-shadow: 0 8px 18px rgba(150,164,159,.3);
+  transition: transform .15s ease, filter .15s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-cta:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+}
+
+/* RWD 修正 */
+@media (max-width: 576px) {
+  .hero-center-card {
+    position: static;
+    transform: none;
+    margin-top: -1.2rem;
   }
-  .btn.btn-pill:hover { filter: brightness(0.95); transform: translateY(-1px); }
-  .btn.btn-pill:active { transform: translateY(0); }
+}
 
-  /* ===== Hero 高度（隨視窗自適應） ===== */
-  .hero-inner { height: clamp(260px, 34vw, 460px); }
-  .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  /* ===== Multi-item carousel ===== */
-  .multi-carousel .product-row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
+  /* ===== 分類圖片卡片：無表情，用圖片背景 ===== */
+  .quick-cats{ background:#fff; }
+  .cats-grid{
+    margin: clamp(.5rem, 2.5vw, 1.25rem) auto;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(.5rem, 1.6vw, 1rem);
   }
-  @media (max-width: 1200px) {
-    .multi-carousel .product-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cat-card{
+    position:relative;
+    display:block;
+    aspect-ratio: 4/3;
+    border-radius: 1rem;
+    overflow:hidden;
+    background: #dfe3df;
+    box-shadow: 0 8px 18px rgba(0,0,0,.06);
+    text-decoration:none;
+    color:#fff;
+    border: 1px solid var(--border);
   }
-  @media (max-width: 992px) {
-    .multi-carousel .product-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 背景圖片（用 css var 傳入），加一層品牌色漸層確保可讀性 */
+  .cat-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.05)),
+      var(--bg, var(--bg, url('{{ asset('images/cats/default.jpg') }}'))) center/cover no-repeat;
+    transition: transform .25s ease;
   }
-  @media (max-width: 576px) {
-    .multi-carousel .product-row { grid-template-columns: 1fr; }
+  .cat-card:hover::before{ transform: scale(1.04); }
+
+  .cat-label{
+    position:absolute; left:.95rem; right:.95rem; bottom:.95rem;
+    background: color-mix(in srgb, var(--brand) 26%, transparent);
+    border: 1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(4px);
+    border-radius:.75rem;
+    padding:.6rem .75rem;
+    line-height:1.15;
   }
+  .cat-title{ font-weight:800; font-size:1.05rem; }
+  .cat-sub{ font-size:.9rem; opacity:.9; }
 
-  /* 讓箭頭稍微外擴，避免遮擋卡片 */
-  .carousel-control-prev, .carousel-control-next { width: 3.5rem; }
-  @media (min-width: 768px) {
-    #latestItemsCarousel .carousel-control-prev { transform: translateX(-.5rem); }
-    #latestItemsCarousel .carousel-control-next { transform: translateX(.5rem); }
-    #randomItemsCarousel .carousel-control-prev { transform: translateX(-.5rem); }
-    #randomItemsCarousel .carousel-control-next { transform: translateX(.5rem); }
+  /* RWD */
+  @media (max-width: 992px){
+    .cats-grid{ grid-template-columns: repeat(2, 1fr); }
   }
-
-  /* 指示器更精緻的外觀 */
-  .carousel-indicators [data-bs-target] {
-    width: 10px; height: 10px; border-radius: 50%;
-    background-color: rgba(0,0,0,.25);
-  }
-  .carousel-indicators .active { background-color: var(--brand); }
-
-  /* 空狀態 */
-  .empty-state { text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 1rem; }
-  .empty-icon { font-size: 2rem; margin-bottom: .5rem; }
-  .link-create { color: var(--brand); font-weight: 600; text-decoration: none; }
-  .link-create:hover { text-decoration: underline; }
-
-  /* 可能存在的 .product-card 調美（不破壞 partial 結構） */
-  .product-card { background: var(--card-bg); border-radius: 1rem; box-shadow: 0 8px 18px rgba(0,0,0,.06); overflow: hidden; }
-  .product-card .product-image { aspect-ratio: 4/3; object-fit: cover; }
-
-  /* 讓分頁導覽置中 */
-  .pagination-links { display: flex; justify-content: center; }
-
-  /* 偏好減少動態時，停用自動輪播（守護 UX） */
-  @media (prefers-reduced-motion: reduce) {
-    #homeHero, #latestItemsCarousel, #randomItemsCarousel { animation: none; }
+  @media (max-width: 576px){
+    .hero-center-card{ position:static; transform:none; margin-top:-1.2rem; }
+    .cats-grid{ grid-template-columns: 1fr; }
   }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-  function refreshRecommendations() {
-    const container = document.getElementById('random-items-container');
-    const refreshBtn = document.getElementById('refreshBtn');
-
-    if (!container || !refreshBtn) return;
-
-    refreshBtn.disabled = true;
-    const originText = refreshBtn.textContent;
-    refreshBtn.textContent = '載入中...';
-
-    fetch('{{ route("home.random-items") }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-      .then(res => res.text())
-      .then(html => {
-        container.innerHTML = html; // 後端請回傳完整 #random-items-container 內部的 HTML
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        refreshBtn.textContent = originText;
-        refreshBtn.disabled = false;
-      });
-  }
-</script>
 @endpush
