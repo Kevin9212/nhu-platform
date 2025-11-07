@@ -402,7 +402,7 @@ nav[role="navigation"] .pagination .disabled > span {
   padding: 1rem 1.25rem;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
   position: sticky;
-  top: 0;
+  top: calc(var(--site-header-height) + 0.75rem);
   z-index: 2;
   flex-shrink: 0;
 }
@@ -749,13 +749,18 @@ nav[role="navigation"] .pagination .disabled > span {
   }
 
   .chat-thread {
-  position: static;
-  top: auto;
-  height: auto;
-  max-height: none;
-  overflow: visible;
-  min-height: auto;
-}
+    position: static;
+    top: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    min-height: auto;
+  }
+
+  .chat-thread__header {
+    position: static;
+    top: auto;
+  }
 }
 
 @media (max-width: 768px) {
