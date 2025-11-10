@@ -1,23 +1,33 @@
-{{-- resources/views/member/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', '會員中心 - NHU 二手交易平台')
-@section('page','member')
+@section('page', 'member')
 
 @section('content')
 <div class="container">
   <div class="member-container">
     {{-- 左側導覽選單 --}}
-    <aside class="member-nav">
+    <aside class="member-nav" aria-label="會員中心">
       <div class="user-profile-summary">
-        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}" alt="使用者頭像" class="avatar">
+        <img
+          src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://placehold.co/100x100/EFEFEF/AAAAAA&text=頭像' }}"
+          alt="使用者頭像" class="avatar">
         <p class="nickname">{{ $user->nickname }}</p>
       </div>
 
-      <ul class="nav-list" role="tablist" aria-label="會員中心選單">
-        <li><a href="#profile"   data-tab="profile"   class="tab-link active" role="tab" aria-selected="true"  aria-controls="tab-profile">個人資料</a></li>
-        <li><a href="#listings"  data-tab="listings"  class="tab-link"        role="tab" aria-selected="false" aria-controls="tab-listings">我的刊登</a></li>
-        <li><a href="#favorites" data-tab="favorites" class="tab-link"        role="tab" aria-selected="false" aria-controls="tab-favorites">我的收藏</a></li>
+      <ul class="nav-list" role="tablist" aria-orientation="vertical" aria-label="會員中心選單">
+        <li>
+          <a href="#profile" data-tab="profile" class="tab-link active"
+             role="tab" aria-selected="true" aria-controls="tab-profile" tabindex="0">個人資料</a>
+        </li>
+        <li>
+          <a href="#listings" data-tab="listings" class="tab-link"
+             role="tab" aria-selected="false" aria-controls="tab-listings" tabindex="-1">我的刊登</a>
+        </li>
+        <li>
+          <a href="#favorites" data-tab="favorites" class="tab-link"
+             role="tab" aria-selected="false" aria-controls="tab-favorites" tabindex="-1">我的收藏</a>
+        </li>
       </ul>
     </aside>
 
@@ -38,7 +48,7 @@
           @include('member.partials.listings-table')
         </section>
 
-        <hr style="margin: 2.5rem 0;">
+        <hr class="section-divider" aria-hidden="true">
 
         <section class="section">
           <h2>新增商品</h2>
@@ -56,7 +66,7 @@
           @endphp
 
           @if($items->isEmpty())
-            <p class="text-gray-500">您目前沒有任何收藏的商品。</p>
+            <p class="empty-tip">您目前沒有任何收藏的商品。</p>
           @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               @foreach($items as $it)
@@ -65,19 +75,19 @@
                   $coverUrl = $cover ? asset('storage/' . ltrim($cover, '/')) : 'https://placehold.co/640x360?text=No+Image';
                 @endphp
 
-                <article class="rounded-2xl border shadow-sm overflow-hidden bg-white">
-                  <img src="{{ $coverUrl }}" alt="{{ $it->idle_name }}" class="h-48 w-full object-cover">
-                  <div class="p-4">
-                    <h3 class="font-semibold line-clamp-2">{{ $it->idle_name }}</h3>
-                    <div class="mt-2 font-semibold">{{ number_format($it->idle_price) }} 元</div>
+                <article class="favorite-card">
+                  <img src="{{ $coverUrl }}" alt="{{ $it->idle_name }}" class="favorite-cover">
+                  <div class="favorite-body">
+                    <h3 class="favorite-title line-clamp-2">{{ $it->idle_name }}</h3>
+                    <div class="favorite-price">{{ number_format($it->idle_price) }} 元</div>
 
-                    <div class="mt-4 flex gap-2">
-                      <a href="{{ route('idle-items.show', $it) }}" class="px-3 py-2 rounded-xl bg-gray-900 text-white">查看</a>
+                    <div class="favorite-actions">
+                      <a href="{{ route('idle-items.show', $it) }}" class="btn btn-dark">查看</a>
                       <form method="POST" action="{{ route('favorites.destroy', $it) }}">
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="redirect_to" value="{{ route('member.index') }}#favorites">
-                        <button class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">取消收藏</button>
+                        <button class="btn btn-light">取消收藏</button>
                       </form>
                     </div>
                   </div>
@@ -97,6 +107,7 @@
   </div>
 </div>
 
+{{-- 分頁切換腳本（使用 hidden 控制顯示 + 鍵盤可用性） --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const links = document.querySelectorAll('.tab-link');
@@ -106,7 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     favorites: document.getElementById('tab-favorites'),
   };
 
-  function show(tabId, pushHash = true) {
+  function updateTabbable(target) {
+    links.forEach(a => a.tabIndex = a.dataset.tab === target ? 0 : -1);
+  }
+
+  function show(tabId, pushHash = true, focusTab = true) {
     Object.values(panes).forEach(p => p && (p.hidden = true));
     panes[tabId] && (panes[tabId].hidden = false);
 
@@ -114,32 +129,48 @@ document.addEventListener('DOMContentLoaded', () => {
       const on = a.dataset.tab === tabId;
       a.classList.toggle('active', on);
       a.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && focusTab) a.focus();
     });
 
+    updateTabbable(tabId);
     localStorage.setItem('activeMemberTab', tabId);
     if (pushHash && location.hash !== '#' + tabId) {
       history.replaceState(null, '', '#' + tabId);
     }
   }
 
-  // 點擊
   links.forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
     show(a.dataset.tab);
   }));
 
-  // 直接輸入 #hash 時
-  window.addEventListener('hashchange', () => {
-    const name = (location.hash || '').slice(1);
-    if (name && panes[name]) show(name, false);
+  document.querySelector('.member-nav').addEventListener('keydown', e => {
+    const tabs = Array.from(links);
+    const currentIndex = tabs.findIndex(t => t.classList.contains('active'));
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = tabs[(currentIndex + 1 + tabs.length) % tabs.length];
+      show(next.dataset.tab, true, true);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
+      show(prev.dataset.tab, true, true);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const active = tabs[currentIndex] || tabs[0];
+      show(active.dataset.tab, true, true);
+    }
   });
 
-  // 初始化
+  window.addEventListener('hashchange', () => {
+    const name = (location.hash || '').slice(1);
+    if (name && panes[name]) show(name, false, false);
+  });
+
   const byHash = (location.hash || '').slice(1);
-  const saved  = localStorage.getItem('activeMemberTab');
+  const saved = localStorage.getItem('activeMemberTab');
   const initial = panes[byHash] ? byHash : (panes[saved] ? saved : 'profile');
-  show(initial, false);
+  show(initial, false, false);
 });
 </script>
-
 @endsection

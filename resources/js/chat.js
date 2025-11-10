@@ -122,6 +122,85 @@ document.addEventListener('DOMContentLoaded', () => {
   const threadEl = document.querySelector('.chat-thread');
   const sidebarEl = document.querySelector('.chat-sidebar');
   const sidebarList = document.querySelector('.chat-sidebar__list');
+  const layoutEl = document.querySelector('.chat-layout');
+  const openSidebarBtn = document.querySelector('[data-chat-open]');
+  const closeSidebarBtns = document.querySelectorAll('[data-chat-close]');
+  const overlayEl = document.querySelector('[data-chat-overlay]');
+
+  const mobileMedia = window.matchMedia('(max-width: 1024px)');
+
+  const setBodyLock = (locked) => {
+    document.body.classList.toggle('chat-sidebar-open', Boolean(locked));
+  };
+
+  const reflectOverlay = (state) => {
+    if (!overlayEl) return;
+    overlayEl.classList.toggle('is-active', state === 'list');
+  };
+
+  const setMobileState = (state) => {
+    if (!layoutEl) return;
+    layoutEl.dataset.mobileState = state;
+
+    if (layoutEl.dataset.mobile !== 'true') {
+      return;
+    }
+
+    const isList = state === 'list';
+    reflectOverlay(state);
+    setBodyLock(isList);
+
+    if (openSidebarBtn) {
+      openSidebarBtn.setAttribute('aria-expanded', String(isList));
+    }
+  };
+
+  const applyMobileLayout = () => {
+    if (!layoutEl) return;
+
+    if (!mobileMedia.matches) {
+      delete layoutEl.dataset.mobile;
+      reflectOverlay('thread');
+      setBodyLock(false);
+      if (openSidebarBtn) {
+        openSidebarBtn.setAttribute('aria-expanded', 'false');
+      }
+      return;
+    }
+
+    layoutEl.dataset.mobile = 'true';
+    const initialState = layoutEl.dataset.mobileState
+      || layoutEl.dataset.mobileInitial
+      || 'thread';
+    setMobileState(initialState);
+  };
+
+  applyMobileLayout();
+  if (typeof mobileMedia.addEventListener === 'function') {
+    mobileMedia.addEventListener('change', applyMobileLayout);
+  } else if (typeof mobileMedia.addListener === 'function') {
+    mobileMedia.addListener(applyMobileLayout);
+  }
+
+  openSidebarBtn?.addEventListener('click', (event) => {
+    event.preventDefault();
+    setMobileState('list');
+  });
+
+  closeSidebarBtns.forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      setMobileState('thread');
+    });
+  });
+
+  overlayEl?.addEventListener('click', () => setMobileState('thread'));
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setMobileState('thread');
+    }
+  });
 
   // 側邊搜尋（即便不在聊天頁也可以運作）
   const searchInput = document.querySelector('[data-chat-search]');

@@ -1,102 +1,51 @@
-/* === Captcha & 密碼元件（補強區塊）=== */
-.captcha-label {
-  font-weight: bold;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* ===== Auth 專用：Captcha 與密碼欄位 ===== */
+/* 若有全站色票，建議在 global.css 定義變數，這裡沿用常見顏色 */
+:root{
+  --primary-600:#1d4ed8;
+  --primary-700:#1e3a8a;
+  --success:#28a745;
+  --danger:#dc3545;
 }
-.refresh-link {
-  color: #007bff;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 0.9em;
-  transition: color .2s;
-}
-.refresh-link:hover { color: #0056b3; }
 
-.captcha-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-.captcha-image {
-  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-  border: 2px solid #ddd;
-  padding: 12px 18px;
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 4px;
-  color: #333;
-  border-radius: 6px;
-  user-select: none;
-  min-width: 120px;
-  text-align: center;
-}
-.captcha-input { flex: 1; max-width: 150px; }
-
-.required { color: red; }
-
-.password-input-wrapper { position: relative; display: flex; align-items: center; }
-.password-toggle {
-  position: absolute; right: 10px;
-  background: none; border: none; color: #007bff;
-  cursor: pointer; font-size: .8em;
-}
-.password-strength { height: 4px; margin-top: 5px; border-radius: 2px; transition: all .3s; }
-.password-match { font-size: .85em; margin-top: 5px; }
-.password-match.match { color: #28a745; }
-.password-match.no-match { color: #dc3545; }
-
+/* 常用小工具（Auth 可用） */
+.required { color: var(--danger); }
 .btn-spinner { display: inline-block; animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
 
-/* === Notification popover (Moodle 風) === */
-.nhu-popover { position: relative; display: inline-block; margin-left: 8px; }
-.nhu-popover .nhu-popover-toggle { color: #fff; text-decoration: none; position: relative; padding: 6px; display: inline-block; }
-.nhu-popover .fa-bell-o { font-size: 18px; }
-.nhu-badge { position: absolute; top: -6px; right: -2px; background:#dc3545; color:#fff; border-radius:999px;
-  padding:0 6px; font-size:12px; line-height:18px; min-width:18px; text-align:center; }
-.is-hidden { display: none !important; }
+/* === Captcha === */
+.captcha-label{
+  font-weight: 700; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.refresh-link{
+  color: var(--primary-600);
+  cursor: pointer; text-decoration: underline; font-size: .9em;
+  transition: color .2s;
+}
+.refresh-link:hover{ color: var(--primary-700); }
 
-.nhu-popover-panel { position: absolute; right: 0; top: calc(100% + 8px); width: 360px; max-height: 460px;
-  background:#fff; border:1px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.08);
-  overflow:hidden; z-index: 1000; display:none; }
-.nhu-popover [data-nhu="panel"][aria-hidden="false"] { display:block; }
+.captcha-wrapper{
+  display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
+}
+.captcha-image{
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  border: 2px solid #ddd; padding: 12px 18px;
+  font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700;
+  letter-spacing: 4px; color: #333; border-radius: 6px;
+  user-select: none; min-width: 120px; text-align: center;
+}
+.captcha-input{ flex: 1; max-width: 150px; }
 
-.nhu-popover-header { display:flex; align-items:center; justify-content:space-between; padding:10px 12px;
-  background:#197e75; color:#fff; font-weight:600; }
-.nhu-actions .icon-btn { background:transparent; border:0; color:#fff; cursor:pointer; margin-left:8px; }
-
-.nhu-popover-body { position:relative; min-height:140px; }
-.nhu-loading { text-align:center; padding:18px; color:#888; }
-.nhu-empty { padding:18px; color:#888; }
-.nhu-list { max-height:340px; overflow:auto; }
-.nhu-item { display:block; padding:10px 12px; text-decoration:none; color:#333; border-bottom:1px solid #f3f4f6; }
-.nhu-item:hover { background:#f8fafc; }
-.nhu-item.is-unread { background:#fffef6; }
-.nhu-item-title { font-weight:600; font-size:14px; margin-bottom:2px; }
-.nhu-item-text { font-size:13px; color:#555; }
-.nhu-item-time { font-size:12px; color:#999; margin-top:4px; }
-
-.nhu-popover-footer { display:block; text-align:center; padding:10px 12px; color:#197e75; text-decoration:none; border-top:1px solid #eee; }
-.nhu-popover-footer:hover { background:#f8fafc; }
-/* 分頁顯示只靠 hidden；避免與 Bootstrap .tab-pane 衝突 */
-.m-pane { display: block; }
-.m-pane[hidden] { display: none !important; }
-
-/* 會員中心排版（若你已加過可略過） */
-.member-container { display:flex; gap:2rem; align-items:flex-start; margin-top:2rem; }
-.member-nav { width:220px; background:#fff; border-radius:1rem; box-shadow:0 2px 6px rgba(0,0,0,.05); padding:1.5rem; }
-.member-nav .avatar { width:100px; height:100px; border-radius:50%; object-fit:cover; display:block; margin:0 auto 1rem; }
-.member-nav .nickname { text-align:center; font-weight:600; margin-bottom:1rem; }
-.member-nav .nav-list { list-style:none; padding:0; margin:0; }
-.member-nav .nav-list li { margin-bottom:.5rem; }
-.member-nav .tab-link { display:block; text-align:center; padding:.6rem 1rem; border-radius:.5rem; color:#333; text-decoration:none; transition:background .2s,color .2s; }
-.member-nav .tab-link:hover { background:#f1f1f1; }
-.member-nav .tab-link.active { background:#1e40af; color:#fff; font-weight:600; }
-.member-content { flex:1; background:#fff; border-radius:1rem; box-shadow:0 2px 6px rgba(0,0,0,.05); padding:2rem; }
-.member-content h2 { font-size:1.25rem; margin-bottom:1.25rem; font-weight:600; }
-
+/* === 密碼欄位、強度條、比對提示 === */
+.password-input-wrapper { position: relative; display: flex; align-items: center; }
+.password-toggle{
+  position: absolute; right: 10px;
+  background: none; border: none; color: var(--primary-600);
+  cursor: pointer; font-size: .8em;
+}
+.password-strength{
+  height: 4px; margin-top: 5px; border-radius: 2px; transition: all .3s;
+}
+.password-match{ font-size: .85em; margin-top: 5px; }
+.password-match.match{ color: var(--success); }
+.password-match.no-match{ color: var(--danger); }

@@ -1,147 +1,348 @@
-/* resources/css/member.css */
+/* ===== Theme tokens ===== */
+:root {
+  --primary: #1e40af;
+  --primary-600: #1d4ed8;
+  --shadow: 0 2px 6px rgba(0,0,0,.05);
+  --ring: 0 0 0 3px rgba(29,78,216,.35);
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --bg: #ffffff;
+  --card: #ffffff;
+  --text: #111827;
+}
 
-/* --- 主要佈局 --- */
+/* 暗色主題（若有需要可移除） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow: 0 1px 2px rgba(0,0,0,.35);
+    --border: #374151;
+    --bg: #0b1220;
+    --card: #0f172a;
+    --text: #e5e7eb;
+  }
+  .member-nav, .member-content, .favorite-card, .listings-table { background: var(--card); }
+  .member-nav, .member-content { box-shadow: var(--shadow); }
+  .member-nav .tab-link { color: var(--text); }
+  .member-nav .tab-link:hover { background: rgba(255,255,255,.06); }
+  .favorite-card { border-color: #1f2937; }
+  .listings-table th { background: #111827; color: #e5e7eb; }
+  .listings-table td, .favorite-body { color: var(--text); }
+}
+
+/* ===== 版面與分頁（維持你現有邏輯） ===== */
+.m-pane { display: block; }
+.m-pane[hidden] { display: none !important; }
+
+/* 主要容器（新增小螢幕堆疊） */
 .member-container {
   display: flex;
   gap: 2rem;
-  align-items: flex-start; /* 兩欄頂部對齊 */
+  align-items: flex-start;
+  margin-top: 2rem;
+}
+@media (max-width: 960px) {
+  .member-container { flex-direction: column; }
+  .member-nav { position: static; width: 100%; }
 }
 
+/* 左側導覽 */
 .member-nav {
-  flex-basis: 220px;  /* 左側導覽固定寬度 */
+  width: 220px;
   flex-shrink: 0;
   position: sticky;
   top: 100px;
+  background: var(--bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  border: 1px solid var(--border);
 }
-
-.member-content {
-  flex-grow: 1;      /* 右側內容填滿 */
-  min-width: 0;      /* 避免內容撐開佈局 */
-}
-
-/* --- 左側導覽選單 --- */
-.user-profile-summary {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.user-profile-summary .avatar {
-  width: 100px;
-  height: 100px;
+.member-nav .avatar {
+  width: 100px; height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 0.75rem;
-}
-
-.nav-list {
-  list-style: none;
-  padding: 0.75rem;
-  margin: 0;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,.08);
-}
-
-.nav-list li a {
   display: block;
-  padding: 0.85rem 1rem;
-  color: #333;
-  border-radius: 6px;
+  margin: 0 auto 1rem;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+.member-nav .nickname {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+.member-nav .nav-list { list-style: none; padding: 0; margin: 0; }
+.member-nav .nav-list li { margin-bottom: .5rem; }
+
+.member-nav .tab-link {
+  display: block;
+  text-align: center;
+  padding: .6rem 1rem;
+  border-radius: .5rem;
+  color: var(--text);
   text-decoration: none;
-  cursor: pointer;
-  transition: background-color .2s, color .2s;
-  font-weight: 500;
+  transition: background .2s, color .2s, transform .06s;
+  outline: none;
+  border: 1px solid transparent;
 }
-
-/* 選一種配色就好（下面用你後來一致的藍） */
-.nav-list li a.active,
-.nav-list li a:hover {
-  background-color: #007bff;
+.member-nav .tab-link:hover { background: #f1f1f1; }
+.member-nav .tab-link:focus-visible { box-shadow: var(--ring); }
+.member-nav .tab-link.active {
+  background: var(--primary);
   color: #fff;
+  font-weight: 600;
+  transform: translateY(-1px);
 }
 
-/* --- 右側內容區塊（分頁） --- */
-.tab-pane { display: none; }
-.tab-pane.active {
-  display: block;
-  animation: fadeIn .5s ease-in-out;
+/* 右側內容 */
+.member-content {
+  flex: 1;
+  background: var(--bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  min-width: 0;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.member-content h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+}
+.section { margin-bottom: 2rem; }
+.section-divider {
+  margin: 2.5rem 0; border: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+/* 空狀態提示 */
+.empty-tip { color: #6b7280; font-size: .95rem; }
 
-/* --- 我的刊登列表 --- */
+/* ===== 刊登表格 ===== */
 .listings-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--card);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+  border: 1px solid var(--border);
 }
 .listings-table th,
 .listings-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 .listings-table th {
   background-color: #f8f9fa;
-  font-weight: 600;
+  font-weight: 700;
 }
 .listings-table img {
   width: 60px; height: 60px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--border) inset;
 }
 .listings-table .action-buttons a {
   margin-right: 10px;
   font-size: .9rem;
-  color: #007bff;
+  color: var(--primary-600);
 }
 .listings-table .action-buttons a.delete { color: #dc3545; }
 
-/* --- 對話列表 --- */
-.conversation-list {
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
+/* ===== 收藏卡片 ===== */
+.favorite-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+  overflow: hidden;
+  background: var(--card);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-.conversation-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 8px;
-  transition: background-color .2s ease;
-  border-bottom: 1px solid #f0f0f0;
+.favorite-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.12);
 }
-.conversation-item:hover { background-color: #f8f9fa; }
-.conversation-item .avatar {
-  width: 50px; height: 50px;
-  border-radius: 50%;
+.favorite-cover {
+  height: 12rem;
+  width: 100%;
   object-fit: cover;
+  display: block;
+  background: #f3f4f6;
 }
-.conversation-details { flex-grow: 1; }
-.conversation-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.favorite-body { padding: 1rem; }
+.favorite-title { font-weight: 700; line-height: 1.4; }
+.favorite-price { margin-top: .5rem; font-weight: 700; }
+.favorite-actions { margin-top: 1rem; display: flex; gap: .5rem; }
+
+/* line-clamp Polyfill（若未用 Tailwind） */
+.line-clamp-2{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.conversation-header .nickname { font-weight: bold; }
-.conversation-header .time {
-  font-size: .8rem;
-  color: #6c757d;
+
+/* ===== 按鈕 ===== */
+.btn { display: inline-block; padding: .55rem .9rem; border-radius: .75rem; text-decoration: none; border: 1px solid transparent; }
+.btn:focus-visible { box-shadow: var(--ring); }
+.btn-dark { background: #111827; color: #fff; }
+.btn-dark:hover { filter: brightness(0.96); }
+.btn-light { background: #f3f4f6; color: #111; border-color: #e5e7eb; }
+.btn-light:hover { background: #e5e7eb; }
+
+/* ===== 對話列表（若仍有用） ===== */
+.conversation-list { display: flex; flex-direction: column; gap: .5rem; }
+.conversation-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem; border-radius: 12px; border: 1px solid var(--border);
+  transition: background-color .2s ease, transform .06s ease, box-shadow .12s ease;
 }
-.last-message {
-  margin: .25rem 0 0;
-  color: #6c757d;
-  font-size: .9rem;
+.conversation-item:hover { background-color: #f8f9fa; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+.conversation-item .avatar {
+  width: 50px; height: 50px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--border) inset;
 }
-.last-message .message-prefix {
-  color: #333;
-  font-weight: 500;
+.conversation-details { flex-grow: 1; color: var(--text); }
+.conversation-header { display: flex; justify-content: space-between; align-items: center; }
+.conversation-header .nickname { font-weight: 700; }
+.conversation-header .time { font-size: .8rem; color: var(--muted); }
+.last-message { margin-top: .25rem; color: var(--muted); font-size: .95rem; }
+.last-message .message-prefix { color: var(--text); font-weight: 600; }
+
+/* ===== 小改善：減少動作偏好 ===== */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+/* ===== Home style theme override ===== */
+:root{
+  /* 色票：淡綠灰背景＋深一階綠灰＋可讀文字色 */
+  --home-bg: #dfe7de;               /* 導覽列/頁背景的淡綠灰感 */
+  --home-tint: #eaf1ea;             /* 玻璃卡底色的更淡層 */
+  --home-accent: #6b8f7b;           /* 次要綠灰（按鈕/邊框） */
+  --home-primary: #1e3a2f;          /* 文字/主色（深綠灰，保對比） */
+
+  /* 玻璃卡與陰影 */
+  --glass: rgba(255,255,255,.55);
+  --glass-border: rgba(255,255,255,.45);
+  --glass-shadow: 0 12px 35px rgba(16, 24, 40, .15);
+  --radius-2xl: 1.25rem;
+  --ring: 0 0 0 3px rgba(107,143,123,.28);
+}
+
+/* 整體背景如果想套淡綠灰（可選） */
+body {
+  background: linear-gradient(180deg, var(--home-bg) 0%, #f5f7f4 60%, #ffffff 100%);
+}
+
+/* 玻璃卡：左欄/右欄/列表表格/收藏卡片統一風格 */
+.member-nav,
+.member-content,
+.listings-table,
+.favorite-card {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-2xl);
+}
+
+/* 左側導覽卡微調 */
+.member-nav{
+  padding: 1.25rem 1.25rem 1.5rem;
+  top: 88px; /* 讓它更貼近你的 header 高度 */
+}
+
+/* 導覽膠囊按鈕（主題化） */
+.member-nav .tab-link{
+  color: var(--home-primary);
+  border: 1px solid rgba(107,143,123,.25);
+  background: linear-gradient(180deg, rgba(255,255,255,.85), var(--home-tint));
+}
+.member-nav .tab-link:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.95), #ffffff);
+}
+.member-nav .tab-link.active{
+  background: linear-gradient(180deg, #6b8f7b, #567965);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(107,143,123,.35);
+  transform: translateY(-1px);
+}
+.member-nav .tab-link:focus-visible{ box-shadow: var(--ring); }
+
+/* 右側內容標題與分隔線 */
+.member-content{ padding: 2.25rem; }
+.member-content h2{
+  color: var(--home-primary);
+  letter-spacing: .2px;
+}
+.section-divider{
+  height: 1px; border: 0;
+  background: linear-gradient(90deg, transparent, rgba(107,143,123,.35), transparent);
+}
+
+/* 刊登表格玻璃風 + 更圓角 */
+.listings-table{
+  overflow: clip;
+  border-radius: var(--radius-2xl);
+}
+.listings-table th{
+  background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.35));
+  color: var(--home-primary);
+  font-weight: 700;
+}
+.listings-table td{ color: #1f2937; }
+.listings-table img{
+  border-radius: .75rem;
+  box-shadow: 0 0 0 1px rgba(107,143,123,.18) inset;
+}
+
+/* 收藏卡片：更像首頁那種柔和卡片 */
+.favorite-card{
+  transition: transform .14s ease, box-shadow .18s ease;
+}
+.favorite-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(16,24,40,.20);
+}
+.favorite-cover{
+  height: 12.5rem;
+  background:
+    radial-gradient(120% 80% at 10% 10%, rgba(255,255,255,.35), transparent 60%),
+    linear-gradient(180deg, rgba(223,231,222,.6), rgba(223,231,222,.2));
+}
+.favorite-title{ color: var(--home-primary); }
+.favorite-price{ color: #2f3b36; }
+
+/* 膠囊按鈕（對齊首頁風格） */
+.btn{
+  padding: .6rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(107,143,123,.3);
+  backdrop-filter: blur(6px);
+}
+.btn-dark{
+  background: linear-gradient(180deg, #1f2a24, #18211c);
+  border-color: rgba(0,0,0,.35);
+}
+.btn-dark:hover{ filter: brightness(.96); }
+.btn-light{
+  background: linear-gradient(180deg, rgba(255,255,255,.92), #ffffff);
+  color: var(--home-primary);
+}
+.btn-light:hover{
+  background: linear-gradient(180deg, #ffffff, #fafafa);
+}
+
+/* 空狀態字色 */
+.empty-tip{ color: #7b8a82; }
+
+/* RWD：窄螢幕保持呼吸感 */
+@media (max-width: 960px){
+  .member-container{ gap: 1rem; }
+  .member-content{ padding: 1.25rem; }
 }

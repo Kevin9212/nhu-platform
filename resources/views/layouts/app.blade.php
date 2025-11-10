@@ -49,26 +49,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
             max-width: 1200px;
-            margin: 0 1rem auto 1rem;
-         
+            margin: 0 auto;
+            padding: 0 1rem;
+            width: 100%;
         }
 
         .logo a {
             font-weight: bold;
             font-size: 1.5rem;
             text-decoration: none;
-            margin-right:35rem;
             color: #333;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
       
         }
 
         .nav-menu {
             display: flex;
             gap: 1.2rem;
-            align-items: center;
-            margin-left:10rem;
-            
+            align-items: center;            
         }
         .nav-menu img{
             width: 2rem;
@@ -133,32 +135,51 @@
         /* 🔹 RWD 漢堡選單 */
         .menu-toggle {
             display: none;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             background: none;
             border: none;
             cursor: pointer;
+            color: #333;
+        }
+        @media(max-width:992px){
+            .header-container{
+                gap: 0.75rem;
+            }
+            .nav-menu{
+                gap: 0.9rem;
+            }
         }
 
         @media (max-width: 768px) {
+            .headr-container{
+                position: relative;
+            }
             .nav-menu {
                 display: none;
                 flex-direction: column;
+                align-items: flex-start;
                 background: #f8f9fa;
                 position: absolute;
-                top: 60px;
-                right: 0;
-                width: 200px;
+                top: calc(100% + 0.5rem);
+                right: 1rem;
+                left: 1rem;
                 padding: 1rem;
                 border: 1px solid #ddd;
                 border-radius: 6px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                z-index: 1100;
             }
 
             .nav-menu.active {
-                display: flex;
+                display: flex !important;
             }
 
             .menu-toggle {
                 display: block;
+            }
+            .nav-menu form,
+            .nav-menu a {
+                width: 100%;
             }
         }
     </style>
@@ -206,9 +227,33 @@
 
             // 🔹 漢堡選單
             if (menuToggle && navMenu) {
-                menuToggle.addEventListener("click", () => {
+                const syncState = () => {
+                    const isOpen = navMenu.classList.contains("active");
+                    menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+                };
+
+                menuToggle.addEventListener("click", (event) => {
+                    event.preventDefault();
                     navMenu.classList.toggle("active");
+                    syncState();
                 });
+                navMenu.querySelectorAll("a, button").forEach((node) => {
+                    node.addEventListener("click", () => {
+                        if (window.innerWidth <= 768) {
+                            navMenu.classList.remove("active");
+                            syncState();
+                        }
+                    });
+                });
+
+                window.addEventListener("resize", () => {
+                    if (window.innerWidth > 768) {
+                        navMenu.classList.remove("active");
+                        syncState();
+                    }
+                });
+
+                syncState();
             }
 
             // 🔹 捲動陰影效果

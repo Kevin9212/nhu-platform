@@ -4,16 +4,26 @@
 @section('title', '對話 #'.$conversation->id)
 
 @section('content')
-<div class="chat-layout" data-enable-echo>
+<div class="chat-layout" data-enable-echo data-mobile-initial="thread">
     {{-- 對話清單 --}}
     @include('conversations.partials.list', [
         'conversations' => $conversations,
         'activeConversation' => $conversation->id,
     ])
 
+    <div class="chat-sidebar__backdrop" data-chat-overlay></div>
+
     <div class="chat-thread">
         {{-- 標題列 --}}
         <header class="chat-thread__header">
+            <button type="button"
+                    class="chat-thread__toggle"
+                    data-chat-open
+                    aria-controls="chatSidebar"
+                    aria-expanded="false">
+                <span class="chat-thread__toggle-icon" aria-hidden="true">☰</span>
+                <span class="chat-thread__toggle-text">對話列表</span>
+            </button>
             <div class="chat-thread__peer">
                 <img class="chat-thread__peer-avatar"
                      src="{{ $otherUser->avatar_url }}"

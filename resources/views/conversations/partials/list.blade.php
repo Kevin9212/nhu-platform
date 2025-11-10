@@ -2,7 +2,14 @@
     use Illuminate\Support\Str;
 @endphp
 
-<div class="chat-sidebar" data-chat-sidebar>
+<div class="chat-sidebar" id="chatSidebar" data-chat-sidebar>
+    <button type="button"
+            class="chat-sidebar__close"
+            data-chat-close
+            aria-label="關閉對話列表">
+        <span aria-hidden="true">&times;</span>
+        <span class="chat-sidebar__close-text">關閉</span>
+    </button>
     <div class="chat-sidebar__header">
         <h2 class="chat-sidebar__title">我的對話</h2>
         <span class="chat-sidebar__count">{{ $conversations->count() }}</span>

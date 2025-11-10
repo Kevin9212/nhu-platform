@@ -7,7 +7,7 @@
         </div>
 
         {{-- 🔹 漢堡選單按鈕（手機用） --}}
-        <button class="menu-toggle" id="menuToggle">☰</button>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-controls="navMenu" aria-expanded="false" aria-label="切換導覽選單">☰</button>
 
         {{-- 🔹 導覽選單 --}}
         <nav class="nav-menu" id="navMenu">
@@ -109,16 +109,3 @@
 </style>
 @endpush
 
-@push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const menuToggle = document.getElementById("menuToggle");
-    const navMenu = document.getElementById("navMenu");
-    if (menuToggle) {
-        menuToggle.addEventListener("click", () => {
-            navMenu.classList.toggle("active");
-        });
-    }
-});
-</script>
-@endpush
