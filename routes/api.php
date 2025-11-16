@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ItemApiController;
 use App\Http\Controllers\Api\AdminStatsController;
 
-
 // 🔹 測試 API：確認 api 路由有正常運作
 Route::get('/ping', function () {
     return response()->json([
@@ -19,7 +18,7 @@ Route::get('/ping', function () {
 Route::get('/items', [ItemApiController::class, 'index']);
 Route::get('/items/{id}', [ItemApiController::class, 'show']);
 
-// 新增的後台統計 API
+// 🔹 後台統計 API（開放讀取，給 React 儀表板使用）
 Route::get('/admin/stats', [AdminStatsController::class, 'index']);
 
 /*
@@ -27,9 +26,7 @@ Route::get('/admin/stats', [AdminStatsController::class, 'index']);
 | API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| 這裡是 API 路由，會被指派到 "api" middleware group。
 |
 */
 
