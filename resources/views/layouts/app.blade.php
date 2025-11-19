@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- Google Fonts: Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +27,23 @@
     @stack('styles')
 
     <style>
-       
+
+        :root {
+            --site-header-height: 4.5rem;
+            --site-header-gap-desktop: 0.5rem;
+            --site-header-gap-mobile: 1.75rem;
+        }
+
+        body.has-fixed-header .app-main {
+            margin-top: calc(var(--site-header-height) + var(--site-header-gap-desktop));
+        }
+
+        @media (max-width: 768px) {
+            body.has-fixed-header .app-main {
+                margin-top: calc(var(--site-header-height) + var(--site-header-gap-mobile));
+            }
+        }
+
         /* 🔹 導覽列樣式 */
         .site-header {
             background: #d2d7ce;
@@ -68,17 +84,75 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-      
+
         }
 
         .nav-menu {
             display: flex;
             gap: 1.2rem;
-            align-items: center;            
+            align-items: center;
+            flex-wrap: nowrap;
         }
-        .nav-menu img{
-            width: 2rem;
-            height: auto;
+
+        .nav-icons {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: inset 0 0 0 1px rgba(99, 121, 115, 0.2);
+        }
+
+        .nav-icon-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(99, 121, 115, 0.35);
+            background: #f8f9f5;
+            color: #273636;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-icon-link:hover,
+        .nav-icon-link:focus-visible {
+            background: #ffffff;
+            color: #1d2a2a;
+            transform: translateY(-1px);
+        }
+
+        .nav-icon-img {
+            width: 1.2rem;
+            height: 1.2rem;
+            display: block;
+            object-fit: contain;
+        }
+
+        .nav-icons .nhu-popover {
+            margin: 0;
+            display: inline-flex;
+        }
+
+        .nav-icons .nhu-popover-toggle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(99, 121, 115, 0.35);
+            background: #f8f9f5;
+            color: inherit;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icons .nhu-popover .fa-bell-o {
+            font-size: 1.1rem;
+            color: #273636;
         }
 
         .login{
@@ -181,18 +255,26 @@
             .menu-toggle {
                 display: block;
             }
-            .nav-menu form,
-            .nav-menu a {
+            .nav-menu > form,
+            .nav-menu > a {
                 width: 100%;
+            }
+
+            .nav-icons {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                padding: 0.5rem;
+                background: rgba(255, 255, 255, 0.9);
             }
         }
     </style>
 </head>
 
-<body class="has-fixed-header">
+<body class="@yield('body_class', 'has-fixed-header')">
     {{-- 導覽列 --}}
     @include('partials.header')
-        
+
     {{-- 主內容 --}}
     <main class="app-main">
         @if(session('success'))
@@ -228,6 +310,21 @@
             const menuToggle = document.getElementById("menuToggle");
             const navMenu = document.getElementById("navMenu");
             const header = document.querySelector(".site-header");
+            const docEl = document.documentElement;
+
+            const updateHeaderHeight = () => {
+                if (!header) return;
+                const measured = header.getBoundingClientRect().height;
+                docEl.style.setProperty("--site-header-height", `${measured}px`);
+            };
+
+            if (header) {
+                updateHeaderHeight();
+                if (window.ResizeObserver) {
+                    const observer = new ResizeObserver(() => updateHeaderHeight());
+                    observer.observe(header);
+                }
+            }
 
             // 🔹 漢堡選單
             if (menuToggle && navMenu) {
@@ -251,6 +348,7 @@
                 });
 
                 window.addEventListener("resize", () => {
+                    updateHeaderHeight();
                     if (window.innerWidth > 768) {
                         navMenu.classList.remove("active");
                         syncState();
@@ -261,13 +359,15 @@
             }
 
             // 🔹 捲動陰影效果
-            window.addEventListener("scroll", () => {
-                if (window.scrollY > 20) {
-                    header.classList.add("scrolled");
-                } else {
-                    header.classList.remove("scrolled");
-                }
-            });
+            if (header) {
+                window.addEventListener("scroll", () => {
+                    if (window.scrollY > 20) {
+                        header.classList.add("scrolled");
+                    } else {
+                        header.classList.remove("scrolled");
+                    }
+                });
+            }
         });
     </script>
 </body>

@@ -3,6 +3,10 @@
 @section('title', '會員中心 - NHU 二手交易平台')
 @section('page', 'member')
 
+@push('styles')
+  @vite('resources/css/member.css')
+@endp
+
 @section('content')
 <div class="container">
   <div class="member-container">

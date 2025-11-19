@@ -35,6 +35,12 @@ NHU.notify = (function () {
     if (!root) return;
     const {loading, empty, list, badge} = els(root);
     const url = root.getAttribute('data-fetch');
+    if (!url) {
+      loading.classList.add('is-hidden');
+      empty.textContent = '通知功能暫時無法使用';
+      empty.classList.remove('is-hidden');
+      return;
+    }
     loading.classList.remove('is-hidden');
     empty.classList.add('is-hidden');
     list.innerHTML = '';

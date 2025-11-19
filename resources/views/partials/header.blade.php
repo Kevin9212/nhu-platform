@@ -11,56 +11,74 @@
 
         {{-- 🔹 導覽選單 --}}
         <nav class="nav-menu" id="navMenu">
-            <a href="{{ route('search.index') }}" class="nav-link">
-                <img class="search-icon" src="{{ asset('images/search_icon.png') }}" alt="search">
-            </a>
-
-            @auth
-                <a href="{{ route('conversations.index') }}" class="nav-link">
-                    <img class="search-icon" src="{{ asset('images/speach-icon.png') }}" alt="chat">
+            <div class="nav-icons" role="group" aria-label="快速操作">
+                <a href="{{ route('search.index') }}" class="nav-icon-link" title="搜尋" aria-label="搜尋">
+                    <img class="nav-icon-img" src="{{ asset('images/search_icon.png') }}" alt="搜尋">
                 </a>
 
-                <a href="{{ route('member.index') }}" class="nav-link">
-                    <img class="search-icon" src="{{ asset('images/member-iocn.png') }}" alt="member">
-                </a>
-
-                {{-- 🔔 通知 --}}
-                @php
-                    $unread = Auth::user()->unreadNotifications()->count();
-                    $base = rtrim(request()->getBaseUrl(), '/'); // ✅ 自動偵測 /nhu-platform/public
-                @endphp
-
-                <div class="nhu-popover" id="nhu-notify"
-                    data-fetch="{{ $base . route('notifications.fetch', [], false) }}"
-                    data-readall="{{ $base . route('notifications.readAll', [], false) }}">
-                    <a href="#" class="nhu-popover-toggle" aria-label="切換通知" onclick="return NHU.notify.toggle(event)">
-                        <i class="fa fa-bell-o"></i>
-                        <span class="nhu-badge {{ $unread ? '' : 'is-hidden' }}" data-nhu="badge">{{ $unread }}</span>
+                @auth
+                    <a href="{{ route('conversations.index') }}" class="nav-icon-link" title="訊息" aria-label="訊息">
+                        <img class="nav-icon-img" src="{{ asset('images/speach-icon.png') }}" alt="訊息">
                     </a>
 
-                    <div class="nhu-popover-panel" data-nhu="panel" aria-hidden="true">
-                        <div class="nhu-popover-header">
-                            <span>通知</span>
-                            <div class="nhu-actions">
-                                <button class="icon-btn" title="全部已讀" onclick="NHU.notify.readAll(event)">
-                                    <i class="fa fa-check"></i>
-                                </button>
-                                <a class="icon-btn" title="查看全部" href="{{ $base . route('notifications.index', [], false) }}">
-                                    <i class="fa fa-cog"></i>
-                                </a>
+                    <a href="{{ route('member.index') }}" class="nav-icon-link" title="會員" aria-label="會員">
+                        <img class="nav-icon-img" src="{{ asset('images/member-iocn.png') }}" alt="會員">
+                    </a>
+
+                    {{-- 🔔 通知 --}}
+                    @php
+                        $unread = Auth::user()->unreadNotifications()->count();
+                        $base = rtrim(request()->getBaseUrl(), '/'); // ✅ 自動偵測 /nhu-platform/public
+                        $notifyFetchUrl = Route::has('notifications.fetch')
+                            ? $base . route('notifications.fetch', [], false)
+                            : null;
+                        $notifyReadAllUrl = Route::has('notifications.readAll')
+                            ? $base . route('notifications.readAll', [], false)
+                            : null;
+                        $notifyIndexUrl = Route::has('notifications.index')
+                            ? $base . route('notifications.index', [], false)
+                            : null;
+                    @endphp
+
+                    <div class="nhu-popover" id="nhu-notify"
+                        @if ($notifyFetchUrl) data-fetch="{{ $notifyFetchUrl }}" @endif
+                        @if ($notifyReadAllUrl) data-readall="{{ $notifyReadAllUrl }}" @endif>
+                        <a href="#" class="nhu-popover-toggle nav-icon-link" aria-label="切換通知"
+                            onclick="return NHU.notify.toggle(event)">
+                            <i class="fa fa-bell-o"></i>
+                            <span class="nhu-badge {{ $unread ? '' : 'is-hidden' }}" data-nhu="badge">{{ $unread }}</span>
+                        </a>
+
+                        <div class="nhu-popover-panel" data-nhu="panel" aria-hidden="true">
+                            <div class="nhu-popover-header">
+                                <span>通知</span>
+                                <div class="nhu-actions">
+                                    <button class="icon-btn" title="全部已讀" onclick="NHU.notify.readAll(event)">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                    @if ($notifyIndexUrl)
+                                        <a class="icon-btn" title="查看全部" href="{{ $notifyIndexUrl }}">
+                                            <i class="fa fa-cog"></i>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="nhu-popover-body">
-                            <div class="nhu-loading" data-nhu="loading"><i class="fa fa-circle-o-notch fa-spin"></i></div>
-                            <div class="nhu-empty is-hidden" data-nhu="empty">你沒有收到通知</div>
-                            <div class="nhu-list" data-nhu="list"></div>
-                        </div>
+                            <div class="nhu-popover-body">
+                                <div class="nhu-loading" data-nhu="loading"><i class="fa fa-circle-o-notch fa-spin"></i></div>
+                                <div class="nhu-empty is-hidden" data-nhu="empty">你沒有收到通知</div>
+                                <div class="nhu-list" data-nhu="list"></div>
+                            </div>
 
-                        <a class="nhu-popover-footer" href="{{ $base . route('notifications.index', [], false) }}">查看全部</a>
+                            @if ($notifyIndexUrl)
+                                <a class="nhu-popover-footer" href="{{ $notifyIndexUrl }}">查看全部</a>
+                            @endif
                     </div>
-                </div>
+                    </div>
+                @endauth
+            </div>
 
+            @auth
                 {{-- 🔹 登出 --}}
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                     @csrf
@@ -77,11 +95,11 @@
 @push('styles')
 <style>
 /* === Notification popover 基本樣式 === */
-.nhu-popover { position: relative; display: inline-block; margin-left: 8px; }
-.nhu-popover .nhu-popover-toggle { color: #fff; text-decoration: none; position: relative; padding: 6px; display: inline-block; }
-.nhu-popover .fa-bell-o { font-size: 18px; }
-.nhu-badge { position: absolute; top: -6px; right: -2px; background:#dc3545; color:#fff; border-radius:999px;
-  padding:0 6px; font-size:12px; line-height:18px; min-width:18px; text-align:center; }
+.nhu-popover { position: relative; display: inline-flex; margin-left: 0; }
+.nhu-popover .nhu-popover-toggle { color: inherit; text-decoration: none; position: relative; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.nhu-popover .fa-bell-o { font-size: 1.1rem; }
+.nhu-badge { position: absolute; top: -4px; right: -4px; background:#dc3545; color:#fff; border-radius:999px;
+  padding:0 5px; font-size:12px; line-height:18px; min-width:18px; text-align:center; }
 .is-hidden { display: none !important; }
 
 .nhu-popover-panel { position: absolute; right: 0; top: calc(100% + 8px); width: 360px; max-height: 460px;
@@ -107,5 +125,3 @@
 .nhu-popover-footer { display:block; text-align:center; padding:10px 12px; color:#197e75; text-decoration:none; border-top:1px solid #eee; }
 .nhu-popover-footer:hover { background:#f8fafc; }
 </style>
-@endpush
-

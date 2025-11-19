@@ -9,6 +9,7 @@ export default defineConfig({
                 
                 'resources/css/style.css',
                 'resources/css/auth.css',
+                'resources/css/member.css',
                 'resources/js/app.js',
                 'resources/js/member.js',
                 ],

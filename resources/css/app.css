@@ -14,6 +14,8 @@
 }
 :root {
   --site-header-height: 4.5rem;
+  --site-header-gap-desktop: 0.5rem;
+  --site-header-gap-mobile: 1.75rem;
 }
 
 html, body {
@@ -26,13 +28,13 @@ body {
   min-height: 100vh;
 }
 
-body.has-fixed-header {
-  padding-top: calc(var(--site-header-height) + 0.5rem);
+body.has-fixed-header .app-main {
+  margin-top: calc(var(--site-header-height) + var(--site-header-gap-desktop));
 }
 
 @media (max-width: 768px) {
-  body.has-fixed-header {
-    padding-top: calc(var(--site-header-height) + 1.75rem);
+  body.has-fixed-header .app-main {
+    margin-top: calc(var(--site-header-height) + var(--site-header-gap-mobile));
   }
 }
 
@@ -45,6 +47,84 @@ body.has-fixed-header {
 
 .site-footer {
   margin-top: auto;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.nav-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(99, 121, 115, 0.2);
+}
+
+.nav-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 121, 115, 0.35);
+  background: #f8f9f5;
+  color: #273636;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+
+.nav-icon-link:hover,
+.nav-icon-link:focus-visible {
+  background: #ffffff;
+  color: #1d2a2a;
+  transform: translateY(-1px);
+}
+
+.nav-icon-img {
+  width: 1.2rem;
+  height: 1.2rem;
+  display: block;
+  object-fit: contain;
+}
+
+.nav-icons .nhu-popover {
+  margin: 0;
+  display: inline-flex;
+}
+
+.nav-icons .nhu-popover-toggle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 121, 115, 0.35);
+  background: #f8f9f5;
+  color: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icons .nhu-popover .fa-bell-o {
+  font-size: 1.1rem;
+  color: #273636;
+}
+
+@media (max-width: 768px) {
+  .nav-icons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+  }
 }
 /* ==================================================
    自訂覆蓋（只放需要覆蓋的部分，避免與 style.css 打架）
