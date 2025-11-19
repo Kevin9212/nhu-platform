@@ -54,23 +54,30 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
-        $latest = $user->unreadNotifications()
+        $unreadCount = $user->unreadNotifications()->count();
+
+        $latest = $user->notifications()
             ->latest('created_at')
             ->limit(5)
             ->get()
             ->map(function (DatabaseNotification $n) {
                 $data = $n->data ?? [];
+                
+                // 舊資料可能用 message，新資料用 text，這裡一起處理
+                $text = $data['text'] ?? $data['message'] ?? '';
+
                 return [
                     'id'    => $n->id, // UUID
                     'title' => (string)($data['title'] ?? ''),
-                    'text'  => (string)($data['text']  ?? ''),
-                    'url'   => (string)($data['url']   ?? route('home')),
-                    'time'  => $n->created_at->diffForHumans(),
+                    'text'  => (string)$text,
+                    'url'   => (string)($data['url'] ?? route('notifications.index', [], false)),
+                    'time'  => optional($n->created_at)?->diffForHumans() ?? '',
+                    'read'  => !is_null($n->read_at),
                 ];
             });
 
         return response()->json([
-            'count' => $user->unreadNotifications()->count(),
+            'count' => $unreadCount,
             'items' => $latest,
         ]);
     }

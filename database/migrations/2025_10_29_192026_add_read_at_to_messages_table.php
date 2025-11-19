@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('messages', 'read_at')) {
+            return;
+        }
+
         Schema::table('messages', function (Blueprint $table) {
-            //
+            $table->timestamp('read_at')->nullable()->index()->after('created_at');
         });
     }
 
@@ -21,8 +25,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasColumn('messages', 'read_at')) {
+            return;
+        }
+
         Schema::table('messages', function (Blueprint $table) {
-            $table->timestamp('read_at')->nullable()-index();
+            $table->dropColumn('read_at');
         });
     }
 };
+

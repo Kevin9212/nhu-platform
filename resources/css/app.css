@@ -26,6 +26,16 @@ body {
   min-height: 100vh;
 }
 
+body.has-fixed-header {
+  padding-top: calc(var(--site-header-height) + 0.5rem);
+}
+
+@media (max-width: 768px) {
+  body.has-fixed-header {
+    padding-top: calc(var(--site-header-height) + 1.75rem);
+  }
+}
+
 .app-main {
   display: flex;
   flex-direction: column;

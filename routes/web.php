@@ -152,3 +152,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/negotiations/{negotiation}/agree', [NegotiationController::class, 'agree'])->name('negotiations.agree');
     Route::patch('/negotiations/{negotiation}/reject', [NegotiationController::class, 'reject'])->name('negotiations.reject');
 });
+
+// React Admin Dashboard
+Route::get('/react-admin/{any?}', function () {
+    return file_get_contents(public_path('react-admin/index.html'));
+})->where('any', '.*');

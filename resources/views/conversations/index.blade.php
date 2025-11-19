@@ -3,7 +3,7 @@
 @section('title', '聊天室')
 
 @section('content')
-<div class="chat-layout">
+<div class="chat-layout" data-mobile-initial="list">
     {{-- 對話清單 --}}
     @include('conversations.partials.list', [
         'conversations' => $conversations,

@@ -33,8 +33,11 @@
             background: #d2d7ce;
             border-bottom: 1px solid #ddd;
             padding: 0.5rem 0.5rem;
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
             z-index: 1000;
             transition: box-shadow 0.3s ease;
             background-color:#d2d7ce;
@@ -46,6 +49,7 @@
         }
 
         .header-container {
+            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -151,7 +155,7 @@
         }
 
         @media (max-width: 768px) {
-            .headr-container{
+            .header-container{
                 position: relative;
             }
             .nav-menu {
@@ -185,7 +189,7 @@
     </style>
 </head>
 
-<body>
+<body class="has-fixed-header">
     {{-- 導覽列 --}}
     @include('partials.header')
         

@@ -11,18 +11,33 @@
     @else
         <ul class="list-group">
             @foreach($notifications as $notification)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ $notification->data['title'] }}</strong><br>
-                        {{ $notification->data['message'] }}
+                @php
+                    $data = $notification->data ?? [];
+                    $text = $data['text'] ?? $data['message'] ?? '';
+                    $isRead = !is_null($notification->read_at);
+                @endphp
+                <li class="list-group-item d-flex justify-content-between align-items-center {{ $isRead ? '' : 'list-group-item-warning' }}">
+                    <div class="me-3">
+                        <strong>{{ $data['title'] ?? '通知' }}</strong><br>
+                        <span class="text-muted small">{{ $notification->created_at?->diffForHumans() }}</span>
+                        <p class="mb-0">{{ $text }}</p>
                     </div>
-                    <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-primary">查看</button>
-                    </form>
+                    <div class="d-flex align-items-center gap-2">
+                        @if(!$isRead)
+                            <span class="badge bg-danger">未讀</span>
+                        @endif
+                        <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-primary">查看</button>
+                        </form>
+                    </div>
                 </li>
             @endforeach
         </ul>
+
+        <div class="mt-3">
+            {{ $notifications->links() }}
+        </div>
     @endif
 </div>
 @endsection

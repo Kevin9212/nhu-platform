@@ -4,72 +4,93 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 
 class AdminAiReportController extends Controller
 {
-    public function generate(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
-        // 前端丟進來的統計資料（summary / items_by_category / items_per_day / hot_keywords / ranking）
+        // 前端傳來的統計資料（summary、items_by_category、items_per_day、hotKeywords、hotItems）
         $payload = $request->all();
 
-        // 安全檢查：沒有 key 就直接回錯誤
+        // 1. 準備 prompt（系統 + 使用者）
+        $systemPrompt = <<<'PROMPT'
+            你是 NHU 二手交易平台的營運顧問，請閱讀後端提供的統計資料，產生一份「給系上老師看得懂」的中文分析報告。
+
+            要求：
+            1. 使用繁體中文。
+            2. 口氣偏正式、條列清楚，適合作為簡報講稿。
+            3. 至少包含這幾段：
+            - 整體概況（例如總商品數、上架率、上架時間分布）
+            - 各分類表現（哪些分類商品數較多，可能原因）
+            - 熱門商品與關鍵字觀察（哪些類型或關鍵字特別熱門）
+            - 未來優化建議（例如鼓勵哪些商品上架、是否可以辦促銷活動等）
+            4. 不要列出完整 JSON，只要用自然語言摘要就好，可以適度引用數字。
+            PROMPT;
+
+        $userPrompt = "以下是 NHU 二手交易平台的統計 JSON，請依照系統提示產出分析報告（不要回 JSON，只要文字）：\n\n"
+            . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        // 2. 讀取 .env 裡的 API Key 和 Model
         $apiKey = env('OPENAI_API_KEY');
+        $model  = env('OPENAI_MODEL', 'gpt-4.1-mini'); // 預設使用 gpt-4.1-mini
+
         if (!$apiKey) {
             return response()->json([
-                'error' => '環境變數 OPENAI_API_KEY 未設定',
+                'message' => 'OPENAI_API_KEY 尚未設定',
             ], 500);
         }
 
-        // 把資料壓成一段 prompt
-        $prompt = <<<PROMPT
-你是一位熟悉大學生二手交易平台營運的數據分析師。
-
-底下是後台統計資料（JSON），請產生一份「可以直接貼到簡報裡」的中文分析報告，格式請用條列式，包含：
-
-1. 平台整體概況（總商品數、上架比例、最近幾天的上架趨勢）
-2. 熱門商品分類分析（哪幾類佔比高、可能原因）
-3. 熱門關鍵字與學生需求推測
-4. 前 3 名熱門商品的行銷建議（如何在首頁或活動中曝光）
-5. 接下來一個月可以執行的營運建議（例如主題活動、推薦位、推播文案方向）
-
-請直接用繁體中文輸出報告，不要再出現 JSON，只要分析文字。
-
-以下為 JSON 資料：
-
-PROMPT;
-
-        $prompt .= "\n\n" . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
-        // 呼叫 OpenAI Chat Completions API
-        $response = Http::withToken($apiKey)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4o-mini', // 也可以改成 gpt-4.1-mini 等
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => '你是一位擅長做商業簡報的數據分析顧問，回答要精簡有重點，以條列式為主。'
+        try {
+            // 3. 呼叫 OpenAI Chat Completions API
+            $response = Http::withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type'  => 'application/json',
+                ])
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model'    => $model,
+                    'messages' => [
+                        [
+                            'role'    => 'system',
+                            'content' => $systemPrompt,
+                        ],
+                        [
+                            'role'    => 'user',
+                            'content' => $userPrompt,
+                        ],
                     ],
-                    [
-                        'role' => 'user',
-                        'content' => $prompt,
-                    ],
-                ],
-                'temperature' => 0.7,
-            ]);
+                    'temperature' => 0.7,
+                ]);
 
-        if ($response->failed()) {
+            if (!$response->ok()) {
+                return response()->json([
+                    'message' => 'OpenAI API 呼叫失敗',
+                    'status'  => $response->status(),
+                    'body'    => $response->body(),
+                ], 500);
+            }
+
+            $data = $response->json();
+
+            $text = $data['choices'][0]['message']['content'] ?? '';
+
+            if (!$text) {
+                return response()->json([
+                    'message' => 'OpenAI 回傳格式異常，沒有 content',
+                    'raw'     => $data,
+                ], 500);
+            }
+
+            //  前端期待 { text: "..." }
             return response()->json([
-                'error'  => 'OpenAI API 呼叫失敗',
-                'status' => $response->status(),
-                'body'   => $response->body(),
+                'text' => $text,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => '呼叫 OpenAI 發生例外',
+                'error'   => $e->getMessage(),
             ], 500);
         }
-
-        $content = $response->json('choices.0.message.content');
-
-        return response()->json([
-            'text' => $content,
-        ]);
     }
 }

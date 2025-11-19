@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckBanned;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // 👇 把 CORS middleware 掛到 api 群組
         $middleware->appendToGroup('api', HandleCors::class);
+
+        // 👇 供 routes/web.php 使用的別名 middleware
+        $middleware->alias([
+            'checkBanned' => CheckBanned::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
