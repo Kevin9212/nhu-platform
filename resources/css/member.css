@@ -346,3 +346,50 @@ body {
   .member-container{ gap: 1rem; }
   .member-content{ padding: 1.25rem; }
 }
+
+/* ===== 議價總覽 ===== */
+.negotiation-hint{
+  background: linear-gradient(180deg, rgba(107,143,123,.15), rgba(255,255,255,.7));
+  border: 1px solid rgba(107,143,123,.3);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.negotiation-hint__title{
+  margin: 0 0 .35rem;
+  color: var(--home-primary);
+  font-weight: 700;
+}
+.negotiation-hint ul{
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #2f3b36;
+  line-height: 1.6;
+}
+.negotiations-table .negotiation-item{
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+.negotiations-table img{
+  width: 64px;
+  height: 64px;
+  border-radius: .75rem;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(107,143,123,.18) inset;
+}
+.negotiation-item__name{ font-weight: 700; color: var(--home-primary); }
+.negotiation-item__price{ font-size: .9rem; color: #6b7280; }
+.negotiation-badge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .35rem .8rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .9rem;
+}
+.badge-pending{ background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.badge-accepted{ background: #ecfdf3; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-rejected{ background: #fef2f2; color: #b91c1c; border: 1px solid #fecdd3; }
+.btn-sm{ padding: .45rem .9rem; font-size: .9rem; }

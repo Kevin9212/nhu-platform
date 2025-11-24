@@ -36,10 +36,14 @@ class IdleItem extends Model {
     public function category() {
         return $this->belongsTo(Category::class, 'category_id');
     }
-public function orders()
-{
-    return $this->hasMany(Order::class, 'idle_item_id'); // ← 一定要用這個欄位
-}
 
+    public function orders() {
+        return $this->hasMany(Order::class, 'idle_item_id'); // ← 一定要用這個欄位
+    }
+
+    // 商品+ 議價記錄
+    public function negotiations() {
+        return $this->hasMany(Negotiation::class,'idle_item_id');
+    }
 
 }

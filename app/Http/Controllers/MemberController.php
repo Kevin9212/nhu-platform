@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
-use App\Models\Conversation; // 新增：引入 Conversation 模型
+use App\Models\Conversation; 
+use App\Models\Negotiation;
 
 class MemberController extends Controller {
     /**
@@ -37,12 +38,30 @@ class MemberController extends Controller {
             ->latest('updated_at') // 讓有最新訊息的對話排在最上面
             ->get();
 
+
+        // 賣家議價整合： 直接拉出賣家所有議價記錄，含商品封面，買家訊息
+        $negotiations = Negotiation::where('seller_id', $user->id)
+            ->with([
+                'item.images', 
+                'buyer'
+            ])
+            ->latest('updated_at')
+            ->get();
+
+        // 直接映射買家/商品對飲的對話id，翻遍檢視1對1
+        $conversationLookup = Conversation::where('seller_id',$user->id)
+                ->whereIn('idle_item_id',$negotiations->pluck('idle_item_id'))
+                ->get()
+                ->keyBy(fn ($c) => $c->buyer_id . '-' . $c->idle_item_id);
+
         return view('member.index', [
             'user' => $user,
             'favoriteItems' => $favoriteItems,
             'userItems' => $userItems,
             'categories' => $categories,
             'conversations' => $conversations, // 將對話資料傳遞給視圖
+            'negotiations' => $negotiations,
+            'conversationLookup' => $conversationLookup,
         ]);
     }
 

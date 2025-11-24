@@ -32,6 +32,10 @@
           <a href="#favorites" data-tab="favorites" class="tab-link"
              role="tab" aria-selected="false" aria-controls="tab-favorites" tabindex="-1">我的收藏</a>
         </li>
+        <li>
+          <a href="#negotiations" data-tab="negotiations" class="tab-link"
+             role="tab" aria-selected="false" aria-controls="tab-negotiations" tabindex="-1">議價總覽</a>
+        </li>
       </ul>
     </aside>
 
@@ -107,6 +111,14 @@
           @endif
         </section>
       </div>
+      
+      {{-- 議價總覽（初始隱藏） --}}
+      <div id="tab-negotiations" class="m-pane" role="tabpanel" aria-labelledby="negotiations" hidden>
+        <section class="section">
+          <h2>議價整合</h2>
+          @include('member.partials.negotiations-table')
+        </section>
+      </div>
     </main>
   </div>
 </div>
@@ -119,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     profile:   document.getElementById('tab-profile'),
     listings:  document.getElementById('tab-listings'),
     favorites: document.getElementById('tab-favorites'),
+    negotiations: document.getElementById('tab-negotiations'),
   };
 
   function updateTabbable(target) {
