@@ -79,54 +79,70 @@ class NegotiationController extends Controller
      * 賣家同意議價
      */
     public function agree(Negotiation $negotiation)
-    {
-        if (Auth::id() !== $negotiation->seller_id) {
-            return back()->with('error', '您沒有權限同意此議價');
-        }
-
-        // 更新議價狀態
-        $negotiation->status = 'accepted';
-        $negotiation->save();
-
-        // 商品資料
-        $item = IdleItem::with('images')->findOrFail($negotiation->idle_item_id);
-
-        // 確保對話存在
-        $conversation = Conversation::firstOrCreate([
-            'buyer_id'     => $negotiation->buyer_id,
-            'seller_id'    => $negotiation->seller_id,
-            'idle_item_id' => $item->id,
-        ]);
-
-        // ✅ 新增「賣家已接受」訊息
-        Message::create([
-            'conversation_id' => $conversation->id,
-            'sender_id'       => Auth::id(),
-            'idle_item_id'    => $item->id,
-            'msg_type'        => 'text',
-            'content'         => "✅ 賣家已接受議價：NT$ {$negotiation->price}",
-            'is_recalled'     => false,
-        ]);
-
-        // 🧾 更新狀態卡片
-        Message::create([
-            'conversation_id' => $conversation->id,
-            'sender_id'       => Auth::id(),
-            'idle_item_id'    => $item->id,
-            'msg_type'        => 'order_summary',
-            'content'         => json_encode([
-                'type'        => 'order_summary',
-                'item_name'   => $item->idle_name,
-                'item_price'  => $item->idle_price,
-                'offer_price' => $negotiation->price,
-                'image'       => optional($item->images->first())->image_url,
-                'status'      => $negotiation->status,
-            ], JSON_UNESCAPED_UNICODE),
-            'is_recalled'     => false,
-        ]);
-
-        return back()->with('success', '您已同意此議價');
+{
+    if (Auth::id() !== $negotiation->seller_id) {
+        return back()->with('error', '您沒有權限同意此議價');
     }
+
+    // 更新議價狀態
+    $negotiation->status = 'accepted';
+    $negotiation->save();
+
+    // 商品資料
+    $item = IdleItem::with('images')->findOrFail($negotiation->idle_item_id);
+
+    // 確保對話存在
+    $conversation = Conversation::firstOrCreate([
+        'buyer_id'     => $negotiation->buyer_id,
+        'seller_id'    => $negotiation->seller_id,
+        'idle_item_id' => $item->id,
+    ]);
+
+    // 文字訊息：賣家已接受
+    Message::create([
+        'conversation_id' => $conversation->id,
+        'sender_id'       => Auth::id(),
+        'idle_item_id'    => $item->id,
+        'msg_type'        => 'text',
+        'content'         => "✅ 賣家已接受議價：NT$ {$negotiation->price}",
+        'is_recalled'     => false,
+    ]);
+
+    // summary 卡片
+    Message::create([
+        'conversation_id' => $conversation->id,
+        'sender_id'       => Auth::id(),
+        'idle_item_id'    => $item->id,
+        'msg_type'        => 'order_summary',
+        'content'         => json_encode([
+            'type'        => 'order_summary',
+            'item_name'   => $item->idle_name,
+            'item_price'  => $item->idle_price,
+            'offer_price' => $negotiation->price,
+            'image'       => optional($item->images->first())->image_url,
+            'status'      => 'accepted',
+        ], JSON_UNESCAPED_UNICODE),
+        'is_recalled'     => false,
+    ]);
+
+    /**
+     * ⭐⭐ 新增「建立訂單」功能 — 讓商品頁可以看到訂單 ⭐⭐
+     */
+    \App\Models\Order::create([
+        'order_number'   => strtoupper(uniqid('ORD')),
+        'user_id'        => $negotiation->buyer_id,  // 買家
+        'idle_item_id'   => $item->id,
+        'order_price'    => $negotiation->price,     // 用議價後價格
+        'payment_status' => 'pending',
+        'payment_way'    => null,
+        'order_status'   => 'pending',
+        'cancel_reason'  => null,
+        'meetup_location'=> null,
+    ]);
+
+    return back()->with('success', '已接受議價並建立訂單');
+}
+
 
     /**
      * 賣家拒絕議價

@@ -10,9 +10,6 @@ class Order extends Model
 {
     use HasFactory;
 
-    /**
-     * 可以進行大量賦值的屬性（白名單）。
-     */
     protected $fillable = [
         'order_number',
         'user_id',
@@ -25,9 +22,6 @@ class Order extends Model
         'meetup_location',
     ];
 
-    /**
-     * 應被轉換的屬性。
-     */
     protected function casts(): array
     {
         return [
@@ -35,17 +29,13 @@ class Order extends Model
         ];
     }
 
-    /**
-     * 這筆訂單屬於哪個用戶(買家)
-     */
+    // 這筆訂單屬於哪個用戶(買家)
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * 這筆訂單對應哪個商品
-     */
+    // 這筆訂單對應哪個商品
     public function item(): BelongsTo
     {
         return $this->belongsTo(IdleItem::class, 'idle_item_id');

@@ -91,7 +91,9 @@ NHU.notify = (function () {
     if (!root) return false;
     const {badge, list} = els(root);
     const url = root.getAttribute('data-readall');
-
+    if(!url){
+      return false;
+    }
     try {
       const res = await fetch(url, {
         method: 'POST',

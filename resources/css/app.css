@@ -12,10 +12,20 @@
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
                'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
 }
+
 :root {
   --site-header-height: 4.5rem;
   --site-header-gap-desktop: 0.5rem;
   --site-header-gap-mobile: 1.75rem;
+
+  /* === 網站品牌色（依照首頁 screenshot） === */
+  --nhu-primary: #5b6f60;            /* 主要按鈕、強調 */
+  --nhu-primary-deep: #273636;       /* 深墨綠文字 */
+  --nhu-primary-soft: #dde5d8;       /* 淺綠背景（接近導覽列） */
+  --nhu-primary-soft-2: #eef3ea;     /* 更淡一點的卡片背景 */
+  --nhu-border-soft: #c5d0c4;        /* 淺綠邊框 */
+  --nhu-shadow-soft: 0 8px 16px rgba(60, 80, 70, 0.18);
+  --nhu-shadow-strong: 0 10px 20px rgba(60, 80, 70, 0.25);
 }
 
 html, body {
@@ -75,7 +85,7 @@ body.has-fixed-header .app-main {
   border-radius: 999px;
   border: 1px solid rgba(99, 121, 115, 0.35);
   background: #f8f9f5;
-  color: #273636;
+  color: var(--nhu-primary-deep);
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
   text-decoration: none;
 }
@@ -83,7 +93,7 @@ body.has-fixed-header .app-main {
 .nav-icon-link:hover,
 .nav-icon-link:focus-visible {
   background: #ffffff;
-  color: #1d2a2a;
+  color: var(--nhu-primary);
   transform: translateY(-1px);
 }
 
@@ -114,7 +124,7 @@ body.has-fixed-header .app-main {
 
 .nav-icons .nhu-popover .fa-bell-o {
   font-size: 1.1rem;
-  color: #273636;
+  color: var(--nhu-primary-deep);
 }
 
 @media (max-width: 768px) {
@@ -135,16 +145,16 @@ body.has-fixed-header .app-main {
 .product-image-link { position: relative; z-index: 0; }
 .product-content   { position: relative; z-index: 1; }
 
-/* 產品標題連結：常態深灰、hover 藍、visited 維持深灰 */
+/* 產品標題連結：常態深灰、hover 綠、visited 維持深灰 */
 .product-title a {
-  color: #1f2937 !important;        /* slate-800 */
+  color: var(--nhu-primary-deep) !important;
   text-decoration: none;
 }
 .product-title a:hover,
-.product-title a:focus { color: #2563eb !important; } /* blue-600 */
-.product-title a:visited { color: #1f2937 !important; }
+.product-title a:focus { color: var(--nhu-primary) !important; }
+.product-title a:visited { color: var(--nhu-primary-deep) !important; }
 
-/* 狀態徽章（與你現有配色一致） */
+/* 狀態徽章 */
 .status-badge {
   position: absolute;
   top: .75rem; right: .75rem;
@@ -153,14 +163,14 @@ body.has-fixed-header .app-main {
   font-size: .75rem;
   font-weight: 700;
 }
-.status-badge.new  { background: #198754; color:#fff; } /* bootstrap 成功綠 */
-.status-badge.sold { background: #dc3545; color:#fff; } /* bootstrap 危險紅 */
+.status-badge.new  { background: #198754; color:#fff; }
+.status-badge.sold { background: #dc3545; color:#fff; }
 
 /* 價格資訊與折扣 */
 .price-info { margin-bottom: .5rem; }
 .original-price {
   text-decoration: line-through;
-  color: #6b7280;            /* gray-500 */
+  color: #6b7280;
   font-size: .8rem;
   margin-left: .5rem;
 }
@@ -189,7 +199,7 @@ body.has-fixed-header .app-main {
   display: flex;
   justify-content: space-between;
   font-size: .8rem;
-  color: #6b7280;            /* gray-500 */
+  color: #6b7280;
   margin-top: .75rem;
 }
 
@@ -197,7 +207,6 @@ body.has-fixed-header .app-main {
    分頁（Laravel Tailwind 分頁樣式修正）
    ================================================== */
 
-/* 分頁群組：對齊與間距（不搶 Tailwind class 主導權） */
 nav[role="navigation"] .pagination {
   display: flex;
   flex-wrap: wrap;
@@ -207,7 +216,6 @@ nav[role="navigation"] .pagination {
   margin: 16px 0;
 }
 
-/* 分頁按鈕：統一字級與內距（防 em 影響 svg 大小） */
 nav[role="navigation"] .pagination a,
 nav[role="navigation"] .pagination span {
   font-size: 14px !important;
@@ -218,13 +226,12 @@ nav[role="navigation"] .pagination span {
   justify-content: center;
   min-width: 32px;
   min-height: 32px;
-  border: 1px solid #e5e7eb;      /* gray-200 */
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: #fff;
-  color: #273636;
+  color: var(--nhu-primary-deep);
 }
 
-/* 只把左右箭頭 svg 鎖在 20px（最關鍵） */
 nav[role="navigation"] .pagination svg,
 nav[role="navigation"] a svg,
 nav[role="navigation"] span svg {
@@ -235,12 +242,11 @@ nav[role="navigation"] span svg {
   transform: none !important;
 }
 
-/* 可見頁碼的 active 與 disabled 狀態（視覺一致） */
 nav[role="navigation"] .pagination .active > .page-link,
 nav[role="navigation"] .pagination .active > span {
-  background: #2563eb;  /* blue-600 */
+  background: var(--nhu-primary);
   color: #fff;
-  border-color: #2563eb;
+  border-color: var(--nhu-primary);
 }
 nav[role="navigation"] .pagination .disabled > .page-link,
 nav[role="navigation"] .pagination .disabled > span {
@@ -250,10 +256,9 @@ nav[role="navigation"] .pagination .disabled > span {
 }
 
 /* ==================================================
-   輪播（如 Swiper / Slick）箭頭常見放大保險
+   輪播箭頭尺寸
    ================================================== */
 
-/* Swiper 預設 44px，改為 20px；容器給 32px 點擊面積 */
 :root { --swiper-navigation-size: 20px !important; }
 .swiper-button-prev, .swiper-button-next {
   width: 32px !important;
@@ -263,12 +268,9 @@ nav[role="navigation"] .pagination .disabled > span {
   font-size: 20px !important;
 }
 
-/* Slick（如有用到） */
 .slick-prev:before, .slick-next:before { font-size: 20px !important; }
 
-/* ==================================================
-  （選擇性）專用圖示容器：若你在 Blade 外包 <span class="pg-icon">…</span>
-   ================================================== */
+/* 專用圖示容器 */
 .pg-icon { width: 20px !important; height: 20px !important; display: inline-block !important; }
 .pg-icon svg { width: 100% !important; height: 100% !important; display: block !important; }
 
@@ -293,9 +295,9 @@ body.chat-sidebar-open {
   display: none;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid #cbd5f5;
-  background: #e0e7ff;
-  color: #1e3a8a;
+  border: 1px solid var(--nhu-border-soft);
+  background: var(--nhu-primary-soft);
+  color: var(--nhu-primary-deep);
   border-radius: 999px;
   padding: 0.35rem 0.85rem;
   font-size: 0.85rem;
@@ -306,9 +308,9 @@ body.chat-sidebar-open {
 
 .chat-thread__toggle:hover,
 .chat-thread__toggle:focus-visible {
-  background: #c7d2fe;
-  color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  background: var(--nhu-primary-soft-2);
+  color: var(--nhu-primary);
+  box-shadow: 0 0 0 3px rgba(91, 111, 96, 0.25);
   outline: none;
 }
 
@@ -340,10 +342,6 @@ body.chat-sidebar-open {
   outline: none;
 }
 
-.chat-sidebar__close-text {
-  font-size: 0.8rem;
-}
-
 .chat-sidebar__backdrop {
   display: none;
 }
@@ -353,7 +351,7 @@ body.chat-sidebar-open {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--nhu-shadow-soft);
   padding: 1.25rem 1rem;
   display: flex;
   flex-direction: column;
@@ -386,8 +384,8 @@ body.chat-sidebar-open {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--nhu-primary);
+  background: rgba(91, 111, 96, 0.12);
   border-radius: 999px;
 }
 
@@ -416,8 +414,8 @@ body.chat-sidebar-open {
 
 .chat-sidebar__item.is-active,
 .chat-sidebar__item:hover {
-  background: rgba(37, 99, 235, 0.12);
-  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.18);
+  background: rgba(91, 111, 96, 0.12);
+  box-shadow: var(--nhu-shadow-soft);
 }
 
 .chat-sidebar__item--empty {
@@ -499,8 +497,8 @@ body.chat-sidebar-open {
 
 .chat-sidebar__item-label {
   font-size: 0.75rem;
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--nhu-primary);
+  background: rgba(91, 111, 96, 0.12);
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
   margin: 0.25rem 0 0.5rem;
@@ -569,7 +567,7 @@ body.chat-sidebar-open {
     border-radius: 0;
     height: auto;
     max-height: none;
-    box-shadow: 0 18px 28px rgba(15, 23, 42, 0.22);
+    box-shadow: var(--nhu-shadow-strong);
     transform: translateX(-100%);
     opacity: 0;
     pointer-events: none;
@@ -600,8 +598,8 @@ body.chat-sidebar-open {
 .chat-thread--empty {
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
-  border: 1px dashed #bfdbfe;
+  background: linear-gradient(135deg, #e4efe6 0%, #f8faf5 100%);
+  border: 1px dashed var(--nhu-border-soft);
   border-radius: 20px;
   padding: 2.5rem;
   text-align: center;
@@ -612,7 +610,7 @@ body.chat-sidebar-open {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #1d4ed8;
+  color: var(--nhu-primary);
 }
 
 .chat-thread__placeholder-text {
@@ -631,7 +629,7 @@ body.chat-sidebar-open {
   border: 1px solid #e5e7eb;
   border-radius: 18px;
   padding: 1rem 1.25rem;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--nhu-shadow-soft);
   position: sticky;
   top: calc(var(--site-header-height) + 0.75rem);
   z-index: 2;
@@ -649,7 +647,7 @@ body.chat-sidebar-open {
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(59, 130, 246, 0.2);
+  border: 2px solid rgba(91, 111, 96, 0.25);
 }
 
 .chat-thread__peer-name {
@@ -691,8 +689,8 @@ body.chat-sidebar-open {
 }
 
 .chat-thread__meta-role.is-buyer {
-  background: rgba(59, 130, 246, 0.15);
-  color: #1d4ed8;
+  background: rgba(91, 111, 96, 0.18);
+  color: var(--nhu-primary-deep);
 }
 
 .chat-thread__meta-role.is-seller {
@@ -702,7 +700,7 @@ body.chat-sidebar-open {
 
 .chat-thread__body {
   flex: 1;
-  background: #f8fafc;
+  background: #f5f7f3;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
   padding: 1.25rem;
@@ -763,7 +761,7 @@ body.chat-sidebar-open {
   height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 8px rgba(60, 80, 70, 0.25);
 }
 
 .chat-message__body {
@@ -799,12 +797,12 @@ body.chat-sidebar-open {
   border-radius: 18px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 18px rgba(60, 80, 70, 0.08);
   position: relative;
 }
 
 .chat-bubble--mine {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #5b6f60 0%, #4a5f53 100%);
   border: none;
   color: #fff;
   border-bottom-right-radius: 6px;
@@ -834,7 +832,7 @@ body.chat-sidebar-open {
 }
 
 .chat-message__status.is-read {
-  color: #2563eb;
+  color: var(--nhu-primary);
   font-weight: 600;
 }
 
@@ -843,7 +841,7 @@ body.chat-sidebar-open {
   border: 1px solid #e2e8f0;
   border-radius: 18px;
   padding: 1rem 1.25rem;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 16px rgba(60, 80, 70, 0.12);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -876,13 +874,13 @@ body.chat-sidebar-open {
 
 .chat-card {
   border-radius: 16px;
-  border: 1px solid #dbeafe;
-  background: #f8fbff;
+  border: 1px solid var(--nhu-border-soft);
+  background: var(--nhu-primary-soft-2);
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.12);
+  box-shadow: var(--nhu-shadow-strong);
 }
 
 .chat-card__header {
@@ -890,7 +888,7 @@ body.chat-sidebar-open {
   align-items: center;
   gap: 0.5rem;
   font-weight: 700;
-  color: #1d4ed8;
+  color: var(--nhu-primary);
 }
 
 .chat-card__icon {
@@ -909,7 +907,7 @@ body.chat-sidebar-open {
   height: 80px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(91, 111, 96, 0.15);
 }
 
 .chat-card__media img {
@@ -950,7 +948,7 @@ body.chat-sidebar-open {
 }
 
 .chat-card__status--accepted {
-  color: #2563eb;
+  color: var(--nhu-primary);
 }
 
 .chat-card__status--rejected {
