@@ -960,11 +960,11 @@ body.chat-sidebar-open {
 }
 
 @media (max-width: 1200px) {
-  .chat-layout {
+  .chat-layout:not([data-mobile="true"]) {
     flex-direction: column;
   }
 
-  .chat-sidebar {
+  .chat-layout:not([data-mobile="true"]) .chat-sidebar {
     flex: 1;
     position: static;
     top: auto;
@@ -973,11 +973,11 @@ body.chat-sidebar-open {
     overflow: visible;
   }
 
-  .chat-sidebar__list {
+  .chat-layout:not([data-mobile="true"]) .chat-sidebar__list {
     max-height: 320px;
   }
 
-  .chat-thread {
+  .chat-layout:not([data-mobile="true"]) .chat-thread {
     position: static;
     top: auto;
     height: auto;
@@ -986,7 +986,7 @@ body.chat-sidebar-open {
     min-height: auto;
   }
 
-  .chat-thread__header {
+  .chat-layout:not([data-mobile="true"]) .chat-thread__header {
     position: static;
     top: auto;
   }

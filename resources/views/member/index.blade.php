@@ -33,6 +33,10 @@
              role="tab" aria-selected="false" aria-controls="tab-favorites" tabindex="-1">我的收藏</a>
         </li>
         <li>
+          <a href="#orders" data-tab="orders" class="tab-link"
+             role="tab" aria-selected="false" aria-controls="tab-orders" tabindex="-1">訂單管理</a>
+        </li>
+        <li>
           <a href="#negotiations" data-tab="negotiations" class="tab-link"
              role="tab" aria-selected="false" aria-controls="tab-negotiations" tabindex="-1">議價總覽</a>
         </li>
@@ -111,7 +115,15 @@
           @endif
         </section>
       </div>
-      
+
+      {{-- 訂單管理（初始隱藏） --}}
+      <div id="tab-orders" class="m-pane" role="tabpanel" aria-labelledby="orders" hidden>
+        <section class="section">
+          <h2>訂單管理</h2>
+          @include('member.partials.orders-panel')
+        </section>
+      </div>
+
       {{-- 議價總覽（初始隱藏） --}}
       <div id="tab-negotiations" class="m-pane" role="tabpanel" aria-labelledby="negotiations" hidden>
         <section class="section">
@@ -127,12 +139,80 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const links = document.querySelectorAll('.tab-link');
-  const panes = {
-    profile:   document.getElementById('tab-profile'),
-    listings:  document.getElementById('tab-listings'),
-    favorites: document.getElementById('tab-favorites'),
-    negotiations: document.getElementById('tab-negotiations'),
-  };
+  const panes = {};
+
+  links.forEach(link => {
+    const tabName = link.dataset.tab;
+    const pane = document.getElementById(`tab-${tabName}`);
+    if (pane) {
+      panes[tabName] = pane;
+    }
+  });
+
+  function updateTabbable(target) {
+    links.forEach(a => a.tabIndex = a.dataset.tab === target ? 0 : -1);
+  }
+
+  function show(tabId, pushHash = true, focusTab = true) {
+    Object.values(panes).forEach(p => p && (p.hidden = true));
+    panes[tabId] && (panes[tabId].hidden = false);
+
+    links.forEach(a => {
+      const on = a.dataset.tab === tabId;
+      a.classList.toggle('active', on);
+      a.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && focusTab) a.focus();
+    });
+
+    updateTabbable(tabId);
+    localStorage.setItem('activeMemberTab', tabId);
+    if (pushHash && location.hash !== '#' + tabId) {
+      history.replaceState(null, '', '#' + tabId);
+    }
+  }
+
+  links.forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    show(a.dataset.tab);
+  }));
+
+  document.querySelector('.member-nav').addEventListener('keydown', e => {
+    const tabs = Array.from(links);
+    const currentIndex = tabs.findIndex(t => t.classList.contains('active'));
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = tabs[(currentIndex + 1 + tabs.length) % tabs.length];
+      show(next.dataset.tab, true, true);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
+      show(prev.dataset.tab, true, true);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const active = tabs[currentIndex] || tabs[0];
+      show(active.dataset.tab, true, true);
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    const name = (location.hash || '').slice(1);
+    if (name && panes[name]) show(name, false, false);
+  });
+
+  const byHash = (location.hash || '').slice(1);
+  const saved = localStorage.getItem('activeMemberTab');
+  const initial = panes[byHash] ? byHash : (panes[saved] ? saved : 'profile');
+  show(initial, false, false);
+  const links = document.querySelectorAll('.tab-link');
+  const panes = {};
+
+  links.forEach(link => {
+    const tabName = link.dataset.tab;
+    const pane = document.getElementById(`tab-${tabName}`);
+    if (pane) {
+      panes[tabName] = pane;
+    }
+  });
 
   function updateTabbable(target) {
     links.forEach(a => a.tabIndex = a.dataset.tab === target ? 0 : -1);

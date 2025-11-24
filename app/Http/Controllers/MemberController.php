@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
-use App\Models\Conversation; 
+use App\Models\Conversation;
 use App\Models\Negotiation;
+use App\Models\Order;
 
 class MemberController extends Controller {
     /**
@@ -42,17 +43,32 @@ class MemberController extends Controller {
         // 賣家議價整合： 直接拉出賣家所有議價記錄，含商品封面，買家訊息
         $negotiations = Negotiation::where('seller_id', $user->id)
             ->with([
-                'item.images', 
+                'item.images',
                 'buyer'
             ])
             ->latest('updated_at')
             ->get();
 
+        $groupedNegotiations = $negotiations
+            ->groupBy('idle_item_id')
+            ->map(fn ($group) => $group->sortBy('price')->values());
+
         // 直接映射買家/商品對飲的對話id，翻遍檢視1對1
-        $conversationLookup = Conversation::where('seller_id',$user->id)
-                ->whereIn('idle_item_id',$negotiations->pluck('idle_item_id'))
-                ->get()
-                ->keyBy(fn ($c) => $c->buyer_id . '-' . $c->idle_item_id);
+        $conversationLookup = Conversation::where('seller_id', $user->id)
+            ->whereIn('idle_item_id', $negotiations->pluck('idle_item_id'))
+            ->get()
+            ->keyBy(fn ($c) => $c->buyer_id . '-' . $c->idle_item_id);
+
+        // 購買與販售的訂單
+        $buyerOrders = Order::with(['item.images', 'item.user', 'user'])
+            ->where('user_id', $user->id)
+            ->latest('updated_at')
+            ->get();
+
+        $sellerOrders = Order::with(['item.images', 'item.user', 'user'])
+            ->whereHas('item', fn ($query) => $query->where('user_id', $user->id))
+            ->latest('updated_at')
+            ->get();
 
         return view('member.index', [
             'user' => $user,
@@ -61,7 +77,10 @@ class MemberController extends Controller {
             'categories' => $categories,
             'conversations' => $conversations, // 將對話資料傳遞給視圖
             'negotiations' => $negotiations,
+            'groupedNegotiations' => $groupedNegotiations,
             'conversationLookup' => $conversationLookup,
+            'buyerOrders' => $buyerOrders,
+            'sellerOrders' => $sellerOrders,
         ]);
     }
 
