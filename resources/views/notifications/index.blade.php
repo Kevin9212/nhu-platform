@@ -4,7 +4,13 @@
 
 @section('content')
 <div class="container" data-enable-echo>
-    <h1>通知中心</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">通知中心</h1>
+        <form action="{{ route('notifications.readAll') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-success">全部標記已讀</button>
+        </form>
+    </div>
 
     @if($notifications->isEmpty())
         <p>目前沒有任何通知。</p>

@@ -44,8 +44,10 @@ class NotificationController extends Controller
     public function markAllRead(Request $request)
     {
         $request->user()->unreadNotifications->markAsRead();
-        return response()->noContent(); // 204
-    }
+        if($request->expectsJson()){
+            return response()->noContent(); // 204 for AJAX
+            }
+        return back()->with('status','已全部標記為已讀');    }
 
     /**
      * AJAX：小鈴鐺用的未讀數 + 最新幾筆（精簡欄位）

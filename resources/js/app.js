@@ -99,7 +99,8 @@ NHU.notify = (function () {
         method: 'POST',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept':'application/json'
         },
         credentials: 'same-origin',
       });

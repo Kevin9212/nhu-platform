@@ -53,9 +53,7 @@
                             <div class="nhu-popover-header">
                                 <span>通知</span>
                                 <div class="nhu-actions">
-                                    <button class="icon-btn" title="全部已讀" onclick="NHU.notify.readAll(event)">
-                                        <i class="fa fa-check"></i>
-                                    </button>
+                                    <button class="pill-btn" onclick="NHU.notify.readAll(event)">全部已讀</button>
                                     @if ($notifyIndexUrl)
                                         <a class="icon-btn" title="查看全部" href="{{ $notifyIndexUrl }}">
                                             <i class="fa fa-cog"></i>
@@ -103,25 +101,31 @@
 .is-hidden { display: none !important; }
 
 .nhu-popover-panel { position: absolute; right: 0; top: calc(100% + 8px); width: 360px; max-height: 460px;
-  background:#fff; border:1px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.08);
-  overflow:hidden; z-index: 1000; display:none; }
+  background: var(--nhu-primary-soft-2); border:1px solid var(--nhu-border-soft); border-radius:12px; box-shadow: var(--nhu-shadow-soft);
+  overflow:hidden; z-index: 1000; display:none; backdrop-filter: blur(6px); }
 .nhu-popover [data-nhu="panel"][aria-hidden="false"] { display:block; }
 
-.nhu-popover-header { display:flex; align-items:center; justify-content:space-between; padding:10px 12px;
-  background:#197e75; color:#fff; font-weight:600; }
-.nhu-actions .icon-btn { background:transparent; border:0; color:#fff; cursor:pointer; margin-left:8px; }
+.nhu-popover-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px;
+  background: var(--nhu-primary); color:#f6f8f4; font-weight:700; letter-spacing: 0.5px; }
+.nhu-actions { display: inline-flex; align-items: center; gap: 0.35rem; }
+.nhu-actions .icon-btn { background:transparent; border:0; color:#f6f8f4; cursor:pointer; padding: 6px; border-radius: 10px; }
+.nhu-actions .icon-btn:hover { background: rgba(255,255,255,0.12); }
+.nhu-actions .pill-btn { border: 1px solid rgba(255,255,255,0.4); color: var(--nhu-primary);
+  background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: transform .15s ease, box-shadow .15s ease; }
+.nhu-actions .pill-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.12); }
 
 .nhu-popover-body { position:relative; min-height:140px; }
 .nhu-loading { text-align:center; padding:18px; color:#888; }
-.nhu-empty { padding:18px; color:#888; }
+.nhu-empty { padding:18px; color: var(--nhu-primary-deep); background: #ffffff60; border-radius: 8px; margin: 12px; }
 .nhu-list { max-height:340px; overflow:auto; }
-.nhu-item { display:block; padding:10px 12px; text-decoration:none; color:#333; border-bottom:1px solid #f3f4f6; }
-.nhu-item:hover { background:#f8fafc; }
-.nhu-item.is-unread { background:#fffef6; }
-.nhu-item-title { font-weight:600; font-size:14px; margin-bottom:2px; }
-.nhu-item-text { font-size:13px; color:#555; }
-.nhu-item-time { font-size:12px; color:#999; margin-top:4px; }
+.nhu-item { display:block; padding:12px 14px; text-decoration:none; color:var(--nhu-primary-deep); border-bottom:1px solid var(--nhu-border-soft); background: #fff; }
+.nhu-item:hover { background: var(--nhu-primary-soft); }
+.nhu-item.is-unread { background: #f6fbf4; border-left: 4px solid var(--nhu-primary); padding-left: 10px; }
+.nhu-item-title { font-weight:700; font-size:14px; margin-bottom:4px; color: var(--nhu-primary-deep); }
+.nhu-item-text { font-size:13px; color:#465045; }
+.nhu-item-time { font-size:12px; color:#6b756b; margin-top:6px; }
 
-.nhu-popover-footer { display:block; text-align:center; padding:10px 12px; color:#197e75; text-decoration:none; border-top:1px solid #eee; }
-.nhu-popover-footer:hover { background:#f8fafc; }
+.nhu-popover-footer { display:block; text-align:center; padding:12px 14px; color:var(--nhu-primary); text-decoration:none; border-top:1px solid var(--nhu-border-soft); background: #fff; font-weight: 700; }
+.nhu-popover-footer:hover { background: var(--nhu-primary-soft); }
 </style>
