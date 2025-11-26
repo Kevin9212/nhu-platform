@@ -5,7 +5,7 @@
 
 @push('styles')
   @vite('resources/css/member.css')
-@endp
+@endpush
 
 @section('content')
 <div class="container">
@@ -203,71 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('activeMemberTab');
   const initial = panes[byHash] ? byHash : (panes[saved] ? saved : 'profile');
   show(initial, false, false);
-  const links = document.querySelectorAll('.tab-link');
-  const panes = {};
-
-  links.forEach(link => {
-    const tabName = link.dataset.tab;
-    const pane = document.getElementById(`tab-${tabName}`);
-    if (pane) {
-      panes[tabName] = pane;
-    }
-  });
-
-  function updateTabbable(target) {
-    links.forEach(a => a.tabIndex = a.dataset.tab === target ? 0 : -1);
-  }
-
-  function show(tabId, pushHash = true, focusTab = true) {
-    Object.values(panes).forEach(p => p && (p.hidden = true));
-    panes[tabId] && (panes[tabId].hidden = false);
-
-    links.forEach(a => {
-      const on = a.dataset.tab === tabId;
-      a.classList.toggle('active', on);
-      a.setAttribute('aria-selected', on ? 'true' : 'false');
-      if (on && focusTab) a.focus();
-    });
-
-    updateTabbable(tabId);
-    localStorage.setItem('activeMemberTab', tabId);
-    if (pushHash && location.hash !== '#' + tabId) {
-      history.replaceState(null, '', '#' + tabId);
-    }
-  }
-
-  links.forEach(a => a.addEventListener('click', e => {
-    e.preventDefault();
-    show(a.dataset.tab);
-  }));
-
-  document.querySelector('.member-nav').addEventListener('keydown', e => {
-    const tabs = Array.from(links);
-    const currentIndex = tabs.findIndex(t => t.classList.contains('active'));
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      const next = tabs[(currentIndex + 1 + tabs.length) % tabs.length];
-      show(next.dataset.tab, true, true);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      const prev = tabs[(currentIndex - 1 + tabs.length) % tabs.length];
-      show(prev.dataset.tab, true, true);
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      const active = tabs[currentIndex] || tabs[0];
-      show(active.dataset.tab, true, true);
-    }
-  });
-
-  window.addEventListener('hashchange', () => {
-    const name = (location.hash || '').slice(1);
-    if (name && panes[name]) show(name, false, false);
-  });
-
-  const byHash = (location.hash || '').slice(1);
-  const saved = localStorage.getItem('activeMemberTab');
-  const initial = panes[byHash] ? byHash : (panes[saved] ? saved : 'profile');
-  show(initial, false, false);
 });
-</script>
+  </script>
 @endsection

@@ -1,21 +1,21 @@
 {{-- resources/views/member/partials/orders-panel.blade.php --}}
 
 @php
-  $orderMeta = function ($order) {
+$orderMeta = function ($order) {
     $location = data_get($order->meetup_location, 'address')
-      ?? data_get($order->meetup_location, 'name')
-      ?? data_get($order->meetup_location, 'place')
-      ?? '未填寫';
+        ?? data_get($order->meetup_location, 'name')
+        ?? data_get($order->meetup_location, 'place')
+        ?? '未填寫';
 
     $date = data_get($order->meetup_location, 'date');
     $time = data_get($order->meetup_location, 'time');
     $datetime = trim(($date ? $date : '') . ' ' . ($time ? $time : ''));
 
     return [
-      'location' => $location,
-      'datetime' => $datetime !== '' ? $datetime : $order->created_at->format('Y-m-d H:i'),
+        'location' => $location,
+        'datetime' => $datetime !== '' ? $datetime : $order->created_at->format('Y-m-d H:i'),
     ];
-  };
+};
 @endphp
 
 <div class="orders-panel">
