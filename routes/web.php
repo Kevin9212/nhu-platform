@@ -151,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/items/{item}/negotiations', [NegotiationController::class, 'store'])->name('negotiations.store');
     Route::patch('/negotiations/{negotiation}/agree', [NegotiationController::class, 'agree'])->name('negotiations.agree');
     Route::patch('/negotiations/{negotiation}/reject', [NegotiationController::class, 'reject'])->name('negotiations.reject');
+    Route::post('/negotiations/{negotiation}/to-orders', [NegotiationController::class, 'redirectToOrders'])->name('negotiations.to-orders');
 });
 
 // React Admin Dashboard

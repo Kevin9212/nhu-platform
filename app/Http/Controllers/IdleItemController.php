@@ -96,7 +96,7 @@ class IdleItemController extends Controller
      */
     public function show(IdleItem $idleItem)
     {
-        $idleItem->load(['seller', 'images']);
+        $idleItem->load(['seller', 'images', 'orders.user']);
         return view('idle-items.show', ['item' => $idleItem]);
     }
 

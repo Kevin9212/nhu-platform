@@ -166,9 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateTabbable(tabId);
     localStorage.setItem('activeMemberTab', tabId);
-    if (pushHash && location.hash !== '#' + tabId) {
-      history.replaceState(null, '', '#' + tabId);
-    }
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabId);
+    url.hash = '#' + tabId;
+    history.replaceState(null, '', url);
   }
 
   links.forEach(a => a.addEventListener('click', e => {
@@ -199,9 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (name && panes[name]) show(name, false, false);
   });
 
+  const params = new URLSearchParams(location.search);
+  const byQuery = params.get('tab');
   const byHash = (location.hash || '').slice(1);
   const saved = localStorage.getItem('activeMemberTab');
-  const initial = panes[byHash] ? byHash : (panes[saved] ? saved : 'profile');
+  const initial = panes[byQuery]
+    ? byQuery
+    : (panes[byHash] ? byHash : (panes[saved] ? saved : 'profile'));
   show(initial, false, false);
 });
   </script>

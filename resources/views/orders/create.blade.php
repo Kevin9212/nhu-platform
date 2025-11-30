@@ -28,6 +28,21 @@
     <div class="card-header">成立訂單</div>
 
     <div class="card-body">
+      {{-- 從網址 / 上一次送出帶進來，給 OrderController@store 驗證用 --}}
+      <input type="hidden" name="idle_item_id" value="{{ old('idle_item_id', request('idle_item_id')) }}">
+      <input type="hidden" name="order_price"  value="{{ old('order_price',  request('order_price')) }}">
+
+      {{-- 顯示後端驗證錯誤（包含 idle_item_id / order_price） --}}
+      @if ($errors->any())
+        <div class="alert alert-danger mb-3">
+          <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
       {{-- 1) 面交地點 --}}
       <div class="form-group">
         <label>面交地點（請在地圖上點選）</label>
@@ -39,16 +54,19 @@
       <div class="form-row">
         <div class="form-group">
           <label for="addressInput">地址</label>
-          <input type="text" id="addressInput" name="meet_address" class="form-control" placeholder="將自動帶入地址" readonly required>
+          <input type="text" id="addressInput" name="meet_address" class="form-control"
+                 placeholder="將自動帶入地址" readonly required>
         </div>
         <div class="form-row" style="gap:16px">
           <div class="form-group">
             <label for="latInput">緯度</label>
-            <input type="text" id="latInput" name="meet_lat" class="form-control" placeholder="請在地圖上點選" readonly required>
+            <input type="text" id="latInput" name="meet_lat" class="form-control"
+                   placeholder="請在地圖上點選" readonly required>
           </div>
           <div class="form-group">
             <label for="lngInput">經度</label>
-            <input type="text" id="lngInput" name="meet_lng" class="form-control" placeholder="請在地圖上點選" readonly required>
+            <input type="text" id="lngInput" name="meet_lng" class="form-control"
+                   placeholder="請在地圖上點選" readonly required>
           </div>
         </div>
       </div>
@@ -80,7 +98,7 @@
 
       <div style="height:16px"></div>
 
-      <button type="submit" class="btn-primary" id="submitBtn" disabled>送出訂單</button>
+      <button type="submit" class="btn-primary" id="submitBtn" disabled>成立訂單</button>
     </div>
   </form>
 </div>
@@ -259,7 +277,14 @@
   }
 
   function toggleSubmit() {
-    const ready = !!(latInput.value && lngInput.value && addrInput.value && dateInput.value && timeSelect.value && rangeError.style.display !== 'block');
+    const ready = !!(
+      latInput.value &&
+      lngInput.value &&
+      addrInput.value &&
+      dateInput.value &&
+      timeSelect.value &&
+      rangeError.style.display !== 'block'
+    );
     submitBtn.disabled = !ready;
   }
 
@@ -276,7 +301,6 @@
       alert('面交日期不可早於今天，請重新選擇。');
       return false;
     }
-    // 可在此加入更多驗證（例如：營業時段、黑名單日期等）
   });
 </script>
 @endsection

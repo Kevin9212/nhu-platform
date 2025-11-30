@@ -19,7 +19,8 @@ $orderMeta = function ($order) {
 @endphp
 
 <div class="orders-panel">
-  <div class="orders-section">
+  {{-- ✅ 購買的訂單：加上錨點 id="orders-buyer" --}}
+  <div class="orders-section" id="orders-buyer">
     <div class="orders-section__header">
       <h3>購買的訂單</h3>
       <p class="orders-section__hint">您作為買家的訂單列表。</p>
@@ -44,9 +45,13 @@ $orderMeta = function ($order) {
               @php
                 $item = $order->item;
                 $cover = optional($item?->images->first())->image_url;
-                $coverUrl = $cover ? asset('storage/' . ltrim($cover, '/')) : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
+                $coverUrl = $cover
+                  ? asset('storage/' . ltrim($cover, '/'))
+                  : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
                 $meta = $orderMeta($order);
-                $sellerName = optional($item?->user)->nickname ?? optional($item?->user)->account ?? '使用者已刪除';
+                $sellerName = optional($item?->user)->nickname
+                  ?? optional($item?->user)->account
+                  ?? '使用者已刪除';
               @endphp
               <tr>
                 <td data-label="商品">
@@ -70,7 +75,8 @@ $orderMeta = function ($order) {
     @endif
   </div>
 
-  <div class="orders-section">
+  {{-- ✅ 賣出的訂單：加上錨點 id="orders-seller" --}}
+  <div class="orders-section" id="orders-seller">
     <div class="orders-section__header">
       <h3>賣出的訂單</h3>
       <p class="orders-section__hint">您作為賣家的訂單列表。</p>
@@ -95,9 +101,13 @@ $orderMeta = function ($order) {
               @php
                 $item = $order->item;
                 $cover = optional($item?->images->first())->image_url;
-                $coverUrl = $cover ? asset('storage/' . ltrim($cover, '/')) : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
+                $coverUrl = $cover
+                  ? asset('storage/' . ltrim($cover, '/'))
+                  : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
                 $meta = $orderMeta($order);
-                $buyerName = optional($order->user)->nickname ?? optional($order->user)->account ?? '使用者已刪除';
+                $buyerName = optional($order->user)->nickname
+                  ?? optional($order->user)->account
+                  ?? '使用者已刪除';
               @endphp
               <tr>
                 <td data-label="商品">

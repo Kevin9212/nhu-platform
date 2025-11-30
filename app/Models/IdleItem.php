@@ -37,7 +37,10 @@ class IdleItem extends Model {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    
+    // 商品 → 訂單
+    public function orders() {
+        return $this->hasMany(Order::class, 'idle_item_id');
+    }
 
     // 商品+ 議價記錄
     public function negotiations() {
