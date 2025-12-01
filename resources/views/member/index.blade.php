@@ -166,10 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateTabbable(tabId);
     localStorage.setItem('activeMemberTab', tabId);
-    const url = new URL(window.location);
-    url.searchParams.set('tab', tabId);
-    url.hash = '#' + tabId;
-    history.replaceState(null, '', url);
+    // 只有在需要覆寫網址片段時才改變 URL，避免像 #orders-seller 這類子錨點被蓋掉
+    if (pushHash) {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabId);
+      url.hash = '#' + tabId;
+      history.replaceState(null, '', url);
+    };
   }
 
   links.forEach(a => a.addEventListener('click', e => {

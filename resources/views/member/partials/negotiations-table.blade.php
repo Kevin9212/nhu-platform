@@ -79,14 +79,11 @@
               </td>
               <td data-label="更新時間">{{ $negotiation->updated_at->format('Y-m-d H:i') }}</td>
               <td data-label="訂單管理" class="text-end">
-  <a href="{{ route('orders.create', [
-          'idle_item_id' => $negotiation->idle_item_id, // 這筆議價對應的商品
-          'order_price'  => $negotiation->price,        // 這筆議價的價格
-      ]) }}"
-     class="btn btn-primary btn-sm">
-    成立訂單
-  </a>
-</td>
+                  <form action="{{ route('negotiations.to-orders', $negotiation) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-primary btn-sm">成立訂單</button>
+                  </form>
+                </td>
 
             </tr>
           @endforeach
