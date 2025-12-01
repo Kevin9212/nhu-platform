@@ -66,7 +66,12 @@
           </form>
 
           <a href="{{ route('conversation.start', ['user' => $item->seller->id]) }}" class="btn primary">聯絡賣家</a>
-          <a href="{{ route('orders.create') }}" class="btn success">成立訂單</a>
+          <a
+            href="{{ route('orders.create', ['idle_item_id' => $item->id, 'order_price' => (int) $item->idle_price]) }}"
+            class="btn success"
+          >
+            成立訂單
+          </a>
         @endif
 
         <div class="meta-row">

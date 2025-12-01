@@ -2,19 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IdleItem;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('orders.create');
+        $idleItem    = null;
+        $orderPrice  = null;
+        $idleItemId  = $request->input('idle_item_id');
+
+        if ($idleItemId) {
+            $idleItem = IdleItem::find($idleItemId);
+
+            if ($idleItem) {
+                $orderPrice = (int) $idleItem->idle_price;
+            }
+        }
+
+        return view('orders.create', compact('idleItem', 'orderPrice'));
     }
 
     public function store(Request $request)
     {
+        $priceFromRequest = $request->input('order_price');
+
+        // 若網址帶入的價格不存在或不是數字，嘗試用商品原價補齊
+        if (!is_numeric($priceFromRequest) && $request->filled('idle_item_id')) {
+            $priceFromRequest = optional(IdleItem::find($request->input('idle_item_id')))->idle_price;
+        }
+
+        // 強制將價格轉為整數，避免小數造成驗證失敗
+        if (is_numeric($priceFromRequest)) {
+            $request->merge([
+                'order_price' => (int) $priceFromRequest,
+            ]);
+        }
+
         // 1. 驗證
         $validated = $request->validate([
             'idle_item_id' => 'required|exists:idle_items,id', // 商品
@@ -42,10 +69,9 @@ class OrderController extends Controller
             'user_id'         => auth()->id(),                // 買家
             'idle_item_id'    => $validated['idle_item_id'],  // 商品
             'order_price'     => $validated['order_price'],
-            'payment_status'  => 'unpaid',
-            'payment_way'     => 'meet',
-            'order_status'    => 'created',
-            'meetup_location' => $meetup,
+            'payment_status'  => false,
+            'payment_way'     => '面交',
+            'order_status'    => 'pending',
         ]);
 
         // 4. 成功後導回會員中心的「訂單管理 → 賣出的訂單」區塊

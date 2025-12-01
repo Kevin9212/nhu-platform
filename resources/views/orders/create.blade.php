@@ -29,9 +29,12 @@
 
     <div class="card-body">
       {{-- 從網址 / 上一次送出帶進來，給 OrderController@store 驗證用 --}}
-      <input type="hidden" name="idle_item_id" value="{{ old('idle_item_id', request('idle_item_id')) }}">
-      <input type="hidden" name="order_price"  value="{{ old('order_price',  request('order_price')) }}">
-
+      @php
+        $idleItemId = old('idle_item_id', $idleItem->id ?? request('idle_item_id'));
+        $priceValue = old('order_price', $orderPrice ?? request('order_price'));
+      @endphp
+      <input type="hidden" name="idle_item_id" value="{{ $idleItemId }}">
+      <input type="hidden" name="order_price"  value="{{ is_numeric($priceValue) ? (int) $priceValue : '' }}">
       {{-- 顯示後端驗證錯誤（包含 idle_item_id / order_price） --}}
       @if ($errors->any())
         <div class="alert alert-danger mb-3">
