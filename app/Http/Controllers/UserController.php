@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Carbon;
 
 class UserController extends Controller {
     /**
@@ -90,7 +92,7 @@ class UserController extends Controller {
         // 驗證後清除Session中的Captcha
         Session::forget('captcha');
         // 使用 create 方法建立新使用者
-        User::create([
+        $user = User::create([
             'account' => $request->account,
             'email' => $request->account, // 將 account 同時存入 email 欄位
             'password' => Hash::make($request->password), // 使用 'password' 欄位
@@ -98,9 +100,13 @@ class UserController extends Controller {
             'user_phone' => $request->user_phone,
         ]);
 
+        $this->sendVerificationCode($user);
+        Session::put('pending_verification_email', $user->email);
+
 
         // 注冊成功后，把使用者導入登入頁面，并且附帶成功訊息
-        return redirect()->route('login')->with('success', '註冊成功，請登入');
+        return redirect()->route('register.verify.form', ['email' => $user->email])
+            ->with('success', '註冊成功！我們已寄出驗證碼到您的學校信箱，請於 10 分鐘內完成驗證。');
     }
 
 
@@ -119,6 +125,12 @@ class UserController extends Controller {
             $request->session()->regenerate();
 
             $user = Auth::user();
+            if (!$user->hasVerifiedEmail()) {
+                $this->sendVerificationCode($user, true);
+                Auth::logout();
+                return redirect()->route('register.verify.form', ['email' => $user->email])
+                    ->withErrors(['account' => '尚未完成信箱驗證，已重新寄送驗證碼。請輸入驗證碼後再登入。']);
+            }
 
             // 檢查是否被封禁
             if ($user->user_status === 'banned') {
@@ -149,6 +161,96 @@ class UserController extends Controller {
     }
 
     /**
+     * 顯示註冊後的驗證碼填寫頁面
+     */
+    public function showVerificationCodeForm(Request $request)
+    {
+        if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('home');
+        }
+
+        $email = $request->query('email') ?? Session::get('pending_verification_email');
+
+        if (!$email) {
+            return redirect()->route('register')->withErrors(['account' => '請先完成註冊資料填寫。']);
+        }
+
+        return view('auth.verify-code', ['email' => $email]);
+    }
+
+    /**
+     * 驗證註冊驗證碼
+     */
+    public function verifyEmailCode(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'code' => ['required', 'digits:6'],
+        ]);
+
+        $user = User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => '找不到此信箱的註冊資料。']);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('login')->with('success', '信箱已驗證，請直接登入。');
+        }
+
+        $record = DB::table('email_verification_codes')->where('email', $data['email'])->first();
+
+        if (!$record) {
+            return back()->withErrors(['code' => '尚未產生驗證碼，請重新寄送。']);
+        }
+
+        if (now()->greaterThan(Carbon::parse($record->expires_at))) {
+            return back()->withErrors(['code' => '驗證碼已過期，請重新寄送。']);
+        }
+
+        if (!Hash::check($data['code'], $record->code)) {
+            return back()->withErrors(['code' => '驗證碼錯誤，請再試一次。']);
+        }
+
+        $user->forceFill([
+            'email_verified_at' => now(),
+        ])->save();
+
+        DB::table('email_verification_codes')->where('email', $data['email'])->delete();
+        Session::forget('pending_verification_email');
+
+        return redirect()->route('login')->with('success', '驗證成功，請登入。');
+    }
+
+    /**
+     * 重新寄送註冊驗證碼
+     */
+    public function resendVerificationCode(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $user = User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => '找不到此信箱的註冊資料。']);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('login')->with('success', '信箱已驗證，請直接登入。');
+        }
+
+        if (!$this->sendVerificationCode($user)) {
+            return back()->withErrors(['code' => '系統剛寄出驗證碼，請稍候再試。']);
+        }
+
+        Session::put('pending_verification_email', $user->email);
+
+        return back()->with('status', '已重新寄出驗證碼，請查收信箱。');
+    }
+
+    /**
      * AJAX：刷新驗證碼
      */
     public function refreshCaptcha(){
@@ -164,5 +266,38 @@ class UserController extends Controller {
     {
         $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         return substr(str_shuffle(str_repeat($chars, 5)), 0, 5);
+    }
+    /**
+     * 產生並寄送註冊驗證碼
+     */
+    private function sendVerificationCode(User $user, bool $force = false): bool
+    {
+        $existing = DB::table('email_verification_codes')
+            ->where('email', $user->email)
+            ->first();
+
+        if (!$force && $existing && Carbon::parse($existing->updated_at)->gt(now()->subMinute())) {
+            return false;
+        }
+
+        $code = (string) random_int(100000, 999999);
+
+        DB::table('email_verification_codes')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'user_id' => $user->id,
+                'code' => Hash::make($code),
+                'expires_at' => now()->addMinutes(10),
+                'updated_at' => now(),
+                'created_at' => $existing?->created_at ?? now(),
+            ]
+        );
+
+        Mail::send('emails.verify-code', ['user' => $user, 'code' => $code], function ($message) use ($user) {
+            $message->to($user->email)
+                ->subject('NHU 二手交易平台 - 註冊驗證碼');
+        });
+
+        return true;
     }
 }
