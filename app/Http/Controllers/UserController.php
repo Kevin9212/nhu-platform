@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller {
     /**
@@ -46,7 +47,7 @@ class UserController extends Controller {
      */
     public function register(Request $request) {
 
-        // 驗證登入資料 
+        // 驗證登入資料
         $request->validate([
             // 'account' 欄位是必須的，必須是有效的電子郵件格式必須以是以 @nhu.edu.tw 或 @ccu.edu.com.tw 結尾。
             'account' => [
@@ -58,7 +59,7 @@ class UserController extends Controller {
             ],
             'password' => ['required', 'confirmed', Password::defaults()], // 密碼欄位是必須的，最小長度為8個字符，並且需要確認密碼
             'nickname' => ['required', 'string', 'max:32'],  // 昵称是必需的，字符串类型，最大长度为32个字符
-            'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含數字，長度不超過10個字符
+            'user_phone' => ['required','numeric', 'digits:10'], // 電話號碼欄位是必須的，並且只能包含10位數字
             // 新增加一個 Captcha 邏輯規則
             'captcha' => ['required','string',function ($attribute, $value, $fail) {
                 if(strtoupper($value)!== Session::get('captcha')){
@@ -68,7 +69,7 @@ class UserController extends Controller {
                 }
             }],
 
-           
+
         ], [
             // 自定錯誤訊息
             'account.required' => '學校信箱為必填項目。',
@@ -85,7 +86,7 @@ class UserController extends Controller {
 
             'user_phone.required' => '電話號碼為必填項目。',
             'user_phone.numeric' => '電話號碼只能包含數字。',
-            'user_phone.digits' => '電話號碼長度不得超過16個字符。',
+            'user_phone.digits' => '電話號碼長度必須為 10 位數字。',
             'captcha.required' => '請輸入驗證碼。',
         ]);
 
@@ -100,17 +101,21 @@ class UserController extends Controller {
             'user_phone' => $request->user_phone,
         ]);
 
-        $this->sendVerificationCode($user);
         Session::put('pending_verification_email', $user->email);
 
+        $error = null;
+        if (!$this->sendVerificationCode($user, true, $error)) {
+            return redirect()->route('register.verify.form', ['email' => $user->email])
+                ->withErrors(['code' => $error ?? '驗證碼寄送失敗，請稍後再試。']);
+        }
 
-        // 注冊成功后，把使用者導入登入頁面，并且附帶成功訊息
+        // 注冊成功后，把使用者導入驗證頁面
         return redirect()->route('register.verify.form', ['email' => $user->email])
             ->with('success', '註冊成功！我們已寄出驗證碼到您的學校信箱，請於 10 分鐘內完成驗證。');
     }
 
 
-    
+
     /**
      * 處理登入請求
      */
@@ -125,9 +130,20 @@ class UserController extends Controller {
             $request->session()->regenerate();
 
             $user = Auth::user();
+
             if (!$user->hasVerifiedEmail()) {
-                $this->sendVerificationCode($user, true);
+                $error = null;
+                $sent = $this->sendVerificationCode($user, true, $error);
+
                 Auth::logout();
+                Session::put('pending_verification_email', $user->email);
+
+                if (!$sent) {
+                    return back()->withErrors([
+                        'account' => $error ?? '尚未完成信箱驗證，且驗證碼寄送失敗，請稍後再試。',
+                    ])->onlyInput('account');
+                }
+
                 return redirect()->route('register.verify.form', ['email' => $user->email])
                     ->withErrors(['account' => '尚未完成信箱驗證，已重新寄送驗證碼。請輸入驗證碼後再登入。']);
             }
@@ -241,8 +257,10 @@ class UserController extends Controller {
             return redirect()->route('login')->with('success', '信箱已驗證，請直接登入。');
         }
 
-        if (!$this->sendVerificationCode($user)) {
-            return back()->withErrors(['code' => '系統剛寄出驗證碼，請稍候再試。']);
+        $error = null;
+
+        if (!$this->sendVerificationCode($user, false, $error)) {
+            return back()->withErrors(['code' => $error ?? '系統剛寄出驗證碼，請稍候再試。']);
         }
 
         Session::put('pending_verification_email', $user->email);
@@ -267,16 +285,18 @@ class UserController extends Controller {
         $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         return substr(str_shuffle(str_repeat($chars, 5)), 0, 5);
     }
+
     /**
      * 產生並寄送註冊驗證碼
      */
-    private function sendVerificationCode(User $user, bool $force = false): bool
+    private function sendVerificationCode(User $user, bool $force = false, ?string &$error = null): bool
     {
         $existing = DB::table('email_verification_codes')
             ->where('email', $user->email)
             ->first();
 
         if (!$force && $existing && Carbon::parse($existing->updated_at)->gt(now()->subMinute())) {
+            $error = '系統剛寄出驗證碼，請稍候再試。';
             return false;
         }
 
@@ -293,11 +313,36 @@ class UserController extends Controller {
             ]
         );
 
-        Mail::send('emails.verify-code', ['user' => $user, 'code' => $code], function ($message) use ($user) {
-            $message->to($user->email)
-                ->subject('NHU 二手交易平台 - 註冊驗證碼');
-        });
+        $mailers = array_unique(array_filter([
+            config('mail.default', 'log'),
+            'log',
+        ]));
 
-        return true;
+        $errors = [];
+
+        foreach ($mailers as $mailer) {
+            try {
+                Mail::mailer($mailer)->send('emails.verify-code', ['user' => $user, 'code' => $code], function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('NHU 二手交易平台 - 註冊驗證碼');
+                });
+
+                return true;
+            } catch (\Throwable $e) {
+                $errors[] = [
+                    'mailer' => $mailer,
+                    'message' => $e->getMessage(),
+                ];
+            }
+        }
+
+        Log::error('Failed to send verification code email', [
+            'email' => $user->email,
+            'errors' => $errors,
+        ]);
+
+        $error = '寄送驗證碼時發生問題，請稍後再試。';
+
+        return false;
     }
 }

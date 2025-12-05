@@ -45,7 +45,6 @@ Route::middleware('guest')->group(function () {
     Route::get('/register/verify', [UserController::class, 'showVerificationCodeForm'])->name('register.verify.form');
     Route::post('/register/verify', [UserController::class, 'verifyEmailCode'])->name('register.verify.submit');
     Route::post('/register/verify/resend', [UserController::class, 'resendVerificationCode'])->name('register.verify.resend');
-    
     // 忘記密碼
     Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
