@@ -10,7 +10,7 @@ use App\Models\IdleItem;
 use App\Models\Message;
 use App\Notifications\NewOfferNotification;
 use App\Notifications\NegotiationAcceptedNotification;
-use App\Models\Order;
+
 
 class NegotiationController extends Controller
 {
@@ -73,8 +73,13 @@ class NegotiationController extends Controller
         // 通知賣家
         $seller->notify(new NewOfferNotification($buyer, $item));
 
-        return redirect()->route('conversations.show', $conversation->id)
-            ->with('success', '已送出議價，進入聊天');
+         return redirect()
+            ->route('orders.create', [
+                'idle_item_id'   => $item->id,
+                'order_price'    => $negotiation->price,
+                'negotiation_id' => $negotiation->id,
+            ])
+            ->with('success', '已送出議價，請選擇面交地點與時間以成立訂單');
     }
 
     /**
@@ -224,54 +229,16 @@ class NegotiationController extends Controller
             return back()->with('error', '您沒有權限操作此議價');
         }
 
-        $item = IdleItem::with('images')->findOrFail($negotiation->idle_item_id);
+        $item = IdleItem::findOrFail($negotiation->idle_item_id);
 
-        // 更新商品狀態為交易中
-        if ($item->idle_status !== 3) {
-            $item->idle_status = 3;
-            $item->save();
-        }
-
-     // ⭐ 1. 確保訂單存在（沒有就建立一筆）
-        $order = Order::firstOrCreate(
-            [
-                'user_id'      => $negotiation->buyer_id, // 買家
-                'idle_item_id' => $item->id,              // 商品
-                'order_status' => 'pending',              // 你目前用的狀態
-            ],
-            [
-                'order_number'   => strtoupper(uniqid('ORD')),
-                'order_price'    => $negotiation->price,     // 用議價後價格
-                'payment_status' => false,
-                'payment_way'    => '面交',
-                'cancel_reason'  => null,
-                'meetup_location'=> null,                    // 先留空，之後要再加面交地點可以再更新
-            ]
-        );
-
-        // ⭐ 1.1 刪除已成立訂單的議價，避免繼續顯示在議價總覽
-        $negotiation->delete();
-
-        // ⭐ 2. 確保聊天室存在
-        $conversation = Conversation::firstOrCreate([
-            'buyer_id'     => $negotiation->buyer_id,
-            'seller_id'    => $negotiation->seller_id,
-            'idle_item_id' => $item->id,
+        $createOrderUrl = route('orders.create', [
+            'idle_item_id'   => $item->id,
+            'order_price'    => $negotiation->price,
+            'negotiation_id' => $negotiation->id,
         ]);
 
-        // ⭐ 3. 在聊天室裡發一則訊息：提示雙方去訂單管理看
-        $ordersUrl = route('member.index', ['tab' => 'orders']) . '#orders';
-
-        Message::create([
-            'conversation_id' => $conversation->id,
-            'sender_id'       => $userId,
-            'idle_item_id'    => $item->id,
-            'msg_type'        => 'text',
-            'content'         => "📦 已成立訂單，請至訂單管理查看：{$ordersUrl}",
-            'is_recalled'     => false,
-        ]);
-
-        // ⭐ 4. 直接導到會員中心的「訂單管理」分頁
-        return redirect()->to($ordersUrl)->with('success', '已成立訂單並前往訂單管理');
+        return redirect()
+            ->to($createOrderUrl)
+            ->with('success', '請選擇面交地點與時間後成立訂單');
     }
 }

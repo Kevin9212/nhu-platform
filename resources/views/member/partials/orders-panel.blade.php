@@ -2,18 +2,21 @@
 
 @php
 $orderMeta = function ($order) {
-    $location = data_get($order->meetup_location, 'address')
-        ?? data_get($order->meetup_location, 'name')
-        ?? data_get($order->meetup_location, 'place')
+    // 優先顯示訂單上紀錄的面交資訊，若沒有則退回商品預設的面交資訊
+    $locationData = $order->meetup_location ?: $order->item?->meetup_location ?: [];
+
+    $location = data_get($locationData, 'address')
+        ?? data_get($locationData, 'name')
+        ?? data_get($locationData, 'place')
         ?? '未填寫';
 
-    $date = data_get($order->meetup_location, 'date');
-    $time = data_get($order->meetup_location, 'time');
+    $date = data_get($locationData, 'date');
+    $time = data_get($locationData, 'time');
     $datetime = trim(($date ? $date : '') . ' ' . ($time ? $time : ''));
 
     return [
         'location' => $location,
-        'datetime' => $datetime !== '' ? $datetime : $order->created_at->format('Y-m-d H:i'),
+        'datetime' => $datetime !== '' ? $datetime : '未填寫',
     ];
 };
 @endphp

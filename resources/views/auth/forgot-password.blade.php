@@ -41,9 +41,8 @@
         <form method="POST" action="{{ route('password.email') }}">
             @csrf
             <div class="form-group">
-                <label for="email">註冊信箱</label>
-                {{-- 修正：欄位名稱應為 'email' 以配合 Laravel 後端 --}}
-                <input id="email" class="form-control" type="email" name="email" value="{{ old('email') }}" required autofocus>
+                <label for="account">註冊信箱</label>
+                <input id="account" class="form-control" type="email" name="account" value="{{ old('account') }}" required autofocus>    
             </div>
 
             <button type="submit" class="btn btn-primary">

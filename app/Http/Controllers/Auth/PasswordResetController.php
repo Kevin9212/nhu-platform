@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PasswordResetController extends Controller
 {
@@ -47,10 +48,27 @@ class PasswordResetController extends Controller
         /** 
          * 寄送email的邏輯：
          * 設定MAIL_MAILER=log,所以内容會寫入log檔案
-         */ 
-        Log::info("Password reset link for{$user->account}:".url(route('password.reset',['token' => $token,'email' => $user->account],false)));
+        */
+        //Log::info("Password reset link for {$user->account}:" . url(route('password.reset', ['token' => $token, 'email' => $user->account], false)));
+        
+        $resetUrl = url(route('password.reset', ['token' => $token, 'email' => $user->account], false));
 
-        return back()->with('status','重設密碼的鏈接已經發送到您的Email。請檢查您的郵箱。');
+        try {
+            Mail::send('emails.password-reset', ['user' => $user, 'resetUrl' => $resetUrl], function ($message) use ($user) {
+                $message->to($user->account)
+                    ->subject('NHU 二手交易平台 - 密碼重設通知');
+            });
+        } catch (\Throwable $e) {
+            Log::error('Failed to send password reset email', [
+                'email' => $user->account,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['account' => '寄送密碼重設郵件時發生錯誤，請稍後再試。']);
+        }
+
+        Log::info("Password reset link for {$user->account}:" . $resetUrl);
+            return back()->with('status','重設密碼的鏈接已經發送到您的Email。請檢查您的郵箱。');
     }
 
     /**
@@ -83,12 +101,12 @@ class PasswordResetController extends Controller
                 ->withErrors(['token' => '無效的重設密碼鏈接']);
         }
 
-        $user = User::where('account',$request->email)->first();
+        $user = User::where('account', $request->email)->first();
         if(!$user){
             return back()->withInput($request->only('email'))
             ->withErrors(['email' => '找不到該使用者的Email']);
         }
-        $user->user_password = Hash::make($request->password);
+        $user->password = Hash::make($request->password);
         $user->save();
 
         // 刪除重設密碼的Token

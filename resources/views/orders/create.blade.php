@@ -32,9 +32,11 @@
       @php
         $idleItemId = old('idle_item_id', $idleItem->id ?? request('idle_item_id'));
         $priceValue = old('order_price', $orderPrice ?? request('order_price'));
+        $negotiationId = old('negotiation_id', $negotiationId ?? request('negotiation_id'));
       @endphp
       <input type="hidden" name="idle_item_id" value="{{ $idleItemId }}">
       <input type="hidden" name="order_price"  value="{{ is_numeric($priceValue) ? (int) $priceValue : '' }}">
+      <input type="hidden" name="negotiation_id" value="{{ $negotiationId }}">
       {{-- 顯示後端驗證錯誤（包含 idle_item_id / order_price） --}}
       @if ($errors->any())
         <div class="alert alert-danger mb-3">
