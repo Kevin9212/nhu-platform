@@ -1,11 +1,104 @@
-/* ===== Auth 專用：Captcha 與密碼欄位 ===== */
+/* ===== Auth 專用基礎樣式 ===== */
 /* 若有全站色票，建議在 global.css 定義變數，這裡沿用常見顏色 */
 :root{
+  --primary-500:#637973;
   --primary-600:#1d4ed8;
   --primary-700:#1e3a8a;
+  --surface:#ffffff;
+  --muted:#6b7280;
+  --soft:#f3f4f6;
+  --border:#e5e7eb;
+  --shadow:0 16px 40px rgba(0,0,0,.08);
   --success:#28a745;
   --danger:#dc3545;
 }
+
+/* 版面容器（避免被 fixed header 遮住） */
+.auth-body{
+  min-height: 100vh;
+  margin: 0;
+  padding: 110px 16px 32px; /* header 預留空間 */
+  background: radial-gradient(circle at 20% 20%, #eef2ff 0, transparent 35%),
+              radial-gradient(circle at 80% 10%, #e0f2fe 0, transparent 32%),
+              #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Helvetica Neue', Arial, 'Microsoft JhengHei', sans-serif;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+.auth-container{
+  width: min(640px, 100%);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.auth-container h2{ margin: 0 0 .35rem; font-weight: 800; color: #111827; }
+.auth-description{ margin: 0 0 1rem; color: var(--muted); line-height: 1.6; }
+
+.auth-body .form-group{ margin-bottom: 16px; }
+.auth-body label{ font-weight: 700; display: block; margin-bottom: 6px; color:#111827; }
+.auth-body .form-control{
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.auth-body .form-control:focus{
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 4px rgba(99,121,115,.25);
+}
+
+.auth-tabs{ display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; margin: 12px 0 16px; background:#edf2f7; padding:4px; border-radius:12px; }
+.auth-tab{ text-align:center; padding:10px; border-radius:10px; cursor:pointer; font-weight:700; color:#4b5563; transition: all .15s ease; }
+.auth-tab.active{ background: var(--surface); color:#111827; box-shadow: 0 8px 20px rgba(0,0,0,.04); }
+
+.auth-form{ display: none; }
+.auth-form.active{ display: block; }
+
+.auth-body .btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: .85rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .12s ease, filter .12s ease;
+  text-decoration: none;
+}
+.auth-body .btn:active{ transform: translateY(1px); }
+.auth-body .btn-primary{ background: linear-gradient(135deg, var(--primary-500), #51635d); color:#fff; box-shadow: 0 10px 22px rgba(81,99,93,.25); }
+.auth-body .btn-primary:hover{ filter: brightness(.97); }
+.auth-body .btn-link{ width:auto; background: transparent; color: var(--primary-600); padding:0; }
+
+.auth-link{ margin-top: 12px; text-align: center; }
+.auth-link a{ color: var(--primary-600); font-weight:700; }
+
+/* 共用狀態訊息 */
+.alert{ border-radius: 12px; padding: .85rem 1rem; margin: 10px 0; font-weight: 600; }
+.alert ul{ margin: 6px 0 0 18px; }
+.alert-success{ background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+.alert-danger{ background: #fef2f2; border: 1px solid #fecdd3; color: #b91c1c; }
+
+/* RWD */
+@media (max-width: 640px){
+  .auth-body{ padding-top: 120px; }
+  .auth-container{ padding: 18px; }
+}
+
 
 /* 常用小工具（Auth 可用） */
 .required { color: var(--danger); }
