@@ -29,6 +29,9 @@ use App\Http\Controllers\OrderController;
 
 Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::middleware(['auth', 'checkBanned'])->group(function () {
+    Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+});
 
 // --- 首頁與核心功能 ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -75,7 +78,9 @@ Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show')
 
 // --- 商品相關 ---
 Route::resource('idle-items', IdleItemController::class)->middleware('auth');
-
+Route::delete('idle-items/{idleItem}/images/{image}', [IdleItemController::class, 'destroyImage'])
+    ->middleware('auth')
+    ->name('idle-items.images.destroy');
 // --- 會員中心與收藏 ---
 Route::middleware(['auth', 'checkBanned'])->group(function () {
     Route::get('/member', [MemberController::class, 'index'])->name('member.index');

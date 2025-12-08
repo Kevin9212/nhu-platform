@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 // 引入會用到的 Model
 use App\Models\Category;
 use App\Models\IdleItem;
+use App\Models\ProductImage;
 
 // 引入 Laravel 的核心功能類別
 use Illuminate\Http\Request;
@@ -160,5 +161,22 @@ class IdleItemController extends Controller
         $idleItem->delete();
 
         return redirect()->route('member.index')->with('success', '商品已成功刪除！');
+    }
+
+    /**
+     * 刪除單一商品圖片
+     */
+    public function destroyImage(IdleItem $idleItem, ProductImage $image)
+    {
+        $this->authorize('update', $idleItem);
+
+        if ($image->idle_item_id !== $idleItem->id) {
+            abort(404);
+        }
+
+        Storage::disk('public')->delete($image->image_url);
+        $image->delete();
+
+        return back()->with('success', '圖片已刪除');
     }
 }

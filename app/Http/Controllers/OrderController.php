@@ -116,4 +116,67 @@ class OrderController extends Controller
             ->to($url)
             ->with('success', '訂單已成立並紀錄面交資訊');
     }
+    
+    public function cancel(Request $request, OrderModel $order)
+    {
+        $userId = auth()->id();
+        $sellerId = optional($order->item)->user_id;
+
+        if ($userId !== $order->user_id && $userId !== $sellerId) {
+            abort(403, '您沒有權限取消這筆訂單');
+        }
+
+        if ($order->order_status === 'cancelled') {
+            return redirect()
+                ->route('member.index', ['tab' => 'orders'])
+                ->with('success', '訂單已經處於取消狀態');
+        }
+
+        $order->order_status = 'cancelled';
+        $order->cancel_reason = '使用者取消訂單';
+        $order->payment_status = false;
+        $order->save();
+
+        if ($item = $order->item) {
+            if ($item->idle_status === 3) {
+                $item->idle_status = 1; // 重新上架
+                $item->save();
+            }
+        }
+
+        return redirect()
+            ->route('member.index', ['tab' => 'orders'])
+            ->with('success', '訂單已取消，買賣家資訊已更新');
+    }
+    public function cancel(Request $request, OrderModel $order)
+    {
+        $userId = auth()->id();
+        $sellerId = optional($order->item)->user_id;
+
+        if ($userId !== $order->user_id && $userId !== $sellerId) {
+            abort(403, '您沒有權限取消這筆訂單');
+        }
+
+        if ($order->order_status === 'cancelled') {
+            return redirect()
+                ->route('member.index', ['tab' => 'orders'])
+                ->with('success', '訂單已經處於取消狀態');
+        }
+
+        $order->order_status = 'cancelled';
+        $order->cancel_reason = '使用者取消訂單';
+        $order->payment_status = false;
+        $order->save();
+
+        if ($item = $order->item) {
+            if ($item->idle_status === 3) {
+                $item->idle_status = 1; // 重新上架
+                $item->save();
+            }
+        }
+
+        return redirect()
+            ->route('member.index', ['tab' => 'orders'])
+            ->with('success', '訂單已取消，買賣家資訊已更新');
+    }
 }

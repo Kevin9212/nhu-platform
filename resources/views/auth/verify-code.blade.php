@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>信箱驗證 - NHU 二手交易平台</title>
+    <title>驗證註冊信箱 - NHU 二手交易平台</title>
     @vite(['resources/css/style.css', 'resources/css/auth.css'])
 </head>
 <body class="auth-body">
+    {{-- 引入共用的頁首 --}}
     @include('partials.header')
 
     <div class="auth-container">
@@ -21,11 +22,17 @@
         @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
+                <ul>
                 @foreach ($errors->all() as $error)
+                    @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
+                        <li>{{ $error }}</li>
                 @endforeach
+                    @endforeach
             </ul>
+                </ul>
         </div>
+            </div>\
         @endif
 
         <form method="POST" action="{{ route('register.verify.submit') }}">

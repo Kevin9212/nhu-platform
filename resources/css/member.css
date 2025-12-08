@@ -164,6 +164,9 @@
 .order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 0 1px var(--border) inset; }
 .order-item__name { font-weight: 700; }
 .order-item__meta { color: var(--muted); font-size: .85rem; }
+.order-actions { display: inline-flex; gap: .5rem; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.orders-table th:last-child,
+.orders-table td[data-label="操作"] { white-space: nowrap; width: 1%; }
 
 /* ===== 收藏卡片 ===== */
 .favorite-card {
