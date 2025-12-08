@@ -78,27 +78,23 @@ $statusLabel = function ($status) {
                     </div>
                   </div>
                 </td>
-                  <td data-label="賣家">{{ $sellerName }}</td>
+                <td data-label="賣家">{{ $sellerName }}</td>
                 <td data-label="價格">NT$ {{ number_format($order->order_price ?? 0, 0) }}</td>
-              <td data-label="價格">NT$ {{ number_format($order->order_price ?? 0, 0) }}</td>
                 <td data-label="交易地點">{{ $meta['location'] }}</td>
-              <td data-label="交易地點">{{ $meta['location'] }}</td>
                 <td data-label="交易時間">{{ $meta['datetime'] }}</td>
-              <td data-label="交易時間">{{ $meta['datetime'] }}</td>
+                <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
+                <td data-label="操作" class="text-end">
+                  @if($order->order_status !== 'cancelled')
+                    <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
+                    </form>
+                  @else
+                    <span class="text-muted">已取消</span>
+                  @endif
+                </td>
               </tr>
-              <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
-              <td data-label="操作" class="text-end">
-                @if($order->order_status !== 'cancelled')
-                  <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
-                  </form>
-                @else
-                  <span class="text-muted">已取消</span>
-                @endif
-              </td>
-            </tr>
             @endforeach
           </tbody>
         </table>
@@ -157,20 +153,20 @@ $statusLabel = function ($status) {
                 <td data-label="交易地點">{{ $meta['location'] }}</td>
                 <td data-label="交易時間">{{ $meta['datetime'] }}</td>
                 <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
-              <td data-label="操作" class="text-end">
-                @if($order->order_status !== 'cancelled')
-                  <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
-                  </form>
-                @else
-                  <span class="text-muted">已取消</span>
-                @endif
-              </td>
-            </tr>
-              
-            @endforeach
+                <td data-label="操作" class="text-end">
+                  @if($order->order_status !== 'cancelled')
+                    <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
+                    </form>
+                  @else
+                    <span class="text-muted">已取消</span>
+                  @endif
+                </td>
+              </tr>
+            
+              @endforeach
           </tbody>
         </table>
       </div>
