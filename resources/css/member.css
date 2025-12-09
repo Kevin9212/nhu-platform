@@ -353,6 +353,14 @@ body {
   background: linear-gradient(180deg, #ffffff, #fafafa);
 }
 
+.stack{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gap-lg{ gap: 1.5rem; }
+
 /* 空狀態字色 */
 .empty-tip{ color: #7b8a82; }
 

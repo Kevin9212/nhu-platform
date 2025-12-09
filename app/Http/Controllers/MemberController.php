@@ -58,6 +58,20 @@ class MemberController extends Controller {
             ->whereIn('idle_item_id', $negotiations->pluck('idle_item_id'))
             ->get()
             ->keyBy(fn ($c) => $c->buyer_id . '-' . $c->idle_item_id);
+        
+        // 買家議價整合：讓買家也能看到自己和賣家的議價狀態
+        $buyerNegotiations = Negotiation::where('buyer_id', $user->id)
+            ->with([
+                'item.images',
+                'seller'
+            ])
+            ->latest('updated_at')
+            ->get();
+
+        $buyerConversationLookup = Conversation::where('buyer_id', $user->id)
+            ->whereIn('idle_item_id', $buyerNegotiations->pluck('idle_item_id'))
+            ->get()
+            ->keyBy(fn ($c) => $c->seller_id . '-' . $c->idle_item_id);
 
         // 購買與販售的訂單
         $buyerOrders = Order::with(['item.images', 'item.user', 'user'])
@@ -79,6 +93,8 @@ class MemberController extends Controller {
             'negotiations' => $negotiations,
             'groupedNegotiations' => $groupedNegotiations,
             'conversationLookup' => $conversationLookup,
+            'buyerNegotiations' => $buyerNegotiations,
+            'buyerConversationLookup' => $buyerConversationLookup,
             'buyerOrders' => $buyerOrders,
             'sellerOrders' => $sellerOrders,
         ]);

@@ -128,7 +128,10 @@
       <div id="tab-negotiations" class="m-pane" role="tabpanel" aria-labelledby="negotiations" hidden>
         <section class="section">
           <h2>議價整合</h2>
-          @include('member.partials.negotiations-table')
+          <div class="stack gap-lg">
+            @include('member.partials.negotiations-table')
+            @include('member.partials.buyer-negotiations-table')
+          </div>
         </section>
       </div>
     </main>

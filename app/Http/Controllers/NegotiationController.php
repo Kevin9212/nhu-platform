@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Negotiation;
 use App\Models\Conversation;
 use App\Models\IdleItem;
+use App\Models\Order;
 use App\Models\Message;
 use App\Notifications\NewOfferNotification;
 use App\Notifications\NegotiationAcceptedNotification;
@@ -140,7 +141,7 @@ class NegotiationController extends Controller
             [
                 'user_id'      => $negotiation->buyer_id,
                 'idle_item_id' => $item->id,
-                'order_status' => 'pending',
+                'order_status' => Order::STATUS_PENDING,
             ],
             [
                 'order_number'   => strtoupper(uniqid('ORD')),
@@ -162,8 +163,8 @@ class NegotiationController extends Controller
         }
 
         return redirect()
-            ->route('seller.orders.index')
-            ->with('success', '已接受議價並建立訂單');
+            ->route('member.index', ['tab' => 'orders'])
+            ->with('success', '已同意議價並建立訂單，請至訂單管理查看');
     }
 
 

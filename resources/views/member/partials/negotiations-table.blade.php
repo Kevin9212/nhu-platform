@@ -1,7 +1,7 @@
 {{-- resources/views/member/partials/negotiations-table.blade.php --}}
 
 <div class="negotiation-hint">
-  <p class="negotiation-hint__title">交易模式說明</p>
+  <p class="negotiation-hint__title">作為賣家</p>
   <ul>
     <li>目前為「賣家決定」模式：買家議價後，由賣家選擇要接受哪一筆（非競標、非系統自動決定）。</li>
     <li>賣家在聊天室按下「同意議價」後即鎖定該買家，請雙方盡快完成訂單以避免爭議。</li>
@@ -79,11 +79,16 @@
               </td>
               <td data-label="更新時間">{{ $negotiation->updated_at->format('Y-m-d H:i') }}</td>
               <td data-label="訂單管理" class="text-end">
-                  <form action="{{ route('negotiations.to-orders', $negotiation) }}" method="POST">
+                  @if($negotiation->status === 'pending')
+                  <form action="{{ route('negotiations.agree', $negotiation) }}" method="POST">
                     @csrf
+                    @method('PATCH')
                     <button type="submit" class="btn btn-primary btn-sm">同意議價</button>
                   </form>
-                </td>
+                @else
+                  <span class="text-muted">已處理</span>
+                @endif
+              </td>
 
             </tr>
           @endforeach
