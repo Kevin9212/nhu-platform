@@ -155,8 +155,48 @@ class OrderController extends Controller
             ->route('member.index', ['tab' => 'orders'])
             ->with('success', '訂單已確認完成');
     }
-    public function cancel(Request $request, OrderModel $order): RedirectResponse
-{
+    public function update(Request $request, OrderModel $order): RedirectResponse
+    {
+        $userId   = auth()->id();
+        $sellerId = optional($order->item)->user_id;
+
+        if ($userId !== $order->user_id && $userId !== $sellerId) {
+            abort(403, '您沒有權限編輯這筆訂單');
+        }
+
+        if ($order->order_status !== OrderModel::STATUS_PENDING) {
+            return redirect()
+                ->route('member.index', ['tab' => 'orders'])
+                ->with('error', '只有待確認的訂單可以修改面交資訊');
+        }
+
+        $validated = $request->validate([
+            'meet_address' => 'required|string|max:255',
+            'meet_lat'     => 'nullable|numeric',
+            'meet_lng'     => 'nullable|numeric',
+            'meet_date'    => 'required|date|after_or_equal:today',
+            'meet_time'    => 'required',
+        ]);
+
+        $location = $order->meetup_location ?? [];
+
+        $order->meetup_location = [
+            'address' => $validated['meet_address'],
+            'lat'     => $validated['meet_lat'] ?? data_get($location, 'lat'),
+            'lng'     => $validated['meet_lng'] ?? data_get($location, 'lng'),
+            'date'    => $validated['meet_date'],
+            'time'    => $validated['meet_time'],
+        ];
+
+        $order->save();
+
+        $anchor = $userId === $order->user_id ? '#orders-buyer' : '#orders-seller';
+
+        return redirect()
+            ->to(route('member.index', ['tab' => 'orders']) . $anchor)
+            ->with('success', '面交資訊已更新');
+    }
+    public function cancel(Request $request, OrderModel $order): RedirectResponse{
     $userId = auth()->id();
     $sellerId = optional($order->item)->user_id;
 

@@ -29,6 +29,9 @@ $statusLabel = function ($status) {
         default     => '未知',
     };
 };
+$meetupValue = function ($order, $key, $default = '') {
+    return data_get($order->meetup_location, $key, $default);
+};
 @endphp
 
 <div class="orders-panel">
@@ -84,13 +87,42 @@ $statusLabel = function ($status) {
                 <td data-label="交易時間">{{ $meta['datetime'] }}</td>
                 <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
                 <td data-label="操作" class="text-end">
-                  @if($order->order_status === 'cancelled')
+                  @if($order->order_status === 'pending')
+                    <details class="order-edit-details">
+                      <summary class="btn btn-link btn-sm p-0">修改面交資訊</summary>
+                      <div class="order-edit-card">
+                        <form method="POST" action="{{ route('orders.update', $order) }}" class="stack gap-2">
+                          @csrf
+                          @method('PATCH')
+                          <div class="form-group">
+                            <label class="form-label" for="buyer-address-{{ $order->id }}">交易地點</label>
+                            <input id="buyer-address-{{ $order->id }}" type="text" name="meet_address" value="{{ $meetupValue($order, 'address') }}" class="form-control" required>
+                          </div>
+                          <div class="d-flex gap-2">
+                            <div class="form-group flex-fill">
+                              <label class="form-label" for="buyer-date-{{ $order->id }}">交易日期</label>
+                              <input id="buyer-date-{{ $order->id }}" type="date" name="meet_date" value="{{ $meetupValue($order, 'date') }}" class="form-control" required>
+                            </div>
+                            <div class="form-group flex-fill">
+                              <label class="form-label" for="buyer-time-{{ $order->id }}">交易時間</label>
+                              <input id="buyer-time-{{ $order->id }}" type="time" name="meet_time" value="{{ $meetupValue($order, 'time') }}" class="form-control" required>
+                            </div>
+                          </div>
+                          <input type="hidden" name="meet_lat" value="{{ $meetupValue($order, 'lat') }}">
+                          <input type="hidden" name="meet_lng" value="{{ $meetupValue($order, 'lng') }}">
+                          <p class="text-muted small mb-1">更新後將同步通知賣家。</p>
+                          <div class="text-end">
+                            <button type="submit" class="btn btn-primary btn-sm">儲存修改</button>
+                          </div>
+                        </form>
+                      </div>
+                    </details>
                     <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
                       @csrf
                       @method('PATCH')
                       <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
                     </form>
-                    @elseif($order->order_status === 'success')
+                  @elseif($order->order_status === 'success')
                     <span class="text-success">已完成</span>
                   @else
                     <span class="text-muted">已取消</span>
@@ -158,6 +190,35 @@ $statusLabel = function ($status) {
                 <td data-label="操作" class="text-end">
                   @if($order->order_status === 'pending')
                     <div class="d-flex flex-column gap-2 align-items-end">
+                      <details class="order-edit-details w-100">
+                        <summary class="btn btn-link btn-sm p-0 text-end">修改面交資訊</summary>
+                        <div class="order-edit-card">
+                          <form method="POST" action="{{ route('orders.update', $order) }}" class="stack gap-2">
+                            @csrf
+                            @method('PATCH')
+                            <div class="form-group">
+                              <label class="form-label" for="seller-address-{{ $order->id }}">交易地點</label>
+                              <input id="seller-address-{{ $order->id }}" type="text" name="meet_address" value="{{ $meetupValue($order, 'address') }}" class="form-control" required>
+                            </div>
+                            <div class="d-flex gap-2">
+                              <div class="form-group flex-fill">
+                                <label class="form-label" for="seller-date-{{ $order->id }}">交易日期</label>
+                                <input id="seller-date-{{ $order->id }}" type="date" name="meet_date" value="{{ $meetupValue($order, 'date') }}" class="form-control" required>
+                              </div>
+                              <div class="form-group flex-fill">
+                                <label class="form-label" for="seller-time-{{ $order->id }}">交易時間</label>
+                                <input id="seller-time-{{ $order->id }}" type="time" name="meet_time" value="{{ $meetupValue($order, 'time') }}" class="form-control" required>
+                              </div>
+                            </div>
+                            <input type="hidden" name="meet_lat" value="{{ $meetupValue($order, 'lat') }}">
+                            <input type="hidden" name="meet_lng" value="{{ $meetupValue($order, 'lng') }}">
+                            <p class="text-muted small mb-1">更新後將同步通知買家。</p>
+                            <div class="text-end">
+                              <button type="submit" class="btn btn-primary btn-sm">儲存修改</button>
+                            </div>
+                          </form>
+                        </div>
+                      </details>
                       <form method="POST" action="{{ route('orders.confirm', $order) }}" onsubmit="return confirm('確認這筆訂單嗎？');">
                         @csrf
                         @method('PATCH')

@@ -30,6 +30,7 @@ use App\Http\Controllers\OrderController;
 Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::middleware(['auth', 'checkBanned'])->group(function () {
+    Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::patch('/orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
