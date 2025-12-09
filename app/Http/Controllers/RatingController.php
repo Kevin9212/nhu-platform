@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Order;
 use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,8 @@ class RatingController extends Controller
         // 驗證輸入資料
         $validated = $request->validate([
             'score' =>'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:1000',    
+            'order_id' => 'required|integer|exists:orders,id',
         ]);
 
         /**
@@ -30,8 +32,27 @@ class RatingController extends Controller
             return back()->with('error', '您不能評價自己。');
         }
 
-        // 防護機制：檢查是否已經評價過此使用者
-        $existingRating = Rating::where('rater_id', $rater->id)
+        // 找出訂單，並確認登入者與被評價者都與訂單有關
+        $order = Order::with('item')->findOrFail($validated['order_id']);
+
+        if ($order->user_id !== $rater->id) {
+            return back()->with('error', '您只能對自己的訂單進行評價。');
+        }
+
+        $sellerId = optional($order->item)->user_id;
+
+        if (!$sellerId || $sellerId !== $user->id) {
+            return back()->with('error', '此訂單的賣家與被評價者不符。');
+        }
+
+        // 只有已完成的訂單才能評價（涵蓋 success/completed 字串）
+        if (! in_array($order->order_status, ['success', 'completed'], true)) {
+            return back()->with('error', '訂單尚未完成，暫時無法評價。');
+        }
+
+        // 防護機制：檢查是否已經評價過此使用者（同一訂單只能評一次）
+        $existingRating = Rating::where('order_id', $order->id)
+            ->where('rater_id', $rater->id)
             ->where('rated_id', $user->id)
             ->first();
 
@@ -41,11 +62,12 @@ class RatingController extends Controller
 
         // 建立新的評價
         Rating::create([
+            'order_id' => $order->id,
             'rater_id' => $rater->id, // 評分者是當前登入的使用者
             'rated_id' => $user->id,  // 被評分者是當前頁面的使用者
             'score' => $validated['score'],
             'comment' => $validated['comment'],
-            // 注意：我們暫時簡化，沒有將評價與特定訂單 (order_id) 關聯
+            
         ]);
 
         return back()->with('success', '感謝您的評價！');

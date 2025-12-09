@@ -148,8 +148,7 @@ class OrderController extends Controller
             ->route('member.index', ['tab' => 'orders'])
             ->with('success', '訂單已取消，買賣家資訊已更新');
     }
-    public function cancel(Request $request, OrderModel $order)
-    {
+    /*public function cancel(Request $request, OrderModel $order){
         $userId = auth()->id();
         $sellerId = optional($order->item)->user_id;
 
@@ -178,5 +177,5 @@ class OrderController extends Controller
         return redirect()
             ->route('member.index', ['tab' => 'orders'])
             ->with('success', '訂單已取消，買賣家資訊已更新');
-    }
+    }*/
 }
