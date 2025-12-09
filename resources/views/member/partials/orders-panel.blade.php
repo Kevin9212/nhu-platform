@@ -84,12 +84,14 @@ $statusLabel = function ($status) {
                 <td data-label="交易時間">{{ $meta['datetime'] }}</td>
                 <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
                 <td data-label="操作" class="text-end">
-                  @if($order->order_status !== 'cancelled')
+                  @if($order->order_status === 'cancelled')
                     <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
                       @csrf
                       @method('PATCH')
                       <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
                     </form>
+                    @elseif($order->order_status === 'success')
+                    <span class="text-success">已完成</span>
                   @else
                     <span class="text-muted">已取消</span>
                   @endif
@@ -154,18 +156,26 @@ $statusLabel = function ($status) {
                 <td data-label="交易時間">{{ $meta['datetime'] }}</td>
                 <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
                 <td data-label="操作" class="text-end">
-                  @if($order->order_status !== 'cancelled')
-                    <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
-                      @csrf
-                      @method('PATCH')
-                      <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
-                    </form>
+                  @if($order->order_status === 'pending')
+                    <div class="d-flex flex-column gap-2 align-items-end">
+                      <form method="POST" action="{{ route('orders.confirm', $order) }}" onsubmit="return confirm('確認這筆訂單嗎？');">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-success btn-sm">確認訂單</button>
+                      </form>
+                      <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
+                      </form>
+                    </div>
+                  @elseif($order->order_status === 'success')
+                    <span class="text-success">已完成</span>
                   @else
                     <span class="text-muted">已取消</span>
                   @endif
                 </td>
               </tr>
-            
               @endforeach
           </tbody>
         </table>

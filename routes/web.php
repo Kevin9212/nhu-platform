@@ -30,6 +30,7 @@ use App\Http\Controllers\OrderController;
 Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::middleware(['auth', 'checkBanned'])->group(function () {
+    Route::patch('/orders/{order}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
 
@@ -84,6 +85,15 @@ Route::delete('idle-items/{idleItem}/images/{image}', [IdleItemController::class
 // --- 會員中心與收藏 ---
 Route::middleware(['auth', 'checkBanned'])->group(function () {
     Route::get('/member', [MemberController::class, 'index'])->name('member.index');
+
+    Route::get('/member/orders', function () {
+        return redirect()->to(route('member.index', ['tab' => 'orders']) . '#orders-buyer');
+    })->name('member.orders.index');
+
+    Route::get('/seller/orders', function () {
+        return redirect()->to(route('member.index', ['tab' => 'orders']) . '#orders-seller');
+    })->name('seller.orders.index');
+
     Route::patch('/member/profile', [MemberController::class, 'updateProfile'])->name('member.profile.update');
 
     Route::post('/favorites/{idleItem}', [FavoriteController::class, 'store'])->name('favorites.store');

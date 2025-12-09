@@ -10,6 +10,11 @@ class Order extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING   = 'pending';
+    public const STATUS_SUCCESS   = 'success';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_FAILED    = 'failed';
+    
     protected $fillable = [
         'order_number',
         'user_id',

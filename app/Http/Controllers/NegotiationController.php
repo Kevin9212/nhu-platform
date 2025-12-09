@@ -161,7 +161,9 @@ class NegotiationController extends Controller
             ));
         }
 
-        return back()->with('success', '已接受議價並建立訂單');
+        return redirect()
+            ->route('seller.orders.index')
+            ->with('success', '已接受議價並建立訂單');
     }
 
 

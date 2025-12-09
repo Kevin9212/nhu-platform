@@ -81,7 +81,7 @@
               <td data-label="訂單管理" class="text-end">
                   <form action="{{ route('negotiations.to-orders', $negotiation) }}" method="POST">
                     @csrf
-                    <button type="submit" class="btn btn-primary btn-sm">成立訂單</button>
+                    <button type="submit" class="btn btn-primary btn-sm">同意議價</button>
                   </form>
                 </td>
 
