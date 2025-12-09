@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\IdleItem;
 use App\Models\Negotiation;
 use App\Models\Order as OrderModel;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function create(Request $request)
+    public function create(Request $request): View
     {
         $idleItem    = null;
         $orderPrice  = null;
@@ -37,7 +39,7 @@ class OrderController extends Controller
         return view('orders.create', compact('idleItem', 'orderPrice', 'negotiationId'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $priceFromRequest = $request->input('order_price');
 
@@ -96,7 +98,7 @@ class OrderController extends Controller
             'order_price'     => $validated['order_price'],
             'payment_status'  => false,
             'payment_way'     => '面交',
-            'order_status'    => 'OrderModel::STATUS_PENDING',
+            'order_status'    => OrderModel::STATUS_PENDING,
             'meetup_location' => $meetup,
         ]);
 
@@ -117,62 +119,28 @@ class OrderController extends Controller
             ->with('success', '訂單已成立並紀錄面交資訊，請至訂單管理查看');
     }
 
-    public function confirm(Request $request, OrderModel $order)
+    public function confirm(OrderModel $order): RedirectResponse
     {
         $userId   = auth()->id();
-        $sellerId = optional($order->item)->user_id;
-
-        if ($userId !== $sellerId) {
-            abort(403, '您沒有權限確認這筆訂單');
-        }
-
-        if ($order->order_status === OrderModel::STATUS_SUCCESS) {
-            return redirect()
-                ->route('member.index', ['tab' => 'orders'])
-                ->with('success', '訂單已經確認完成');
-        }
-
-        if ($order->order_status === OrderModel::STATUS_CANCELLED) {
-            return redirect()
-                ->route('member.index', ['tab' => 'orders'])
-                ->with('error', '訂單已被取消，無法再次確認');
-        }
-
-        $order->order_status   = OrderModel::STATUS_SUCCESS;
-        $order->payment_status = true;
-        $order->save();
-
-        if ($item = $order->item) {
-            $item->idle_status = 4; // 完成
-            $item->save();
-        }
-
-        return redirect()
-            ->route('member.index', ['tab' => 'orders'])
-            ->with('success', '訂單已確認，交易完成');
-    }
-    public function confirm(OrderModel $order)
-    {
-        $userId = auth()->id();
         $sellerId = optional($order->item)->user_id;
 
         if ($userId !== $order->user_id && $userId !== $sellerId) {
             abort(403, '您沒有權限確認這筆訂單');
         }
 
-        if ($order->order_status === 'cancelled') {
+        if ($order->order_status === OrderModel::STATUS_CANCELLED) {
             return redirect()
                 ->route('member.index', ['tab' => 'orders'])
                 ->with('error', '訂單已取消，無法確認完成');
         }
 
-        if ($order->order_status === 'success') {
+        if ($order->order_status === OrderModel::STATUS_SUCCESS) {
             return redirect()
                 ->route('member.index', ['tab' => 'orders'])
                 ->with('success', '訂單已經為完成狀態');
         }
 
-        $order->order_status = 'success';
+        $order->order_status   = OrderModel::STATUS_SUCCESS;
         $order->payment_status = true;
         $order->save();
 
@@ -187,41 +155,41 @@ class OrderController extends Controller
             ->route('member.index', ['tab' => 'orders'])
             ->with('success', '訂單已確認完成');
     }
-    public function cancel(Request $request, OrderModel $order)
-    {
-        $userId = auth()->id();
-        $sellerId = optional($order->item)->user_id;
+    public function cancel(Request $request, OrderModel $order): RedirectResponse
+{
+    $userId = auth()->id();
+    $sellerId = optional($order->item)->user_id;
 
-        if ($userId !== $order->user_id && $userId !== $sellerId) {
-            abort(403, '您沒有權限取消這筆訂單');
-        }
+    if ($userId !== $order->user_id && $userId !== $sellerId) {
+        abort(403, '您沒有權限取消這筆訂單');
+    }
 
-        if ($order->order_status === OrderModel::STATUS_SUCCESS) {
-            return redirect()
-                ->route('member.index', ['tab' => 'orders'])
-                ->with('error', '訂單已完成，無法取消');
-        }
-
-        if ($order->order_status === OrderModel::STATUS_CANCELLED) {
-            return redirect()
-                ->route('member.index', ['tab' => 'orders'])
-                ->with('success', '訂單已經處於取消狀態');
-        }
-
-        $order->order_status = OrderModel::STATUS_CANCELLED;
-        $order->cancel_reason = '使用者取消訂單';
-        $order->payment_status = false;
-        $order->save();
-
-        if ($item = $order->item) {
-            if ($item->idle_status === 3) {
-                $item->idle_status = 1; // 重新上架
-                $item->save();
-            }
-        }
-
+    if ($order->order_status === OrderModel::STATUS_SUCCESS) {
         return redirect()
             ->route('member.index', ['tab' => 'orders'])
-            ->with('success', '訂單已取消，買賣家資訊已更新');
+            ->with('error', '訂單已完成，無法取消');
+    }
+
+    if ($order->order_status === OrderModel::STATUS_CANCELLED) {
+        return redirect()
+            ->route('member.index', ['tab' => 'orders'])
+            ->with('success', '訂單已經處於取消狀態');
+    }
+
+    $order->order_status = OrderModel::STATUS_CANCELLED;
+    $order->cancel_reason = '使用者取消訂單';
+    $order->payment_status = false;
+    $order->save();
+
+    if ($item = $order->item) {
+        if ($item->idle_status === 3) {
+            $item->idle_status = 1; // 重新上架
+            $item->save();
+        }
+    }
+
+    return redirect()
+        ->route('member.index', ['tab' => 'orders'])
+        ->with('success', '訂單已取消，買賣家資訊已更新');
     }
 }
