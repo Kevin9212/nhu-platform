@@ -194,107 +194,106 @@ $buyerRatings = $buyerRatings ?? collect();
       <h3>賣出的訂單</h3>
       <p class="orders-section__hint">您作為賣家的訂單列表。</p>
     </div>
-
-    @if($sellerOrders->isEmpty())
-      <p class="empty-tip">目前沒有賣出的訂單。</p>
-    @else
-      <div class="table-responsive">
-        <table class="listings-table orders-table">
-          <thead>
+    <div class="table-responsive">
+      <table class="listings-table orders-table">
+        <thead>
+          <tr>
+            <th>商品</th>
+            <th>買家</th>
+            <th>價格</th>
+            <th>交易地點</th>
+            <th>交易時間</th>
+            <th>狀態</th>
+            <th class="text-end">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($sellerOrders as $order)
+            @php
+              $item = $order->item;
+              $cover = optional($item?->images->first())->image_url;
+              $coverUrl = $cover
+                ? asset('storage/' . ltrim($cover, '/'))
+                : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
+              $meta = $orderMeta($order);
+              $buyerName = optional($order->user)->nickname
+                ?? optional($order->user)->account
+                ?? '使用者已刪除';
+              $isCompleted = $order->order_status === 'success';
+            @endphp
             <tr>
-              <th>商品</th>
-              <th>買家</th>
-              <th>價格</th>
-              <th>交易地點</th>
-              <th>交易時間</th>
-              <th>狀態</th>
-              <th class="text-end">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach($sellerOrders as $order)
-              @php
-                $item = $order->item;
-                $cover = optional($item?->images->first())->image_url;
-                $coverUrl = $cover
-                  ? asset('storage/' . ltrim($cover, '/'))
-                  : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
-                $meta = $orderMeta($order);
-                $buyerName = optional($order->user)->nickname
-                  ?? optional($order->user)->account
-                  ?? '使用者已刪除';
-                  $isCompleted = $order->order_status === 'success';
-              @endphp
-              <tr>
-                <td data-label="商品">
-                  <div class="order-item">
-                    <img src="{{ $coverUrl }}" alt="{{ $item?->idle_name }}">
-                    <div>
-                      <div class="order-item__name">{{ $item?->idle_name ?? '商品已移除' }}</div>
-                      <div class="order-item__meta">訂單編號：{{ $order->order_number }}</div>
-                    </div>
+              <td data-label="商品">
+                <div class="order-item">
+                  <img src="{{ $coverUrl }}" alt="{{ $item?->idle_name }}">
+                  <div>
+                    <div class="order-item__name">{{ $item?->idle_name ?? '商品已移除' }}</div>
+                    <div class="order-item__meta">訂單編號：{{ $order->order_number }}</div>
                   </div>
-                </td>
-                <td data-label="買家">{{ $buyerName }}</td>
-                <td data-label="價格">NT$ {{ number_format($order->order_price ?? 0, 0) }}</td>
-                <td data-label="交易地點">{{ $meta['location'] }}</td>
-                <td data-label="交易時間">{{ $meta['datetime'] }}</td>
-                <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
-                <td data-label="操作" class="text-end">
-                  @if($order->order_status === 'pending')
-                    <div class="d-flex flex-column gap-2 align-items-end">
-                      <details class="order-edit-details w-100">
-                        <summary class="btn btn-link btn-sm p-0 text-end">修改面交資訊</summary>
-                        <div class="order-edit-card">
-                          <form method="POST" action="{{ route('orders.update', $order) }}" class="stack gap-2">
-                            @csrf
-                            @method('PATCH')
-                            <div class="form-group">
-                              <label class="form-label" for="seller-address-{{ $order->id }}">交易地點</label>
-                              <input id="seller-address-{{ $order->id }}" type="text" name="meet_address" value="{{ $meetupValue($order, 'address') }}" class="form-control" required>
+                </div>
+              </td>
+              <td data-label="買家">{{ $buyerName }}</td>
+              <td data-label="價格">NT$ {{ number_format($order->order_price ?? 0, 0) }}</td>
+              <td data-label="交易地點">{{ $meta['location'] }}</td>
+              <td data-label="交易時間">{{ $meta['datetime'] }}</td>
+              <td data-label="狀態">{{ $statusLabel($order->order_status) }}</td>
+              <td data-label="操作" class="text-end">
+                @if($order->order_status === 'pending')
+                  <div class="d-flex flex-column gap-2 align-items-end">
+                    <details class="order-edit-details w-100">
+                      <summary class="btn btn-link btn-sm p-0 text-end">修改面交資訊</summary>
+                      <div class="order-edit-card">
+                        <form method="POST" action="{{ route('orders.update', $order) }}" class="stack gap-2">
+                          @csrf
+                          @method('PATCH')
+                          <div class="form-group">
+                            <label class="form-label" for="seller-address-{{ $order->id }}">交易地點</label>
+                            <input id="seller-address-{{ $order->id }}" type="text" name="meet_address" value="{{ $meetupValue($order, 'address') }}" class="form-control" required>
+                          </div>
+                          <div class="d-flex gap-2">
+                            <div class="form-group flex-fill">
+                              <label class="form-label" for="seller-date-{{ $order->id }}">交易日期</label>
+                              <input id="seller-date-{{ $order->id }}" type="date" name="meet_date" value="{{ $meetupValue($order, 'date') }}" class="form-control" required>
                             </div>
-                            <div class="d-flex gap-2">
-                              <div class="form-group flex-fill">
-                                <label class="form-label" for="seller-date-{{ $order->id }}">交易日期</label>
-                                <input id="seller-date-{{ $order->id }}" type="date" name="meet_date" value="{{ $meetupValue($order, 'date') }}" class="form-control" required>
-                              </div>
-                              <div class="form-group flex-fill">
-                                <label class="form-label" for="seller-time-{{ $order->id }}">交易時間</label>
-                                <input id="seller-time-{{ $order->id }}" type="time" name="meet_time" value="{{ $meetupValue($order, 'time') }}" class="form-control" required>
-                              </div>
+                            <div class="form-group flex-fill">
+                              <label class="form-label" for="seller-time-{{ $order->id }}">交易時間</label>
+                              <input id="seller-time-{{ $order->id }}" type="time" name="meet_time" value="{{ $meetupValue($order, 'time') }}" class="form-control" required>
                             </div>
-                            <input type="hidden" name="meet_lat" value="{{ $meetupValue($order, 'lat') }}">
-                            <input type="hidden" name="meet_lng" value="{{ $meetupValue($order, 'lng') }}">
-                            <p class="text-muted small mb-1">更新後將同步通知買家。</p>
-                            <div class="text-end">
-                              <button type="submit" class="btn btn-primary btn-sm">儲存修改</button>
-                            </div>
-                          </form>
-                        </div>
-                      </details>
-                      <form method="POST" action="{{ route('orders.confirm', $order) }}" onsubmit="return confirm('確認這筆訂單嗎？');">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-success btn-sm">確認訂單</button>
-                      </form>
-                      <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
-                      </form>
-                    </div>
-                  @elseif($isCompleted)
-                    <span class="text-success">已完成</span>
-                  @else
-                    <span class="text-muted">已取消</span>
-                  @endif
-                </td>
-              </tr>
-              @endforeach
-          </tbody>
-        </table>
-      </div>
-    @endif
+                          </div>
+                          <input type="hidden" name="meet_lat" value="{{ $meetupValue($order, 'lat') }}">
+                          <input type="hidden" name="meet_lng" value="{{ $meetupValue($order, 'lng') }}">
+                          <p class="text-muted small mb-1">更新後將同步通知買家。</p>
+                          <div class="text-end">
+                            <button type="submit" class="btn btn-primary btn-sm">儲存修改</button>
+                          </div>
+                        </form>
+                      </div>
+                    </details>
+                    <form method="POST" action="{{ route('orders.confirm', $order) }}" onsubmit="return confirm('確認這筆訂單嗎？');">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-success btn-sm">確認訂單</button>
+                    </form>
+                    <form method="POST" action="{{ route('orders.cancel', $order) }}" onsubmit="return confirm('確定要取消這筆訂單嗎？');">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
+                    </form>
+                  </div>
+                @elseif($isCompleted)
+                  <span class="text-success">已完成</span>
+                @else
+                  <span class="text-muted">已取消</span>
+                @endif
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">目前沒有賣出的訂單。</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
