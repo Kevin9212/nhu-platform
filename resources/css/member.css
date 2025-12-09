@@ -167,7 +167,28 @@
 .order-actions { display: inline-flex; gap: .5rem; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
 .orders-table th:last-child,
 .orders-table td[data-label="操作"] { white-space: nowrap; width: 1%; }
+.rating-options { display: flex; gap: .75rem; flex-wrap: wrap; }
+.rating-option { display: inline-flex; gap: .35rem; align-items: center; padding: .35rem .55rem; border-radius: .6rem; border: 1px solid var(--border); background: #f9fafb; cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease; }
+.rating-option:hover { border-color: var(--primary-200); box-shadow: 0 4px 10px rgba(0,0,0,.06); }
+.rating-option input { accent-color: var(--primary-600); }
 
+/* ===== Modal ===== */
+.modal[hidden] { display: none !important; }
+.modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; }
+.modal-open { overflow: hidden; }
+.modal__backdrop { position: absolute; inset: 0; background: rgba(15,23,42,.45); backdrop-filter: blur(2px); }
+.modal__dialog { position: relative; width: min(520px, 90vw); background: #fff; border-radius: 18px; box-shadow: 0 18px 50px rgba(0,0,0,.18); border: 1px solid var(--border); overflow: hidden; animation: modal-pop .16s ease-out; }
+.modal__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.25rem 0.5rem; }
+.modal__title { margin: 0; font-size: 1.2rem; }
+.modal__eyebrow { margin: 0 0 .35rem; color: var(--muted); font-size: .9rem; }
+.modal__body { padding: 0 1.25rem 1.25rem; }
+.modal__close { background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: #6b7280; padding: .25rem; border-radius: .5rem; }
+.modal__close:hover { background: #f3f4f6; color: #111827; }
+
+@keyframes modal-pop {
+  from { transform: translateY(12px) scale(.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
 /* ===== 收藏卡片 ===== */
 .favorite-card {
   border-radius: 1rem;

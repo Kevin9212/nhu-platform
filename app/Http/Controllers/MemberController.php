@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Conversation;
 use App\Models\Negotiation;
 use App\Models\Order;
+use App\Models\Rating;
 
 class MemberController extends Controller {
     /**
@@ -84,6 +85,11 @@ class MemberController extends Controller {
             ->latest('updated_at')
             ->get();
 
+            $buyerRatings = Rating::where('rater_id', $user->id)
+            ->whereIn('order_id', $buyerOrders->pluck('id'))
+            ->get()
+            ->keyBy('order_id');
+
         return view('member.index', [
             'user' => $user,
             'favoriteItems' => $favoriteItems,
@@ -97,6 +103,7 @@ class MemberController extends Controller {
             'buyerConversationLookup' => $buyerConversationLookup,
             'buyerOrders' => $buyerOrders,
             'sellerOrders' => $sellerOrders,
+            'buyerRatings' => $buyerRatings,
         ]);
     }
 

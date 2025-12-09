@@ -45,8 +45,8 @@ class RatingController extends Controller
             return back()->with('error', '此訂單的賣家與被評價者不符。');
         }
 
-        // 只有已完成的訂單才能評價（涵蓋 success/completed 字串）
-        if (! in_array($order->order_status, ['success', 'completed'], true)) {
+        // 只有已完成的訂單才能評價（成功狀態）
+        if ($order->order_status !== 'success') {
             return back()->with('error', '訂單尚未完成，暫時無法評價。');
         }
 

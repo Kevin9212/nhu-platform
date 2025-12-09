@@ -32,6 +32,7 @@ $statusLabel = function ($status) {
 $meetupValue = function ($order, $key, $default = '') {
     return data_get($order->meetup_location, $key, $default);
 };
+$buyerRatings = $buyerRatings ?? collect();
 @endphp
 
 <div class="orders-panel">
@@ -70,6 +71,9 @@ $meetupValue = function ($order, $key, $default = '') {
                 $sellerName = optional($item?->user)->nickname
                   ?? optional($item?->user)->account
                   ?? '使用者已刪除';
+                $seller = $item?->user;
+                $existingRating = $buyerRatings->get($order->id);
+                $isCompleted = $order->order_status === 'success';
               @endphp
               <tr>
                 <td data-label="商品">
@@ -122,8 +126,56 @@ $meetupValue = function ($order, $key, $default = '') {
                       @method('PATCH')
                       <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
                     </form>
-                  @elseif($order->order_status === 'success')
-                    <span class="text-success">已完成</span>
+                    @elseif($isCompleted)
+                    <div class="d-flex flex-column gap-2 align-items-end">
+                      <span class="text-success">已完成</span>
+                      @if(! $seller)
+                        <span class="text-muted small">賣家資訊缺失，無法評價</span>
+                      @elseif($existingRating)
+                        <span class="text-muted small">已對 {{ $sellerName }} 留下評價</span>
+                      @else
+                        @php($modalId = 'rating-modal-' . $order->id)
+                        <button type="button" class="btn btn-warning btn-sm text-end" data-modal-open="{{ $modalId }}">留下交易評價</button>
+
+                        <div class="modal" id="{{ $modalId }}" role="dialog" aria-modal="true" aria-labelledby="{{ $modalId }}-title" hidden>
+                          <div class="modal__backdrop" data-modal-close></div>
+                          <div class="modal__dialog" role="document">
+                            <div class="modal__header">
+                              <div>
+                                <p class="modal__eyebrow">已完成 · {{ $item?->idle_name }}</p>
+                                <h3 class="modal__title" id="{{ $modalId }}-title">留下交易評價</h3>
+                              </div>
+                              <button type="button" class="modal__close" aria-label="關閉" data-modal-close>&times;</button>
+                            </div>
+                            <div class="modal__body">
+                              <form method="POST" action="{{ route('ratings.store', $seller) }}" class="stack gap-3">
+                                @csrf
+                                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                <div class="form-group">
+                                  <label class="form-label d-block">評分</label>
+                                  <div class="rating-options" role="radiogroup" aria-label="評分">
+                                    @for($i = 1; $i <= 5; $i++)
+                                      <label class="rating-option">
+                                        <input type="radio" name="score" value="{{ $i }}" required>
+                                        <span>{{ $i }} 星</span>
+                                      </label>
+                                    @endfor
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                  <label class="form-label" for="rating-comment-{{ $order->id }}">評價內容（選填）</label>
+                                  <textarea id="rating-comment-{{ $order->id }}" name="comment" class="form-control" rows="3" maxlength="1000" placeholder="分享這次交易的感受吧！"></textarea>
+                                </div>
+                                <div class="text-end d-flex gap-2 justify-content-end">
+                                  <button type="button" class="btn btn-light btn-sm" data-modal-close>取消</button>
+                                  <button type="submit" class="btn btn-primary btn-sm">送出評價</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      @endif
+                    </div>
                   @else
                     <span class="text-muted">已取消</span>
                   @endif
@@ -171,6 +223,7 @@ $meetupValue = function ($order, $key, $default = '') {
                 $buyerName = optional($order->user)->nickname
                   ?? optional($order->user)->account
                   ?? '使用者已刪除';
+                  $isCompleted = $order->order_status === 'success';
               @endphp
               <tr>
                 <td data-label="商品">
@@ -230,7 +283,7 @@ $meetupValue = function ($order, $key, $default = '') {
                         <button type="submit" class="btn btn-outline-danger btn-sm">取消訂單</button>
                       </form>
                     </div>
-                  @elseif($order->order_status === 'success')
+                  @elseif($isCompleted)
                     <span class="text-success">已完成</span>
                   @else
                     <span class="text-muted">已取消</span>
@@ -244,3 +297,58 @@ $meetupValue = function ($order, $key, $default = '') {
     @endif
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const openButtons = document.querySelectorAll('[data-modal-open]');
+  const modals = new Map();
+  let lastTrigger = null;
+
+  function getModal(id) {
+    if (!modals.has(id)) {
+      const modal = document.getElementById(id);
+      if (modal) modals.set(id, modal);
+    }
+    return modals.get(id);
+  }
+
+  function openModal(id, trigger) {
+    const modal = getModal(id);
+    if (!modal) return;
+    lastTrigger = trigger;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    const focusable = modal.querySelector('input[name="score"]');
+    if (focusable) focusable.focus();
+  }
+
+  function closeModal(modal) {
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    if (lastTrigger) {
+      lastTrigger.focus();
+      lastTrigger = null;
+    }
+  }
+
+  openButtons.forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.dataset.modalOpen, btn));
+  });
+
+  document.addEventListener('click', event => {
+    const closeBtn = event.target.closest('[data-modal-close]');
+    if (!closeBtn) return;
+    const modal = closeBtn.closest('.modal');
+    if (modal) closeModal(modal);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const visibleModal = Array.from(modals.values()).find(m => !m.hidden);
+    if (visibleModal) {
+      event.preventDefault();
+      closeModal(visibleModal);
+    }
+  });
+});
+</script>
