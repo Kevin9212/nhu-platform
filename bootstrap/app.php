@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CheckBanned;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('api', HandleCors::class);
 
         // 👇 供 routes/web.php 使用的別名 middleware
-        $middleware->alias([
+        $middleware->alias([    
+            'admin' => AdminMiddle::class,
             'checkBanned' => CheckBanned::class,
         ]);
     })

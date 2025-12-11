@@ -3,6 +3,10 @@
 @section('content')
 <h1>使用者管理</h1>
 
+@if(session('success'))
+    <div style="color:#22c55e;">{{ session('success') }}</div>
+@endif
+
 <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
     <thead>
         <tr>
@@ -49,6 +53,10 @@
                     </button>
                 </form>
                 @endif
+                <form method="POST" action="{{ route('admin.users.destroy', $u) }}" style="display:inline;" onsubmit="return confirm('確定要刪除這個帳號嗎？');">
+                    @csrf @method('DELETE')
+                    <button type="submit" style="background:#b91c1c;color:white;padding:4px 8px;border:none;border-radius:4px;">刪除帳號</button>
+                </form>
             </td>
         </tr>
         @endforeach

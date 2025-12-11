@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\IdleItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller {
     // 商品列表
@@ -54,5 +55,18 @@ class ItemController extends Controller {
         $item->save();
 
         return redirect()->back()->with('success', '商品狀態已更新。');
+    }
+
+    // 商品強制刪除
+    public function destroy(IdleItem $item) {
+        $item->loadMissing('images');
+
+        foreach ($item->images as $image) {
+            Storage::disk('public')->delete($image->image_url);
+        }
+
+        $item->delete();
+
+        return back()->with('success', '商品已刪除');
     }
 }

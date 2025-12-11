@@ -5,6 +5,10 @@
 @section('content')
 <h1>商品管理</h1>
 
+@if(session('success'))
+    <div style="color:#22c55e;">{{ session('success') }}</div>
+@endif
+
 <form method="GET" action="{{ route('admin.items.index') }}" class="mb-3">
     <input type="text" name="keyword" placeholder="搜尋商品名稱..." value="{{ request('keyword') }}">
     <select name="status">
@@ -46,6 +50,10 @@
                 <form action="{{ route('admin.items.toggle', $item) }}" method="POST" style="display:inline;">
                     @csrf @method('PATCH')
                     <button type="submit">切換狀態</button>
+                </form>
+                <form action="{{ route('admin.items.destroy', $item) }}" method="POST" style="display:inline;" onsubmit="return confirm('確定刪除這件商品嗎？');">
+                    @csrf @method('DELETE')
+                    <button type="submit" style="background:#b91c1c;color:white;padding:4px 8px;border:none;border-radius:4px;">刪除</button>
                 </form>
             </td>
         </tr>

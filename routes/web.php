@@ -19,7 +19,10 @@ use App\Http\Controllers\Admin\DashboardController;    // 後台儀表板
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\NegotiationController as AdminNegotiationController;
 use App\Http\Controllers\Admin\ItemController as AdminItemController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\OrderController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -136,33 +139,42 @@ Route::middleware(['auth', 'checkBanned'])->group(function () {
     Route::get('/notifications/fetch-unread', [NotificationController::class, 'fetchUnread'])->name('notifications.fetch'); // 鈴鐺 AJAX
 });
 
-
 // --- 後台管理 ---
-Route::redirect('/admin', '/admin/dashboard');
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
         // 儀表板
+        Route::get('/', fn () => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // 使用者管理
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
         Route::patch('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
+        // 商品分類管理
+        Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
         // 商品管理
         Route::get('/items', [AdminItemController::class, 'index'])->name('items.index');
         Route::get('/items/{item}', [AdminItemController::class, 'show'])->name('items.show');
         Route::patch('/items/{item}/approve', [AdminItemController::class, 'approve'])->name('items.approve');
         Route::patch('/items/{item}/reject', [AdminItemController::class, 'reject'])->name('items.reject');
         Route::patch('/items/{item}/toggle-status', [AdminItemController::class, 'toggleStatus'])->name('items.toggle');
-
+        Route::delete('/items/{item}', [AdminItemController::class, 'destroy'])->name('items.destroy');
+        
         // 議價管理
         Route::get('/negotiations', [AdminNegotiationController::class, 'index'])->name('negotiations.index');
         Route::patch('/negotiations/{negotiation}/agree', [AdminNegotiationController::class, 'agree'])->name('negotiations.agree');
         Route::patch('/negotiations/{negotiation}/reject', [AdminNegotiationController::class, 'reject'])->name('negotiations.reject');
+        
+        // 訂單管理
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
     });
 
 // 前台議價（登入者）
