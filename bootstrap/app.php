@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 👇 供 routes/web.php 使用的別名 middleware
         $middleware->alias([    
-            'admin' => AdminMiddle::class,
+            'admin' => AdminMiddleware::class,
             'checkBanned' => CheckBanned::class,
         ]);
     })

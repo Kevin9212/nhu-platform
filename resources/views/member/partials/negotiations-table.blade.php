@@ -80,11 +80,18 @@
               <td data-label="更新時間">{{ $negotiation->updated_at->format('Y-m-d H:i') }}</td>
               <td data-label="訂單管理" class="text-end">
                   @if($negotiation->status === 'pending')
-                  <form action="{{ route('negotiations.agree', $negotiation) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-primary btn-sm">同意議價</button>
-                  </form>
+                  <div class="d-flex gap-2 justify-content-end">
+                    <form action="{{ route('negotiations.agree', $negotiation) }}" method="POST">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-primary btn-sm">同意議價</button>
+                    </form>
+                    <form action="{{ route('negotiations.reject', $negotiation) }}" method="POST">
+                      @csrf
+                      @method('PATCH')
+                      <button type="submit" class="btn btn-danger btn-sm">拒絕議價</button>
+                    </form>
+                  </div>
                 @else
                   <span class="text-muted">已處理</span>
                 @endif

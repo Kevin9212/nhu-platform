@@ -25,18 +25,24 @@
                 <td>{{ $negotiation->item->idle_name ?? '已刪除商品' }}</td>
                 <td>{{ $negotiation->buyer->nickname ?? '未知' }}</td>
                 <td>{{ $negotiation->seller->nickname ?? '未知' }}</td>
-                <td>NT$ {{ number_format($negotiation->proposed_price) }}</td>
+                <td>NT$ {{ number_format($negotiation->price) }}</td>
                 <td>
-                    @if($negotiation->status === 'open')
-                    <span class="badge bg-warning">進行中</span>
-                    @elseif($negotiation->status === 'agreed')
-                    <span class="badge bg-success">同意</span>
-                    @else
-                    <span class="badge bg-danger">拒絕</span>
-                    @endif
+                    @switch($negotiation->status)
+                        @case('pending')
+                            <span class="badge bg-warning">進行中</span>
+                            @break
+                        @case('accepted')
+                            <span class="badge bg-success">已同意</span>
+                            @break
+                        @case('rejected')
+                            <span class="badge bg-danger">已拒絕</span>
+                            @break
+                        @default
+                            <span class="badge bg-secondary">未知</span>
+                    @endswitch
                 </td>
                 <td>
-                    @if($negotiation->status === 'open')
+                    @if($negotiation->status === 'pending')
                     <form action="{{ route('admin.negotiations.agree', $negotiation) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('PATCH')

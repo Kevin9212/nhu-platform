@@ -18,7 +18,7 @@ class NegotiationController extends Controller {
 
     // 管理員同意
     public function agree(Negotiation $negotiation) {
-        $negotiation->update(['status' => 'agreed']);
+        $negotiation->update(['status' => 'accepted']);
         return back()->with('success', '管理員已同意此議價');
     }
 
