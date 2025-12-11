@@ -57,6 +57,7 @@ NHU.notify = (function () {
         const a = document.createElement('a');
         a.className = 'nhu-item' + (item.read ? '' : ' is-unread');
         a.href = item.url || '#';
+        
         a.innerHTML = `
           <div class="nhu-item-title">${escapeHtml(item.title || '')}</div>
           <div class="nhu-item-text">${escapeHtml(item.text  || '')}</div>

@@ -36,7 +36,8 @@ class NewMessageNotification extends Notification {
         return [
             'message' => \Illuminate\Support\Str::limit($this->message->content, 50),
             'sender_name' => $this->message->sender->nickname,
-            'url' => route('conversation.start', $this->message->sender_id),
+            // 直接引導使用者到會員中心 > 議價總覽
+            'url' => route('member.index') . '#negotiations',
         ];
     }
 }

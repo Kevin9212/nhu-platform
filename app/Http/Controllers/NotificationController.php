@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\NegotiationAcceptedNotification;
+use App\Notifications\NewOfferNotification;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
 
@@ -35,7 +37,7 @@ class NotificationController extends Controller
             $notification->markAsRead();
         }
 
-        return redirect()->to(data_get($notification?->data, 'url', route('notifications.index')));
+        return redirect()->to($this->resolveTargetUrl($notification));
     }
 
     /**
@@ -72,7 +74,7 @@ class NotificationController extends Controller
                     'id'    => $n->id, // UUID
                     'title' => (string)($data['title'] ?? ''),
                     'text'  => (string)$text,
-                    'url'   => (string)($data['url'] ?? route('notifications.index', [], false)),
+                    'url'   => $this->resolveTargetUrl($n),
                     'time'  => optional($n->created_at)?->diffForHumans() ?? '',
                     'read'  => !is_null($n->read_at),
                 ];
@@ -82,5 +84,21 @@ class NotificationController extends Controller
             'count' => $unreadCount,
             'items' => $latest,
         ]);
+    }
+    
+    /**
+     * 根據通知類型，統一導向會員中心對應分頁
+     */
+    protected function resolveTargetUrl(?DatabaseNotification $notification): string
+    {
+        if (!$notification) {
+            return route('notifications.index');
+        }
+
+        return match ($notification->type) {
+            NewOfferNotification::class => route('member.index') . '#negotiations',
+            NegotiationAcceptedNotification::class => route('member.index') . '#orders',
+            default => (string) data_get($notification->data, 'url', route('notifications.index')),
+        };
     }
 }

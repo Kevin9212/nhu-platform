@@ -143,7 +143,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   const links = document.querySelectorAll('.tab-link');
   const panes = {};
-
+  const defaultTab = 'profile';
+  
   links.forEach(link => {
     const tabName = link.dataset.tab;
     const pane = document.getElementById(`tab-${tabName}`);
@@ -156,7 +157,33 @@ document.addEventListener('DOMContentLoaded', () => {
     links.forEach(a => a.tabIndex = a.dataset.tab === target ? 0 : -1);
   }
 
+  function resolveTabFromHash(hashValue) {
+    const raw = (hashValue || '').replace(/^#/, '');
+    if (!raw) return null;
+
+    // 支援舊連結（例如 #order 或 #negotiation）對應到現有分頁
+    const aliases = {
+      order: 'orders',
+      orders: 'orders',
+      negotiation: 'negotiations',
+      negotiations: 'negotiations',
+    };
+
+    // 允許像 #orders-buyer 這類子區塊，優先取前綴對應的分頁
+    const [prefix] = raw.split('-');
+    const normalized = aliases[raw] || aliases[prefix];
+    if (normalized && panes[normalized]) return normalized;
+    if (panes[raw]) return raw;
+    if (panes[prefix]) return prefix;
+    return null;
+  }
+
   function show(tabId, pushHash = true, focusTab = true) {
+    // 安全防護：若分頁名稱不存在，回到預設個人資料，避免畫面被全數隱藏
+    if (!panes[tabId]) {
+      tabId = defaultTab;
+      pushHash = false;
+    }
     Object.values(panes).forEach(p => p && (p.hidden = true));
     panes[tabId] && (panes[tabId].hidden = false);
 
@@ -169,13 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateTabbable(tabId);
     localStorage.setItem('activeMemberTab', tabId);
-    // 只有在需要覆寫網址片段時才改變 URL，避免像 #orders-seller 這類子錨點被蓋掉
+    // 僅透過 hash 記住使用者點擊的分頁，避免在重新進入會員中心時仍保留舊的 tab 參數
+    // （預設應回到個人資料頁）。
     if (pushHash) {
       const url = new URL(window.location);
-      url.searchParams.set('tab', tabId);
-      url.hash = '#' + tabId;
+      url.search = '';
+      const currentHash = (window.location.hash || '').replace(/^#/, '');
+      const currentBase = resolveTabFromHash(window.location.hash);
+      // 若目前的 hash 已屬於同一分頁（例如 #orders-buyer），保留完整錨點以便定位子區塊
+      url.hash = currentBase === tabId && currentHash ? '#' + currentHash : '#' + tabId;
       history.replaceState(null, '', url);
-    };
+    }
   }
 
   links.forEach(a => a.addEventListener('click', e => {
@@ -201,17 +232,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const getTabFromHash = () => {
+    const hash = (location.hash || '').slice(1);
+    return panes[hash] ? hash : null;
+  };
+
   window.addEventListener('hashchange', () => {
-    const name = (location.hash || '').slice(1);
-    if (name && panes[name]) show(name, false, false);
+    const name = getTabFromHash();
+    if (name) show(name, false, false);
   });
 
   const params = new URLSearchParams(location.search);
   const byQuery = params.get('tab');
-  const byHash = (location.hash || '').slice(1);
-  const initial = panes[byQuery]
-    ? byQuery
-    : (panes[byHash] ? byHash : 'profile');
+  const initial = getTabFromHash()
+    || (panes[byQuery] ? byQuery : null)
+    || 'profile';
   show(initial, false, false);
 });
   </script>
