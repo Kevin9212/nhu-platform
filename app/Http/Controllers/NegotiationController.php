@@ -9,6 +9,7 @@ use App\Models\Conversation;
 use App\Models\IdleItem;
 use App\Models\Order;
 use App\Models\Message;
+use Illuminate\Support\Str;
 use App\Notifications\NewOfferNotification;
 use App\Notifications\NegotiationAcceptedNotification;
 
@@ -87,7 +88,7 @@ class NegotiationController extends Controller
      * 賣家同意議價
      */
     public function agree(Negotiation $negotiation){
-    if (Auth::id() !== $negotiation->seller_id) {
+        if (Auth::id() !== $negotiation->seller_id) {
             return back()->with('error', '您沒有權限同意此議價');
         }
 
@@ -204,9 +205,19 @@ class NegotiationController extends Controller
                 $negotiation->price
             ));
         }
+        $fallbackUrl = route('member.index', ['tab' => 'orders']);
+        $previousUrl = url()->previous();
+        $appUrl = rtrim((string) config('app.url'), '/');
+        $safePrefixes = array_filter([$appUrl, url('/')]);
+
+        $redirectUrl = (! $previousUrl
+            || $previousUrl === url()->current()
+            || ! Str::startsWith($previousUrl, $safePrefixes))
+            ? $fallbackUrl
+            : $previousUrl;
 
         return redirect()
-            ->route('member.index', ['tab' => 'orders'])
+            ->to($redirectUrl)
             ->with('success', '已同意議價並建立訂單，請至訂單管理查看');
     }
 
