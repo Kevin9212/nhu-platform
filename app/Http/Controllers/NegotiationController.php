@@ -100,6 +100,49 @@ class NegotiationController extends Controller
         $item->idle_status = 3; // 交易中
         $item->save();
 
+        // 關閉同商品的其他議價並清楚告知原因
+        $otherNegotiations = Negotiation::where('idle_item_id', $item->id)
+            ->where('id', '!=', $negotiation->id)
+            ->where('status', 'pending')
+            ->get();
+
+        foreach ($otherNegotiations as $other) {
+            $other->status = 'rejected';
+            $other->save();
+
+            $otherConversation = Conversation::firstOrCreate([
+                'buyer_id'     => $other->buyer_id,
+                'seller_id'    => $other->seller_id,
+                'idle_item_id' => $item->id,
+            ]);
+
+            $reasonText = '❌ 此議價已結束：賣家已接受其他出價';
+
+            Message::create([
+                'conversation_id' => $otherConversation->id,
+                'sender_id'       => Auth::id(),
+                'idle_item_id'    => $item->id,
+                'msg_type'        => 'text',
+                'content'         => $reasonText,
+                'is_recalled'     => false,
+            ]);
+
+            Message::create([
+                'conversation_id' => $otherConversation->id,
+                'sender_id'       => Auth::id(),
+                'idle_item_id'    => $item->id,
+                'msg_type'        => 'order_summary',
+                'content'         => json_encode([
+                    'type'        => 'order_summary',
+                    'item_name'   => $item->idle_name,
+                    'item_price'  => $item->idle_price,
+                    'offer_price' => $other->price,
+                    'image'       => optional($item->images->first())->image_url,
+                    'status'      => 'rejected',
+                ], JSON_UNESCAPED_UNICODE),
+                'is_recalled'     => false,
+            ]);
+        }
         // 確保對話存在
         $conversation = Conversation::firstOrCreate([
             'buyer_id'     => $negotiation->buyer_id,

@@ -209,10 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
   const byQuery = params.get('tab');
   const byHash = (location.hash || '').slice(1);
-  const saved = localStorage.getItem('activeMemberTab');
   const initial = panes[byQuery]
     ? byQuery
-    : (panes[byHash] ? byHash : (panes[saved] ? saved : 'profile'));
+    : (panes[byHash] ? byHash : 'profile');
   show(initial, false, false);
 });
   </script>
