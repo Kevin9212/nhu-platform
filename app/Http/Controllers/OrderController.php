@@ -18,6 +18,7 @@ class OrderController extends Controller
         $orderPrice  = null;
         $idleItemId  = $request->input('idle_item_id');
         $negotiationId = $request->input('negotiation_id');
+        $negotiationStatus = null;
 
         if ($negotiationId) {
             $negotiation = Negotiation::find($negotiationId);
@@ -26,6 +27,7 @@ class OrderController extends Controller
                 $idleItemId = $negotiation->idle_item_id;
                 $orderPrice = (int) $negotiation->price;
             }
+            $negotiationStatus = $negotiation?->status;
         }
 
         if ($idleItemId) {
@@ -36,7 +38,12 @@ class OrderController extends Controller
             }
         }
 
-        return view('orders.create', compact('idleItem', 'orderPrice', 'negotiationId'));
+    return view('orders.create', compact(
+            'idleItem',
+            'orderPrice',
+            'negotiationId',
+            'negotiationStatus'
+        ));    
     }
 
     public function store(Request $request): RedirectResponse

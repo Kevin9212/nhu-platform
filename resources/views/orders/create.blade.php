@@ -4,6 +4,10 @@
 @section('title', '成立訂單')
 
 @section('content')
+@php
+  $negotiationId = $negotiationId ?? null;
+  $negotiationStatus = $negotiationStatus ?? null;
+@endphp
 <style>
   .order-section { max-width: 980px; margin: 0 auto; }
   .card { background: #fff; border: 1px solid #e6e6e6; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
@@ -21,7 +25,29 @@
   .summary { background: #f9fafb; border: 1px dashed #d1d5db; padding: 12px; border-radius: 10px; font-size: .95rem; }
   @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
 </style>
+<script>
+  // === 前端守門員：議價未被接受時直接返回議價總覽 ===
+  (() => {
+    const guard = {
+      id: @json($negotiationId),
+      status: @json($negotiationStatus),
+      overviewUrl: "{{ route('member.index', ['tab' => 'negotiations']) }}#negotiations",
+    };
 
+    if (!guard.id) return; // 非議價流程直接成立訂單
+
+    const isAccepted = guard.status === 'accepted';
+
+    if (isAccepted) return;
+
+    const message = guard.status
+      ? '此議價尚未由賣家接受，將為您返回議價總覽。'
+      : '找不到相關議價，請重新從議價流程進入。';
+
+    alert(message);
+    window.location.href = guard.overviewUrl;
+  })();
+</script>
 <div class="order-section">
   <form class="card" action="{{ route('orders.store') }}" method="POST" id="orderForm">
     @csrf
