@@ -90,11 +90,13 @@ class OrderController extends Controller
             $negotiation = Negotiation::find($validated['negotiation_id']);
 
             if (!$negotiation || auth()->id() !== $negotiation->buyer_id) {
-                return back()->with('error', '您沒有權限使用此議價成立訂單');
+                return back()->with('error', '您沒有權限使用此議價設定交易地點');
             }
+
             if ($negotiation->status !== 'accepted') {
                 return redirect()->to($overviewUrl)->with('error', '此議價尚未由賣家接受，請等待賣家回覆');
             }
+
             $validated['idle_item_id'] = $negotiation->idle_item_id;
             $validated['order_price']  = (int) $negotiation->price;
         }

@@ -70,7 +70,7 @@
             href="{{ route('orders.create', ['idle_item_id' => $item->id, 'order_price' => (int) $item->idle_price]) }}"
             class="btn success"
           >
-            成立訂單
+            交易地點
           </a>
         @endif
 
@@ -168,7 +168,7 @@
                   {{ $statusLabel }}
                 </span>
 
-                <a href="{{ route('seller.orders.show', $order) }}"
+                <a href="{{ route('seller.orders.index') }}"
                    class="btn btn-sm btn-outline-primary mini-order-btn">
                   管理訂單
                 </a>
@@ -201,7 +201,7 @@
   --accent:#698E7E;       /* 主要按鈕色 */
   --accent-hover:#587C6D; /* 按鈕 hover */
   --warn:#DA946B;         /* 橘色議價 */
-  --success:#7EA798;      /* 成立訂單綠 */
+  --success:#7EA798;      /* 交易地點綠 */
   --radius:14px;
   --shadow1:0 6px 18px rgba(0,0,0,.06);
   --shadow2:0 14px 28px rgba(0,0,0,.1);

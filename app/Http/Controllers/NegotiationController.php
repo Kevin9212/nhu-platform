@@ -91,7 +91,7 @@ class NegotiationController extends Controller
 
         return redirect()
             ->to($overviewUrl)
-            ->with('success', '已送出議價，請至議價總覽等待賣家接受後再成立訂單');
+            ->with('success', '已送出議價，請至議價總覽等待賣家接受後再設定交易地點');
     }
 
     /**
@@ -302,16 +302,17 @@ class NegotiationController extends Controller
         if ($negotiation->status !== 'accepted') {
             return redirect()
                 ->to($overviewUrl)
-                ->with('error', '此議價尚未由賣家接受，請等待賣家回覆後再成立訂單');
+                ->with('error', '此議價尚未由賣家接受，請等待賣家回覆後再設定交易地點');
         }
-        $createOrderUrl = route('orders.create', [
-            'idle_item_id'   => $item->id,
-            'order_price'    => $negotiation->price,
-            'negotiation_id' => $negotiation->id,
-        ]);
 
-        return redirect()
-            ->to($createOrderUrl)
-            ->with('success', '請選擇面交地點與時間後成立訂單');
+    $createOrderUrl = route('orders.create', [
+        'idle_item_id'   => $item->id,
+        'order_price'    => $negotiation->price,
+        'negotiation_id' => $negotiation->id,
+    ]);
+
+    return redirect()
+        ->to($createOrderUrl)
+        ->with('success', '請選擇面交地點與時間後設定交易地點');
     }
 }

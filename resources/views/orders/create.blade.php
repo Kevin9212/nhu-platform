@@ -34,7 +34,7 @@
       overviewUrl: "{{ route('member.index', ['tab' => 'negotiations']) }}#negotiations",
     };
 
-    if (!guard.id) return; // 非議價流程直接成立訂單
+    if (!guard.id) return; // 非議價流程直接設定交易地點
 
     const isAccepted = guard.status === 'accepted';
 
@@ -51,7 +51,7 @@
 <div class="order-section">
   <form class="card" action="{{ route('orders.store') }}" method="POST" id="orderForm">
     @csrf
-    <div class="card-header">成立訂單</div>
+    <div class="card-header">設定交易地點</div>
 
     <div class="card-body">
       {{-- 從網址 / 上一次送出帶進來，給 OrderController@store 驗證用 --}}
@@ -129,7 +129,7 @@
 
       <div style="height:16px"></div>
 
-      <button type="submit" class="btn-primary" id="submitBtn" disabled>成立訂單</button>
+      <button type="submit" class="btn-primary" id="submitBtn" disabled>設定交易地點</button>
     </div>
   </form>
 </div>
