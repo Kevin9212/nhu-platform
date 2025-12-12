@@ -23,10 +23,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 如果根本沒有 pane，就不做事
     if (Object.keys(panes).length === 0) return;
+    const orderGuard = window.orderAccessGuard || {};
 
+    function canEnterOrders(targetTab) {
+        if (targetTab !== 'orders') return true;
+        if (orderGuard.hasAcceptedNegotiation) return true;
+
+        const fallbackTab = orderGuard.redirectTab || 'negotiations';
+        const notice = orderGuard.message
+            || '此議價尚未由賣家接受，請先回到議價總覽。';
+
+        alert(notice);
+        if (panes[fallbackTab]) {
+            show(fallbackTab, true);
+        }
+
+        return false;
+    }
     function show(tab, pushHash = true) {
         if (!panes[tab]) {
             // 要切換到一個不存在的 tab，直接忽略
+            return;
+        }
+        if (!canEnterOrders(tab)) {
             return;
         }
 

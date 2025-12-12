@@ -122,10 +122,7 @@ class OrderController extends Controller
             'meetup_location' => $meetup,
         ]);
 
-        if ($negotiation) {
-            $negotiation->delete();
-        }
-
+        
         if ($item = IdleItem::find($validated['idle_item_id'])) {
             $item->idle_status = 3; // 交易中
             $item->save();
@@ -139,7 +136,7 @@ class OrderController extends Controller
 
         return redirect()
             ->to($url)
-            ->with('success', '訂單已成立並紀錄面交資訊，請至訂單管理查看');
+            ->with('success', '訂單已紀錄面交資訊，請先回到議價總覽等待賣家同意後再進入訂單管理');
     }
 
     public function confirm(OrderModel $order): RedirectResponse

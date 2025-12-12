@@ -7,6 +7,11 @@
   @vite('resources/css/member.css')
 @endpush
 
+@php
+  $hasAcceptedNegotiation = $groupedNegotiations->flatten()->contains('status', 'accepted')
+    || $buyerNegotiations->contains('status', 'accepted');
+@endphp
+
 @section('content')
 <div class="container">
   <div class="member-container">
@@ -137,3 +142,13 @@
     </main>
   </div>
 </div>
+
+@push('scripts')
+  <script>
+    window.orderAccessGuard = {
+      hasAcceptedNegotiation: @json($hasAcceptedNegotiation),
+      redirectTab: 'negotiations',
+      message: '此議價尚未由賣家接受，將為您返回議價總覽。',
+    };
+  </script>
+@endpush
