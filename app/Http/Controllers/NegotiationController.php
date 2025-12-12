@@ -75,10 +75,14 @@ class NegotiationController extends Controller
         // 通知賣家
         $seller->notify(new NewOfferNotification($buyer, $item));
 
-        return redirect()
-            ->route('conversations.show', $conversation)
-            ->with('success', '已送出議價，請等待賣家回覆後再確認訂單');            
-        }
+         return redirect()
+            ->route('orders.create', [
+                'idle_item_id'   => $item->id,
+                'order_price'    => $negotiation->price,
+                'negotiation_id' => $negotiation->id,
+            ])
+            ->with('success', '已送出議價，請選擇面交地點與時間以成立訂單');
+    }
 
     /**
      * 賣家同意議價

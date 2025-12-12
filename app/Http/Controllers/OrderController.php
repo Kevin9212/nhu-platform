@@ -22,17 +22,9 @@ class OrderController extends Controller
         if ($negotiationId) {
             $negotiation = Negotiation::find($negotiationId);
 
-            if ($negotiation && auth()->id() === $negotiation->buyer_id && $negotiation->status === 'accepted') {
+            if ($negotiation && auth()->id() === $negotiation->buyer_id) {
                 $idleItemId = $negotiation->idle_item_id;
                 $orderPrice = (int) $negotiation->price;
-                } elseif ($negotiation && $negotiation->status !== 'accepted') {
-                return redirect()
-                    ->route('member.index', ['tab' => 'negotiations'])
-                    ->with('error', '賣家尚未接受此議價，無法成立訂單');
-            } else {
-                return redirect()
-                    ->route('member.index', ['tab' => 'negotiations'])
-                    ->with('error', '您沒有權限使用此議價建立訂單');
             }
         }
 
@@ -84,9 +76,7 @@ class OrderController extends Controller
             if (!$negotiation || auth()->id() !== $negotiation->buyer_id) {
                 return back()->with('error', '您沒有權限使用此議價成立訂單');
             }
-            if ($negotiation->status !== 'accepted') {
-                return back()->with('error', '賣家尚未接受此議價，無法成立訂單');
-            }
+
             $validated['idle_item_id'] = $negotiation->idle_item_id;
             $validated['order_price']  = (int) $negotiation->price;
         }
