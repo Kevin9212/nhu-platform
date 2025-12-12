@@ -27,10 +27,6 @@ class OrderController extends Controller
                 return redirect()->to($overviewUrl)->with('error', '找不到相關議價，請重新從議價流程進入');
             }
 
-            if ($negotiation->status !== 'accepted') {
-                return redirect()->to($overviewUrl)->with('error', '此議價尚未由賣家接受，請等待賣家回覆');
-            }
-
             if ($negotiation && auth()->id() === $negotiation->buyer_id) {
                 $idleItemId = $negotiation->idle_item_id;
                 $orderPrice = (int) $negotiation->price;
@@ -46,12 +42,12 @@ class OrderController extends Controller
             }
         }
 
-    return view('orders.create', compact(
+        return view('orders.create', compact(
             'idleItem',
             'orderPrice',
             'negotiationId',
             'negotiationStatus'
-        ));    
+        ));
     }
 
     public function store(Request $request): RedirectResponse
@@ -85,16 +81,11 @@ class OrderController extends Controller
         ]);
 
         $negotiation = null;
-        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
         if (!empty($validated['negotiation_id'])) {
             $negotiation = Negotiation::find($validated['negotiation_id']);
 
             if (!$negotiation || auth()->id() !== $negotiation->buyer_id) {
                 return back()->with('error', '您沒有權限使用此議價設定交易地點');
-            }
-
-            if ($negotiation->status !== 'accepted') {
-                return redirect()->to($overviewUrl)->with('error', '此議價尚未由賣家接受，請等待賣家回覆');
             }
 
             $validated['idle_item_id'] = $negotiation->idle_item_id;
@@ -127,16 +118,11 @@ class OrderController extends Controller
             $item->idle_status = 3; // 交易中
             $item->save();
         }
-
-        // 4. 成功後導回會員中心：
-        //    若來自議價流程，返回議價總覽；否則回到訂單管理
-        $url = $negotiation
-            ? route('member.index', ['tab' => 'negotiations']) . '#negotiations'
-            : route('member.index', ['tab' => 'orders']) . '#orders-buyer';
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
 
         return redirect()
-            ->to($url)
-            ->with('success', '訂單已紀錄面交資訊，請先回到議價總覽等待賣家同意後再進入訂單管理');
+            ->to($overviewUrl)
+            ->with('success', '面交資訊已儲存，請回到議價總覽等待賣家同意後再進入訂單管理。');
     }
 
     public function confirm(OrderModel $order): RedirectResponse
@@ -148,6 +134,10 @@ class OrderController extends Controller
             abort(403, '您沒有權限確認這筆訂單');
         }
 
+        if (! $this->isOrderFromAcceptedNegotiation($order)) {
+            return $this->redirectToNegotiations()
+                ->with('error', '此議價尚未由賣家接受，請先回到議價總覽');
+        }
         if ($order->order_status === OrderModel::STATUS_CANCELLED) {
             return redirect()
                 ->route('member.index', ['tab' => 'orders'])
@@ -184,6 +174,11 @@ class OrderController extends Controller
             abort(403, '您沒有權限編輯這筆訂單');
         }
 
+        if (! $this->isOrderFromAcceptedNegotiation($order)) {
+            return $this->redirectToNegotiations()
+                ->with('error', '此議價尚未由賣家接受，請先回到議價總覽');
+        }
+
         if ($order->order_status !== OrderModel::STATUS_PENDING) {
             return redirect()
                 ->route('member.index', ['tab' => 'orders'])
@@ -217,39 +212,66 @@ class OrderController extends Controller
             ->with('success', '面交資訊已更新');
     }
     public function cancel(Request $request, OrderModel $order): RedirectResponse{
-    $userId = auth()->id();
-    $sellerId = optional($order->item)->user_id;
+        $userId = auth()->id();
+        $sellerId = optional($order->item)->user_id;
 
-    if ($userId !== $order->user_id && $userId !== $sellerId) {
-        abort(403, '您沒有權限取消這筆訂單');
-    }
-
-    if ($order->order_status === OrderModel::STATUS_SUCCESS) {
-        return redirect()
-            ->route('member.index', ['tab' => 'orders'])
-            ->with('error', '訂單已完成，無法取消');
-    }
-
-    if ($order->order_status === OrderModel::STATUS_CANCELLED) {
-        return redirect()
-            ->route('member.index', ['tab' => 'orders'])
-            ->with('success', '訂單已經處於取消狀態');
-    }
-
-    $order->order_status = OrderModel::STATUS_CANCELLED;
-    $order->cancel_reason = '使用者取消訂單';
-    $order->payment_status = false;
-    $order->save();
-
-    if ($item = $order->item) {
-        if ($item->idle_status === 3) {
-            $item->idle_status = 1; // 重新上架
-            $item->save();
+        if ($userId !== $order->user_id && $userId !== $sellerId) {
+            abort(403, '您沒有權限取消這筆訂單');
         }
+
+        if (! $this->isOrderFromAcceptedNegotiation($order)) {
+            return $this->redirectToNegotiations()
+                ->with('error', '此議價尚未由賣家接受，請先回到議價總覽');
+        }
+
+        if ($order->order_status === OrderModel::STATUS_SUCCESS) {
+            return redirect()
+                ->route('member.index', ['tab' => 'orders'])
+                ->with('error', '訂單已完成，無法取消');
+        }
+
+        if ($order->order_status === OrderModel::STATUS_CANCELLED) {
+            return redirect()
+                ->route('member.index', ['tab' => 'orders'])
+                ->with('success', '訂單已經處於取消狀態');
+        }
+
+        $order->order_status = OrderModel::STATUS_CANCELLED;
+        $order->cancel_reason = '使用者取消訂單';
+        $order->payment_status = false;
+        $order->save();
+
+        if ($item = $order->item) {
+            if ($item->idle_status === 3) {
+                $item->idle_status = 1; // 重新上架
+                $item->save();
+            }
+        }
+
+        return redirect()
+            ->route('member.index', ['tab' => 'orders'])
+            ->with('success', '訂單已取消，買賣家資訊已更新');
     }
 
-    return redirect()
-        ->route('member.index', ['tab' => 'orders'])
-        ->with('success', '訂單已取消，買賣家資訊已更新');
+    private function isOrderFromAcceptedNegotiation(OrderModel $order): bool
+    {
+        $sellerId = optional($order->item)->user_id;
+
+        if (! $sellerId) {
+            return false;
+        }
+
+        return Negotiation::where('idle_item_id', $order->idle_item_id)
+            ->where('buyer_id', $order->user_id)
+            ->where('seller_id', $sellerId)
+            ->where('status', 'accepted')
+            ->exists();
+    }
+
+    private function redirectToNegotiations(): RedirectResponse
+    {
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
+
+        return redirect()->to($overviewUrl);
     }
 }

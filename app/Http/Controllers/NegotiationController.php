@@ -299,10 +299,10 @@ class NegotiationController extends Controller
         $item = IdleItem::findOrFail($negotiation->idle_item_id);
         $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
 
-        if ($negotiation->status !== 'accepted') {
+        if ($negotiation->status === 'rejected') {
             return redirect()
                 ->to($overviewUrl)
-                ->with('error', '此議價尚未由賣家接受，請等待賣家回覆後再設定交易地點');
+                ->with('error', '此議價已被拒絕，無法設定交易地點');
         }
 
     $createOrderUrl = route('orders.create', [

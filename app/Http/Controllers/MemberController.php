@@ -14,7 +14,7 @@ class MemberController extends Controller {
     /**
      * 顯示會員中心頁面。
      */
-    public function index() {
+    public function index(Request $request) {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
@@ -73,15 +73,32 @@ class MemberController extends Controller {
             ->whereIn('idle_item_id', $buyerNegotiations->pluck('idle_item_id'))
             ->get()
             ->keyBy(fn ($c) => $c->seller_id . '-' . $c->idle_item_id);
+        
+        $hasAcceptedNegotiation = $groupedNegotiations->flatten()->contains('status', 'accepted')
+            || $buyerNegotiations->contains('status', 'accepted');
 
+        if ($request->query('tab') === 'orders' && ! $hasAcceptedNegotiation) {
+            return redirect()
+                ->to(route('member.index', ['tab' => 'negotiations']) . '#negotiations')
+                ->with('error', '此議價尚未由賣家接受，請先回到議價總覽');
+        }
         // 購買與販售的訂單
         $buyerOrders = Order::with(['item.images', 'item.user', 'user'])
             ->where('user_id', $user->id)
+            ->whereHas('item.negotiations', function ($query) use ($user) {
+                $query->whereColumn('negotiations.buyer_id', 'orders.user_id')
+                    ->where('status', 'accepted');
+            })
             ->latest('updated_at')
             ->get();
 
         $sellerOrders = Order::with(['item.images', 'item.user', 'user'])
             ->whereHas('item', fn ($query) => $query->where('user_id', $user->id))
+            ->whereHas('item.negotiations', function ($query) use ($user) {
+                $query->where('seller_id', $user->id)
+                    ->whereColumn('negotiations.buyer_id', 'orders.user_id')
+                    ->where('status', 'accepted');
+            })
             ->latest('updated_at')
             ->get();
 
@@ -104,6 +121,7 @@ class MemberController extends Controller {
             'buyerOrders' => $buyerOrders,
             'sellerOrders' => $sellerOrders,
             'buyerRatings' => $buyerRatings,
+            'hasAcceptedNegotiation' => $hasAcceptedNegotiation,
         ]);
     }
 
