@@ -424,6 +424,11 @@ body {
 }
 .negotiation-item__name{ font-weight: 700; color: var(--home-primary); }
 .negotiation-item__price{ font-size: .9rem; color: #6b7280; }
+.negotiation-item__location{
+  margin-top: .25rem;
+  font-size: .9rem;
+  color: #4b5563;
+}
 .negotiation-badge{
   display: inline-flex;
   align-items: center;
@@ -436,4 +441,21 @@ body {
 .badge-pending{ background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
 .badge-accepted{ background: #ecfdf3; color: #15803d; border: 1px solid #bbf7d0; }
 .badge-rejected{ background: #fef2f2; color: #b91c1c; border: 1px solid #fecdd3; }
+.negotiation-actions{
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: flex-end;
+}
+.negotiation-actions .btn{
+  min-width: 120px;
+}
+@media (max-width: 768px){
+  .negotiation-actions{
+    align-items: stretch;
+  }
+  .negotiation-actions .btn{
+    width: 100%;
+  }
+}
 .btn-sm{ padding: .45rem .9rem; font-size: .9rem; }

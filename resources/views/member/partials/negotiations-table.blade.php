@@ -45,6 +45,11 @@
                 'accepted' => 'badge-accepted',
                 'rejected' => 'badge-rejected',
               ][$negotiation->status] ?? 'badge-pending';
+
+              $meetup     = $item?->meetup_location ?? [];
+              $meetupPlace = is_array($meetup)
+                ? ($meetup['address'] ?? $meetup['place'] ?? null)
+                : null;
             @endphp
             <tr>
               @if($loop->first)
@@ -55,6 +60,9 @@
                       <div class="negotiation-item__name">{{ $item?->idle_name ?? '商品已移除' }}</div>
                       @if($item)
                         <div class="negotiation-item__price">原價 NT$ {{ number_format($item->idle_price) }}</div>
+                         <div class="negotiation-item__location">
+                          面交地點：{{ $meetupPlace ?? '未設定' }}
+                        </div>
                       @endif
                     </div>
                   </div>
@@ -81,7 +89,7 @@
               <td data-label="更新時間">{{ $negotiation->updated_at->format('Y-m-d H:i') }}</td>
               <td data-label="訂單管理" class="text-end">
                   @if($negotiation->status === 'pending')
-                  <div class="d-flex gap-2 justify-content-end">
+                  <div class="negotiation-actions">
                     <form action="{{ route('negotiations.agree', $negotiation) }}" method="POST">
                       @csrf
                       @method('PATCH')
