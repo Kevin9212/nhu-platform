@@ -72,7 +72,7 @@
                         </div>
                         <div class="negotiation-item__location">
                           面交時間：{{ ($meetupDate && $meetupTime) ? ($meetupDate . ' ' . $meetupTime) : '未設定' }}
-                        </div>s
+                        </div>
                       @endif
                     </div>
                   </div>

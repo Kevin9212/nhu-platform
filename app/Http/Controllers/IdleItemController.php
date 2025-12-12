@@ -27,12 +27,12 @@ class IdleItemController extends Controller
     public function index()
     {
         $items = IdleItem::with(['images', 'seller'])
-            ->where('idle_status', 1)
+            ->whereIn('idle_status', [1, 2]) // 議價中的商品仍應可見
             ->latest()
             ->paginate(12);
 
         $randomItems = IdleItem::with(['images', 'seller'])
-            ->where('idle_status', 1)
+            ->whereIn('idle_status', [1, 2])
             ->inRandomOrder()
             ->take(4)
             ->get();

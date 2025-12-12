@@ -14,7 +14,7 @@ class ItemApiController extends Controller
     public function index()
     {
         $items = IdleItem::with(['images', 'category', 'seller'])
-            ->where('idle_status', 1)
+            ->whereIn('idle_status', [1, 2])
             ->latest('created_at')
             ->take(50)
             ->get()

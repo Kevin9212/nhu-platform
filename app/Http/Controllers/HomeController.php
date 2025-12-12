@@ -14,7 +14,7 @@ class HomeController extends Controller {
     public function index(): View {
         // 取得最新上架的商品（分頁）
         $items = IdleItem::with(['images', 'seller', 'category'])
-            ->where('idle_status', 1)
+            ->whereIn('idle_status', [1, 2]) // 上架中與議價中都應顯示於列表
             ->latest('created_at')  // 明確指定排序欄位
             ->paginate(12);
 
@@ -70,7 +70,7 @@ class HomeController extends Controller {
      */
     private function getRandomItems(int $limit = 8, array $excludeIds = []) {
         $query = IdleItem::with(['images', 'seller', 'category'])
-            ->where('idle_status', 1);
+            ->whereIn('idle_status', [1, 2]);
 
         // 排除指定的商品ID
         if (!empty($excludeIds)) {
@@ -80,13 +80,13 @@ class HomeController extends Controller {
         // 為了避免大資料表的效能問題，可以考慮使用更有效率的隨機查詢
         // 方法1: 簡單隨機（適合小資料表）
         // 若商品數量少於1000，會跳到方法2
-        if (IdleItem::where('idle_status', 1)->count() < 1000) {
+        if (IdleItem::whereIn('idle_status', [1, 2])->count() < 1000) {
             return $query->inRandomOrder()->limit($limit)->get();
         }
 
         // 方法2: 更有效率的隨機查詢（適合大資料表）
-        $maxId = IdleItem::where('idle_status', 1)->max('id');
-        $minId = IdleItem::where('idle_status', 1)->min('id');
+        $maxId = IdleItem::whereIn('idle_status', [1, 2])->max('id');
+        $minId = IdleItem::whereIn('idle_status', [1, 2])->min('id');
 
         if (!$maxId || !$minId) {
             return collect(); // 回傳空集合
@@ -99,7 +99,7 @@ class HomeController extends Controller {
             $randomId = rand($minId, $maxId);
             if (!in_array($randomId, $excludeIds) && !in_array($randomId, $randomIds)) {
                 $item = IdleItem::where('id', $randomId)
-                    ->where('idle_status', 1)
+                    ->whereIn('idle_status', [1, 2])
                     ->first();
 
                 if ($item) {
