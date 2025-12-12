@@ -35,6 +35,8 @@
               ? asset('storage/' . ltrim($coverPath, '/'))
               : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
             $rowspan = $itemNegotiations->count();
+            $itemOrders = ($sellerOrders ?? collect())
+              ->where('idle_item_id', optional($item)->id);
           @endphp
           @foreach($itemNegotiations as $negotiation)
             @php
@@ -46,10 +48,15 @@
                 'rejected' => 'badge-rejected',
               ][$negotiation->status] ?? 'badge-pending';
 
-              $meetup     = $item?->meetup_location ?? [];
+              $matchedOrder = $itemOrders
+                ->first(fn ($order) => $order->user_id === $negotiation->buyer_id);
+
+              $meetup = $matchedOrder?->meetup_location ?? $item?->meetup_location ?? [];
               $meetupPlace = is_array($meetup)
                 ? ($meetup['address'] ?? $meetup['place'] ?? null)
                 : null;
+              $meetupDate = is_array($meetup) ? ($meetup['date'] ?? null) : null;
+              $meetupTime = is_array($meetup) ? ($meetup['time'] ?? null) : null;
             @endphp
             <tr>
               @if($loop->first)
@@ -60,9 +67,12 @@
                       <div class="negotiation-item__name">{{ $item?->idle_name ?? '商品已移除' }}</div>
                       @if($item)
                         <div class="negotiation-item__price">原價 NT$ {{ number_format($item->idle_price) }}</div>
-                         <div class="negotiation-item__location">
+                        <div class="negotiation-item__location">
                           面交地點：{{ $meetupPlace ?? '未設定' }}
                         </div>
+                        <div class="negotiation-item__location">
+                          面交時間：{{ ($meetupDate && $meetupTime) ? ($meetupDate . ' ' . $meetupTime) : '未設定' }}
+                        </div>s
                       @endif
                     </div>
                   </div>

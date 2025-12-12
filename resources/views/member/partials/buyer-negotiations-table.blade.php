@@ -39,6 +39,16 @@
               'accepted' => 'badge-accepted',
               'rejected' => 'badge-rejected',
             ][$negotiation->status] ?? 'badge-pending';
+            $matchedOrder = ($buyerOrders ?? collect())
+              ->first(fn ($order) => $order->idle_item_id === $negotiation->idle_item_id
+                && optional($order->item)->user_id === $negotiation->seller_id);
+
+            $meetup = $matchedOrder?->meetup_location ?? $item?->meetup_location ?? [];
+            $meetupPlace = is_array($meetup)
+              ? ($meetup['address'] ?? $meetup['place'] ?? null)
+              : null;
+            $meetupDate = is_array($meetup) ? ($meetup['date'] ?? null) : null;
+            $meetupTime = is_array($meetup) ? ($meetup['time'] ?? null) : null;
           @endphp
           <tr>
             <td data-label="商品">
@@ -48,6 +58,12 @@
                   <div class="negotiation-item__name">{{ $item?->idle_name ?? '商品已移除' }}</div>
                   @if($item)
                     <div class="negotiation-item__price">原價 NT$ {{ number_format($item->idle_price) }}</div>
+                    <div class="negotiation-item__location">
+                      面交地點：{{ $meetupPlace ?? '未設定' }}
+                    </div>
+                    <div class="negotiation-item__location">
+                      面交時間：{{ ($meetupDate && $meetupTime) ? ($meetupDate . ' ' . $meetupTime) : '未設定' }}
+                    </div>
                   @endif
                 </div>
               </div>

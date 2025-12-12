@@ -131,8 +131,11 @@ class OrderController extends Controller
             $item->save();
         }
 
-        // 4. 成功後導回會員中心的「訂單管理 → 購買的訂單」區塊
-        $url = route('member.index', ['tab' => 'orders']) . '#orders-buyer';
+        // 4. 成功後導回會員中心：
+        //    若來自議價流程，返回議價總覽；否則回到訂單管理
+        $url = $negotiation
+            ? route('member.index', ['tab' => 'negotiations']) . '#negotiations'
+            : route('member.index', ['tab' => 'orders']) . '#orders-buyer';
 
         return redirect()
             ->to($url)
