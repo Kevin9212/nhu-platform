@@ -1,7 +1,7 @@
 {{-- resources/views/orders/create.blade.php --}}
 @extends('layouts.app')
 
-@section('title', '成立訂單')
+@section('title', '交易地點')
 
 @section('content')
 @php

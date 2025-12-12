@@ -29,14 +29,26 @@ class NegotiationController extends Controller
             'price' => ['required', 'numeric', 'min:1'],
         ]);
 
-        // 建立議價紀錄
-        $negotiation = Negotiation::create([
-            'idle_item_id' => $item->id,
-            'buyer_id'     => $buyer->id,
-            'seller_id'    => $seller->id,
-            'price'        => $validated['price'],
-            'status'       => 'pending',
-        ]);
+        // 若已有同買家/商品的待處理議價，直接更新避免重複紀錄
+        $negotiation = Negotiation::where('idle_item_id', $item->id)
+            ->where('buyer_id', $buyer->id)
+            ->where('seller_id', $seller->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($negotiation) {
+            $negotiation->update([
+                'price' => $validated['price'],
+            ]);
+        } else {
+            $negotiation = Negotiation::create([
+                'idle_item_id' => $item->id,
+                'buyer_id'     => $buyer->id,
+                'seller_id'    => $seller->id,
+                'price'        => $validated['price'],
+                'status'       => 'pending',
+            ]);
+        }
 
         // 確保聊天室存在（買家/賣家/商品 唯一組合）
         $conversation = Conversation::firstOrCreate([
@@ -75,13 +87,11 @@ class NegotiationController extends Controller
         // 通知賣家
         $seller->notify(new NewOfferNotification($buyer, $item));
 
-         return redirect()
-            ->route('orders.create', [
-                'idle_item_id'   => $item->id,
-                'order_price'    => $negotiation->price,
-                'negotiation_id' => $negotiation->id,
-            ])
-            ->with('success', '已送出議價，請選擇面交地點與時間以成立訂單');
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
+
+        return redirect()
+            ->to($overviewUrl)
+            ->with('success', '已送出議價，請至議價總覽等待賣家接受後再成立訂單');
     }
 
     /**
@@ -287,7 +297,13 @@ class NegotiationController extends Controller
         }
 
         $item = IdleItem::findOrFail($negotiation->idle_item_id);
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
 
+        if ($negotiation->status !== 'accepted') {
+            return redirect()
+                ->to($overviewUrl)
+                ->with('error', '此議價尚未由賣家接受，請等待賣家回覆後再成立訂單');
+        }
         $createOrderUrl = route('orders.create', [
             'idle_item_id'   => $item->id,
             'order_price'    => $negotiation->price,

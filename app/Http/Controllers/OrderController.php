@@ -19,9 +19,17 @@ class OrderController extends Controller
         $idleItemId  = $request->input('idle_item_id');
         $negotiationId = $request->input('negotiation_id');
         $negotiationStatus = null;
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
 
         if ($negotiationId) {
             $negotiation = Negotiation::find($negotiationId);
+            if (! $negotiation) {
+                return redirect()->to($overviewUrl)->with('error', '找不到相關議價，請重新從議價流程進入');
+            }
+
+            if ($negotiation->status !== 'accepted') {
+                return redirect()->to($overviewUrl)->with('error', '此議價尚未由賣家接受，請等待賣家回覆');
+            }
 
             if ($negotiation && auth()->id() === $negotiation->buyer_id) {
                 $idleItemId = $negotiation->idle_item_id;
@@ -77,13 +85,16 @@ class OrderController extends Controller
         ]);
 
         $negotiation = null;
+        $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
         if (!empty($validated['negotiation_id'])) {
             $negotiation = Negotiation::find($validated['negotiation_id']);
 
             if (!$negotiation || auth()->id() !== $negotiation->buyer_id) {
                 return back()->with('error', '您沒有權限使用此議價成立訂單');
             }
-
+            if ($negotiation->status !== 'accepted') {
+                return redirect()->to($overviewUrl)->with('error', '此議價尚未由賣家接受，請等待賣家回覆');
+            }
             $validated['idle_item_id'] = $negotiation->idle_item_id;
             $validated['order_price']  = (int) $negotiation->price;
         }
