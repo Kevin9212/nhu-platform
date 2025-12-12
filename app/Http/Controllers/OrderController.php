@@ -114,10 +114,7 @@ class OrderController extends Controller
         ]);
 
         
-        if ($item = IdleItem::find($validated['idle_item_id'])) {
-            $item->idle_status = 3; // 交易中
-            $item->save();
-        }
+        
         $overviewUrl = route('member.index', ['tab' => 'negotiations']) . '#negotiations';
 
         return redirect()

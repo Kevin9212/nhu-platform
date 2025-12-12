@@ -24,7 +24,7 @@ class SearchController extends Controller {
                 'seller',
                 'category',
             ])
-            ->where('idle_status', 1);
+            ->whereIn('idle_status', [1, 2]);
 
         if ($q !== '') {
             $itemsQuery->where(function ($w) use ($q) {
@@ -53,7 +53,7 @@ class SearchController extends Controller {
         // ★ 支援 q 與 term 兩種名稱
         $term = trim((string) $request->input('q', $request->input('term', '')));
 
-        $suggestions = IdleItem::where('idle_status', 1)
+        $suggestions = IdleItem::whereIn('idle_status', [1, 2])
             ->where('idle_name', 'LIKE', "%{$term}%")
             ->limit(5)
             ->pluck('idle_name')
