@@ -69,6 +69,12 @@ class MemberController extends Controller {
             ->latest('updated_at')
             ->get();
 
+        $buyerNegotiationOrders = Order::with(['item.images', 'item.user', 'user'])
+            ->where('user_id', $user->id)
+            ->whereIn('idle_item_id', $buyerNegotiations->pluck('idle_item_id'))
+            ->latest('updated_at')
+            ->get();
+
         $buyerConversationLookup = Conversation::where('buyer_id', $user->id)
             ->whereIn('idle_item_id', $buyerNegotiations->pluck('idle_item_id'))
             ->get()
@@ -89,6 +95,14 @@ class MemberController extends Controller {
                 $query->whereColumn('negotiations.buyer_id', 'orders.user_id')
                     ->where('status', 'accepted');
             })
+            ->latest('updated_at')
+            ->get();
+
+        $sellingItemIds = $groupedNegotiations->keys();
+
+        $sellerNegotiationOrders = Order::with(['item.images', 'item.user', 'user'])
+            ->whereHas('item', fn ($query) => $query->where('user_id', $user->id))
+            ->whereIn('idle_item_id', $sellingItemIds)
             ->latest('updated_at')
             ->get();
 
@@ -118,7 +132,9 @@ class MemberController extends Controller {
             'conversationLookup' => $conversationLookup,
             'buyerNegotiations' => $buyerNegotiations,
             'buyerConversationLookup' => $buyerConversationLookup,
+            'buyerNegotiationOrders' => $buyerNegotiationOrders,
             'buyerOrders' => $buyerOrders,
+            'sellerNegotiationOrders' => $sellerNegotiationOrders,
             'sellerOrders' => $sellerOrders,
             'buyerRatings' => $buyerRatings,
             'hasAcceptedNegotiation' => $hasAcceptedNegotiation,

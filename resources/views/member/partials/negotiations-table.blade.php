@@ -35,7 +35,7 @@
               ? asset('storage/' . ltrim($coverPath, '/'))
               : 'https://placehold.co/80x80/EFEFEF/AAAAAA&text=無圖片';
             $rowspan = $itemNegotiations->count();
-            $itemOrders = ($sellerOrders ?? collect())
+            $itemOrders = ($sellerNegotiationOrders ?? collect())
               ->where('idle_item_id', optional($item)->id);
           @endphp
           @foreach($itemNegotiations as $negotiation)

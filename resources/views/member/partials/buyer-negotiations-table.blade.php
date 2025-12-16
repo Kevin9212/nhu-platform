@@ -39,7 +39,7 @@
               'accepted' => 'badge-accepted',
               'rejected' => 'badge-rejected',
             ][$negotiation->status] ?? 'badge-pending';
-            $matchedOrder = ($buyerOrders ?? collect())
+            $matchedOrder = ($buyerNegotiationOrders ?? collect())
               ->first(fn ($order) => $order->idle_item_id === $negotiation->idle_item_id
                 && optional($order->item)->user_id === $negotiation->seller_id);
 
